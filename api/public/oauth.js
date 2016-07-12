@@ -27,7 +27,7 @@ router.route('/stripe_connect/callback')
             if(err)
               return res.status(400).send({error: err});
 
-            res.status(200).redirect('http://localhost:3000/dashboard/plans');
+            res.status(200).redirect('/dashboard/plans');
           });
         });
     });
