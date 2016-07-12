@@ -1,0 +1,27 @@
+div.container-fluid.login-container.login-page(style='background-color: inherit; padding-top: 30px;')
+  div.row
+    div.col-sm-8.col-sm-offset-2.text-center
+      H2(style="color: #000000;") Add a New Plan
+      form.login-form.new-user
+        <!-- Errors container -->
+        div.errors-container
+        div.form-group
+          label.control-label(for="plan-name")
+          input#plan-name.form-control.input-dark.input-lg(name="plan-name" placeholder="Give your plan a name", autofocus="true", ng-model="plan.name")
+        div.form-group
+          label.control-label(for="description")
+          input#description.form-control.input-dark.input-lg(placeholder="Describe your plan", ng-model="plan.description")
+        div.form-group
+          label.control-label(for="billing-interval")
+          input#billing-interval.form-control.input-dark.input-lg(placeholder="How often do you bill your custers?", ng-model="plan.interval")
+        div.form-group
+          label.control-label(for="billing-amount")
+          input#billing-amount.form-control.input-dark.input-lg(placeholder="How much does a subscription cost", ng-model="plan.amount")
+        div.form-group
+          label.control-label(for="free-trial-period")
+          input#billing-amount.form-control.input-dark.input-lg(placeholder="How many free trial days?", ng-model="plan.trial_period_days")
+        div.form-group
+          label.control-label(for="terms-and-conditions")
+          input#terms-and-conditions.form-control.input-dark.input-lg(placeholder="Additional terms and conditions", ng-modal="plan.terms_of_service")
+        div.form-group
+          button.btn.btn-success.btn-block.text-center(ng-click="createPlanClicked()") Create Plan

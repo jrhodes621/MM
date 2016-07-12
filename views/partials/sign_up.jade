@@ -1,0 +1,31 @@
+div.contain-fluid.login-container.login-page(style="background-color: #edf0f5")
+  div.row
+    div.col-sm-6.col-sm-offset-3.text-center
+      a(href="../")
+        img(src="/images/logo-black.png", width="300", style="margin-bottom: 20px;")
+      form.login-form.new-user
+        <!-- Errors container -->
+        div.errors-container
+        div.form-group
+          label.control-label(name="first_name")
+          input.form-control.input-dark.input-lg(name="first_name", autofocus="true", placeholder="First Name", ng-model="user.first_name")
+        div.form-group
+          label.control-label(name="last_name")
+          input.form-control.input-dark.input-lg(name="last_name", autofocus="true", placeholder="Last Name", ng-model="user.last_name")
+        div.form-group
+          label.control-label(name="company_name")
+          input.form-control.input-dark.input-lg(name="company_name", autofocus="true", placeholder="Company Name", ng-model="user.company_name")
+        div.form-group
+          label.control-label(name="email")
+          input.form-control.input-dark.input-lg(name="email", autofocus="true", placeholder="you@example.com", ng-model="user.email_address")
+        div.form-group
+          label.control-label(name="password")
+          input.form-control.input-dark.input-lg(name="password", autofocus="true", placeholder="Password", ng-model="user.password")
+        div.form-group
+          label.control-label(name="password_confirmation")
+          input.form-control.input-dark.input-lg(name="password_confirmation", autofocus="true", autocomplete="off", placeholder="Confirm Password", ng-model="confirm_password")
+        div.form-group
+          button.btn.btn-success.btn-block.text-center(ng-click="signUpClicked()") Sign up
+        div.login-footer
+          .link-to(style="display: block;")
+            a(href="sign_in") Sign in

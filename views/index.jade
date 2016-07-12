@@ -1,0 +1,117 @@
+extends layout
+
+block content
+  div.homepage
+    header(role="banner")
+      nav(role="primary")
+        a.login(href="/users/sign_in") Login
+        a.logo(href="/")
+          img(src="images/logo-white.png")
+      .pitch
+        h1 Get paid automatically
+        h2 Stop chasing invoices. <br />Start Getting paid. <br />No code required.
+      .calls-to-action
+        a(data-remodal-target="modal", href="#modal") Get Started for Free
+    section.overview
+      h1 Healthy cash flow in just a click
+      .left-column
+        .grow
+          span.title Grow your business
+          p Get paid automatically. Your time is valuable, so stop chasing invoices. Convert your one-time customers into reliable income with recurring payments and watch your bank account grow.
+        .save-time
+          span.title Save time
+          p Give your customers control of their own plans so you can focus on building your business. MemberMoose lets your customers manage their own account so they can access invoices, update their payment information, and upgrade or downgrade plans between cycles.
+      .right-column
+        .paid-fster
+          span.title Get paid faster
+          p Give your customers multiple payment options. Request payments via text, email, or through embedded payment forms on your site. The more options you give your customers to pay, the faster you'll get paid!
+        .hassle-free
+          span.title Enjoy hassle-free transactions
+          p Take control of your transactions. Issue refunds, put memberships on hold, cancel payments, and send emails to your customers with ease. Managing transactions is easy and fun with MemberMoose.
+    section.how-it-works
+      .wrapper
+        h1 How it works
+        .block
+          span.title Easy setup
+          p Log in, make a payment plan, and request money from customers in minutes without leaving your MemberMoose dashboard.
+        .block
+          span.title No code required
+          p Not a programmer, but you want to take recurring payments?  Don't worry, MemberMoose is easy to use and requires no technical knowledge.
+        .block
+          span.title Quick and simple reports
+          p Need to know how much money you are making?  Get a quick snapshot of your business with simple reprts so you can learn more about your customers.
+    section.get-started
+      .left-column
+        .features
+          h2 Features
+          ul
+            li Unlimited customers
+            li Unlimited recurring subscriptions
+            li Unlimited invoices
+            li Unlimited emails
+            li Branded payment forms
+            li Excellent customer support
+            li Easy to use dashboard
+      .right-column
+        .start-your-trial
+          h2 Start your 30 Day Free Trial
+          ul
+            li $29.95/mo + transaction fees
+            li Credit Card Processing with Stripe
+            li 2.9% + 30¢ / transaction
+          img(alt="Cards we support (visa, mastercard, discover, amex)", src='/images/cards.png')
+          a.signup-button('data-remodal-target'='modal', href="#modal") Sign Up Now
+    footer.page-footer
+      span.title Say hello!
+      .social
+        a.facebook('href'='http://facebook.com/membermoose', target='_blank')
+          i.fa-facebook  
+        a.twitter('href'='http://twitter.com/membermoose', target='_blank')
+          i.fa-twitter  
+        a.mail('href'='http://membermoose.weebly.com/help.html', target='_blank')
+          i.fa-envelope  
+      span.copyright ©2015-2016 All Rights Reserved. MemberMoose® is a registered trademark.
+    main.remodal-bg
+      .remodal('data-remodal-id'='modal')
+        .moose-dialog
+          img.logo('src'='/images/logo.png')
+        form#get-started(ng-controller="FunnelController")
+          error-message.alert.alert-danger('role'='alert', "style"='display: none') Sorry, it looks like something went wrong! Please try again.
+          section.personal-name('data-id'='1', ng-class="{active: step == 1}")
+            header
+              h1 What is your name?
+            .group
+              label('for'='personal_name') Your Name
+              input#personal_name(autofocus='', name='personal_name', placeholder='Moose Anderson', required='', type='text' ng-model="user.name")
+            footer
+              button.continue(ng-click="nextClicked()")
+                Company Name
+                i.fa-arrow-right  
+          section.company-name(data-action="company", ng-class="{active: step == 2}")
+            header
+              h1 What is the name of your company?
+            .group
+              label('for'='company_name') Company Name
+              input#company_name(name='company_name', placeholder="Mooses 'R' Us", type='text', ng-model="user.company_name")
+            footer
+              button.previous
+                i.fa-arrow-left  
+                Your Name
+                button.continue(ng-click="nextClicked()")
+                  Email & Password
+                  i.fa-arrow-right  
+          section.email-and-password(data-action='account', ng-class="{active: step == 3}")
+            header
+              h1 What do you want your login details to be?
+            .multi-group
+              label('for'="email") Email
+              input#email(name="email", placeholder="email", type="email", ng-model="user.email_address")
+              label{:for => "password"} Password
+              input#password(name="password", placeholder="password", type="text", ng-model="user.password")
+            footer
+              button.previous
+                i.fa-arrow-left  
+                Company Name
+                button.continue(ng-click="nextClicked()")
+                  Complete Registration
+                  i.fa-arrow-right  

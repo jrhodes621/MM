@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  H1 Plans #{user.company_name} We Have #{plans.length} plans
+
+  div.container-fluid
+    div.row
+      each plan in plans
+        div.col-sm-12.col-md-4.col-md-offset-0
+          div.thumbnail.card
+            h3 #{plan.name}
+            span $#{(plan.amount/100).toFixed(2)}/#{plan.interval}
+            div
+              button.btn.btn-primary.btn-default Subscribe

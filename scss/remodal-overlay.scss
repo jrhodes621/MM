@@ -1,0 +1,190 @@
+.remodal-wrapper {
+  .wsite-placeholder {
+    color: #a9a9a9;
+  }
+  ::-webkit-input-placeholder {
+    color: #a9a9a9;
+  }
+  :-ms-input-laceholder {
+    color: #a9a9a9;
+  }
+  ::-moz-placeholder {
+    color: #a9a9a9;
+  }
+  :-moz-placeholder {
+    color: #a9a9a9;
+  }
+  main {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .error {
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  em.error {
+    font-style: normal;
+    color: red;
+    display: inline-block;
+    border-radius: 10px;
+    margin: 0 auto;
+  }
+
+  .moose-dialog {
+    position: absolute;
+    top: -150px;
+    left: 50%;
+    width: 100%;
+    margin-left: -50%;
+    z-index: 99999;
+  }
+
+  .overlay {
+    position: absolute; left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(#2A92E5, 0.65);
+    z-index: 1;
+    -webkit-filter: blur(1px);
+    -moz-filter: blur(1px);
+    -o-filter: blur(1px);
+    -ms-filter: blur(1px);
+    filter: blur(1px);
+  }
+
+  .modal {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    max-width: 699px;
+    min-width: 320px;
+    padding: 25px 0;
+
+    .content {
+      background: #fefefe;
+      padding: 15px;
+    }
+  }
+
+  .remodal section {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+
+    h1 {
+      font-size: 1.5em;
+      color: #696969;
+    }
+  }
+
+  footer {
+    overflow: hidden;
+    clear: both;
+    margin-top: 50px;
+  }
+
+  // Forms & Inputs
+  label {
+    display: none;
+
+    &[for="hide-password"] {
+      display: block;
+    }
+  }
+
+  .group, .multi-group {
+    position: relative;
+  }
+
+  input, select, textarea {
+    text-align: center;
+    color: #888888;
+    font-size: 32px;
+    width: 100%;
+    background: none;
+    border: 2px solid transparent;
+    border-bottom: #ccc solid 2px;
+    margin: 0 0 5px;
+    padding: 18px 18px 10px;
+    outline: none;
+
+    &.error {
+      -webkit-animation-name: shake;
+      -webkit-animation-duration: 0.3s;
+      -webkit-transform-origin:50% 50%;
+      -webkit-animation-iteration-count: 1;
+      -webkit-animation-timing-function: linear;
+    }
+  }
+
+  %button {
+    line-height: 18px;
+    outline: red;
+    color: #ccc;
+    background: none;
+    border: transparent solid 2px;
+    border-radius: 24px;
+    padding: 13px 25px;
+  }
+
+  .previous {
+    @extend %button;
+    float: left;
+    padding-left: 0;
+  }
+
+  .continue {
+    @extend %button;
+    color: #8dc63f;
+    border-color: #8dc63f;
+    float: right;
+    padding-right: 15px;
+
+    i {
+      margin-left: 10px;
+    }
+
+    &.disabled {
+      color: #ccc;
+      border-color: #ccc;
+    }
+  }
+
+  .done {
+    @extend %button;
+    color: #8dc63f;
+    border-color: #8dc63f;
+    padding-right: 15px;
+
+    i {
+      margin-left: 10px;
+    }
+
+    &.disabled {
+      color: #ccc;
+      border-color: #ccc;
+    }
+  }
+
+  .input-group {
+    width: 100%;
+    overflow: hidden;
+
+    input {
+      width: 80%;
+      float: left;
+    }
+
+    .checkbox {
+      width: 20%;
+      float: right;
+    }
+  }
+}

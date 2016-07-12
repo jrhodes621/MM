@@ -1,0 +1,19 @@
+div.container
+  div.main-container
+    div.member-index
+      div.row
+        div#bull-card.col-md-3
+          include bull_card
+        div#member-grid.col-md-9
+          div.grid-header
+            h3 Your Plans
+            a.btn.btn-primary.btn-success.btn-lg.pull-right(href="/dashboard/plans/new") Add New Plan
+            hr
+          div.col-md-4.col-xs-6(ng-repeat="plan in plans")
+            div.bs-component
+              a.thumbnail(href="/dashboard/plans/{{ plan.id | encodeURIComponent }}")
+                div.card
+                  img.member-pic(src="https://secure.gravatar.com/avatar/430c5bbd759724c6aef89cf203fc2296.png?d=identicon&amp;r=G&amp;s=96")
+                  span.plan-name {{plan.name}}
+                  span.plan-cost {{plan.amount/100 | currency}}/{{plan.interval}}
+                  span.member-count 2 Members

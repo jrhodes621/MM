@@ -1,0 +1,21 @@
+div.container
+  div.main-container
+      div.row
+        div#bull-card.col-md-3
+          include bull_card
+        div#member-grid.col-md-9
+          div.grid-header
+            h3 Your Members
+            a.btn.btn-primary.btn-success.btn-lg.pull-right(href="members/new") Add New Member
+            hr
+          div.col-md-4.col-xs-6(ng-repeat="member in members")
+            div.bs-component
+              a.thumbnail(href="/dashboard/members/{{member.id  | encodeURIComponent }}")
+                div.card
+                  img.member-pic(src="https://secure.gravatar.com/avatar/430c5bbd759724c6aef89cf203fc2296.png?d=identicon&amp;r=G&amp;s=96")
+                  span.member-name {{member.email}}
+                  span.member-email {{member.email}}
+                  div.member-subscriptions.text-left
+                    span.plan-header Subscriptions:
+                    div(ng-repeat="subscription in member.subscriptions.data")
+                      span.plan-name {{subscription.plan.name}}

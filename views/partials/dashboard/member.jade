@@ -1,0 +1,55 @@
+div.container
+  div.main-container
+      div.row
+        div#bull-card.col-md-3
+          div.thumbnail
+            div.bs-component
+              div.card
+                img.member-pic(src="https://secure.gravatar.com/avatar/430c5bbd759724c6aef89cf203fc2296.png?d=identicon&amp;r=G&amp;s=96")
+                span.member-name {{member.email}}
+                span.member-email {{member.email}}
+                div.card-button-group
+                  button.btn.btn-primary.btn-sm.btn-block(type=button) Subscribe to Plan
+                  button.btn.btn-primary.btn-sm.btn-block(type=button) Edit Member
+                  button.btn.btn-primary.btn-sm.btn-block(type=button) Manage Cards
+        div#member-grid.col-md-9
+          div.panel(style="padding: 20px;")
+            h3 Subscriptions
+            div(ng-repeat="subscription in member.subscriptions.data")
+              div.clearfix
+                h4.plan-name.pull-left {{subscription.plan.name}}
+                div.button-list.pull-right
+                  button.btn.btn-primary.btn-sm(type=button) Change Plan
+                  button.btn.btn-cancel.btn-sm(type=button) Hold Subscription
+                  button.btn.btn-cancel.btn-sm(type=button) Cancel Subscription
+              hr
+              div.clearfix
+                H5.pull-left Payment Method
+                div.button-list.pull-right
+                  button.btn.btn-primary.btn-sm(type=button) Update Card
+                  button.btn.btn-primary.btn-sm(type=button) Change Card
+              dl
+                dd James Rhodes
+                dd Visa xxxx-1111
+                dd 07/12
+              div.clearfix
+                H5.pull-left Payment History
+                div.button-lift.pull-right
+                  button.btn.btn-primary.btn-sm(type=button) Next Invoice
+              table.table
+                thead
+                  td Payment Date
+                  td Amount
+                  td Fee
+                  td Payment Method
+                  td Status
+                  td
+                tr(ng-repeat="charge in charges")
+                  td {{(charge.created * 1000) | date}}
+                  td {{charge.amount/100 | currency}}
+                  td {{charge.fee | currency}}
+                  td {{charge.card.brand }} xxxx-{{charge.card.last4}}
+                  td Paid
+                  td.text-right
+                    button.btn.btn-primary.btn-sm Invoice
+              a(href="") View Complete Payment History

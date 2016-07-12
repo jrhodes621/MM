@@ -1,0 +1,10 @@
+div.bs-component
+  .thumbnail(href="members/1234")
+    div.card
+      img.member-pic(src="https://secure.gravatar.com/avatar/430c5bbd759724c6aef89cf203fc2296.png?d=identicon&amp;r=G&amp;s=96")
+      span.company-name{{user.account.company_name }}
+      span.user-name {{user.first_name }} {{ user.last_name}}
+      span.my-subscriptions-header My Subscriptions
+      div
+        a.connect-stripe(href="https://connect.stripe.com/oauth/authorize?response_type=code&state={{user._id}}&client_id=ca_6wlpdDDjF51A3zfKXMdz3BTdSz7iH9V3&scope=read_write")
+          span Connect With Stripe

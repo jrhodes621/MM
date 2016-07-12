@@ -1,0 +1,39 @@
+div.container
+  div.main-container
+      div.row
+        div#bull-card.col-md-3
+          div.thumbnail
+            div.bs-component
+              div.card
+                img.member-pic(src="https://secure.gravatar.com/avatar/430c5bbd759724c6aef89cf203fc2296.png?d=identicon&amp;r=G&amp;s=96")
+                span.member-name {{member.email}}
+                span.member-email {{member.email}}
+                div.card-button-group
+                  button.btn.btn-primary.btn-sm.btn-block(type=button) Share Plan
+                  button.btn.btn-primary.btn-sm.btn-block(type=button) Delete Plan
+        div#member-grid.col-md-9
+          div.panel(style="padding: 0px 20px 20px 20px;")
+            H2(style="color: #000000;") Update Plan
+            form.login-form.new-user
+              <!-- Errors container -->
+              div.errors-container
+              div.form-group
+                label.control-label(for="plan-name")
+                input#plan-name.form-control.input-dark.input-lg(name="plan-name" placeholder="Give your plan a name", autofocus="true", ng-model="plan.name")
+              div.form-group
+                label.control-label(for="description")
+                input#description.form-control.input-dark.input-lg(placeholder="Describe your plan", ng-model="plan.metadata.description")
+              div.form-group
+                label.control-label(for="billing-interval")
+                input#billing-interval.form-control.input-dark.input-lg(placeholder="How often do you bill your custers?", ng-model="plan.interval")
+              div.form-group
+                label.control-label(for="billing-amount")
+                input#billing-amount.form-control.input-dark.input-lg(placeholder="How much does a subscription cost", ng-model="plan.amount")
+              div.form-group
+                label.control-label(for="free-trial-period")
+                input#billing-amount.form-control.input-dark.input-lg(placeholder="How many free trial days?", ng-model="plan.trial_period_days")
+              div.form-group
+                label.control-label(for="terms-and-conditions")
+                input#terms-and-conditions.form-control.input-dark.input-lg(placeholder="Additional terms and conditions", ng-modal="plan.metadata.terms_of_service")
+              div.form-group
+                button.btn.btn-success.btn-block.text-center(ng-click="updatePlanClicked()") Update Plan

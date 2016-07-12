@@ -1,0 +1,38 @@
+doctype html
+html(ng-app="membermooseApp")
+  head
+    title= title
+    script(language='javascript', src='https://code.jquery.com/jquery-2.2.0.min.js')
+    script(language='javascript', src="/js/angular.js")
+    script(language='javascript', src="/js/angular-route.js")
+    script(language='javascript', src="/js/ngStorage.js")
+    script(language='javascript', src="/js/angular-sanitize.js")
+    script(language='javascript', src="/js/ui-bootstrap-tpls.js")
+    script(language='javascript', src='/js/remodal.js')
+    script(language='javascript', src="/js/app.js")
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous")
+    link(rel='stylesheet', href='/stylesheets/main.css')
+    link(rel='stylesheet', href='/stylesheets/xenon-components.css')
+    link(rel='stylesheet', href='/css/remodal.css')
+    link(rel='stylesheet', href='/css/remodal-default-theme.css')
+  body(style='background-color: #edf0f5;', ng-controller="DashboardController")
+    nav.navbar.navbar-inverse(role="navigation")
+      div.collapse.navbar-collapse
+        ul.nav.navbar-nav
+          li.pull-left
+            a.navbar-brand(href="/") MM
+          li
+            a(href="/dashboard/launch") Launch List
+          li
+            a(href="/dashboard/plans") Plans
+          li
+            a(href="/dashboard/members") Members
+          li
+            a(href="/dashboard/coupons") Coupons
+          li
+            a(href="/dashboard/reports") Reports
+          li
+            a(ng-click="logoutClicked()") Logout
+
+    block content
