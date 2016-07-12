@@ -6,5 +6,5 @@ div.bs-component
       span.user-name {{user.first_name }} {{ user.last_name}}
       span.my-subscriptions-header My Subscriptions
       div
-        a.connect-stripe(href="https://connect.stripe.com/oauth/authorize?response_type=code&state={{user._id}}&client_id=ca_6wlpdDDjF51A3zfKXMdz3BTdSz7iH9V3&scope=read_write")
+        a.connect-stripe(href="https://connect.stripe.com/oauth/authorize?response_type=code&state={{user._id}}&client_id=#{process.env.STRIPE_CONNECT_CLIENT_ID}&scope=read_write")
           span Connect With Stripe

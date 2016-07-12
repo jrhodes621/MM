@@ -17,10 +17,8 @@ router.route('/stripe_connect/callback')
       if(err)
         return res.status(400).send({error: "User Not Found."});
 
-        StripeOauthHelper.getAccessToken("sk_test_4WpPOcDVttWDL9zuwUzGIivr", code, function(err, response) {
+        StripeOauthHelper.getAccessToken(process.env.STRIPE_CONNECT_SECRET_KEY, code, function(err, response) {
           if(err) {
-            console.debug(err);
-
             return res.status(400).send({error: err});
           }
           user.stripe_connect = JSON.parse(response);
