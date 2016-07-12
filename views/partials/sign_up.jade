@@ -7,17 +7,17 @@ div.contain-fluid.login-container.login-page(style="background-color: #edf0f5")
         <!-- Errors container -->
         div.errors-container
         div.form-group
-          input.form-control.input-dark.input-lg(name="first_name", autofocus="true", placeholder="First Name", ng-model="user.first_name")
+          input.form-control.input-dark.input-lg(name="first_name", type="text", autofocus="true", placeholder="First Name", ng-model="user.first_name")
         div.form-group
-          input.form-control.input-dark.input-lg(name="last_name", autofocus="true", placeholder="Last Name", ng-model="user.last_name")
+          input.form-control.input-dark.input-lg(name="last_name", type="text", autofocus="true", placeholder="Last Name", ng-model="user.last_name")
         div.form-group
-          input.form-control.input-dark.input-lg(name="company_name", autofocus="true", placeholder="Company Name", ng-model="user.company_name")
+          input.form-control.input-dark.input-lg(name="company_name", type="text", autofocus="true", placeholder="Company Name", ng-model="user.company_name")
         div.form-group
-          input.form-control.input-dark.input-lg(name="email", autofocus="true", placeholder="you@example.com", ng-model="user.email_address")
+          input.form-control.input-dark.input-lg(name="email", type="text", autofocus="true", placeholder="you@example.com", ng-model="user.email_address")
         div.form-group
-          input.form-control.input-dark.input-lg(name="password", autofocus="true", placeholder="Password", ng-model="user.password")
+          input.form-control.input-dark.input-lg(name="password", type="password", autofocus="true", placeholder="Password", ng-model="user.password")
         div.form-group
-          input.form-control.input-dark.input-lg(name="password_confirmation", autofocus="true", autocomplete="off", placeholder="Confirm Password", ng-model="confirm_password")
+          input.form-control.input-dark.input-lg(name="password_confirmation", type="password", autofocus="true", autocomplete="off", placeholder="Confirm Password", ng-model="confirm_password")
         div.form-group
           button.btn.btn-success.btn-block.text-center(ng-click="signUpClicked()") Sign up
         div.login-footer

@@ -7,9 +7,9 @@ div.container-fluid.login-container.login-page(style='background-color: inherit;
         <!-- Errors container -->
         div.errors-container
         div.form-group
-          input.form-control.input-dark.input-lg(name="email", placeholder="you@example.com", autofocus="true", ng-model="credentials.email_address")
+          input.form-control.input-dark.input-lg(name="email", type="text" ,placeholder="you@example.com", autofocus="true", ng-model="credentials.email_address")
         div.form-group
-          input.form-control.input-dark.input-lg(name="password", placeholder="password", ng-model="credentials.password")
+          input.form-control.input-dark.input-lg(name="password", type="password", placeholder="password", ng-model="credentials.password")
         div.form-group.text-left
           input#remember_me(type="checkbox", name="remember_me")
           label(for="remember_me", style="color: #979889; font-weight: 400;") Remember Me
