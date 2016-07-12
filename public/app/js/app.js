@@ -115,12 +115,7 @@ angular.module("membermooseApp")
 //funnel.service.js
 angular.module("membermooseApp")
 .constant('ApiConfig', {
-  url: 'http://localhost:8080/api'
-});
-
-angular.module("membermooseApp")
-.filter('encodeURIComponent', function() {
-    return window.encodeURIComponent;
+  url: '/api'
 });
 
 //funnel.controller.js
@@ -300,6 +295,7 @@ angular.module("membermooseApp")
   init();
 });
 
+
 angular.module("membermooseApp")
 .controller("UpdatePlansController", function($scope, $localStorage, $window, PlansService, plan) {
   init = function() {
@@ -316,6 +312,11 @@ angular.module("membermooseApp")
   };
 
   init();
+});
+
+angular.module("membermooseApp")
+.filter('encodeURIComponent', function() {
+    return window.encodeURIComponent;
 });
 
 (function (angular) {
