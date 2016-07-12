@@ -2,7 +2,9 @@
 angular.module("membermooseApp")
 .controller("SignInController", function($scope, $window, $localStorage, auth, session) {
   init = function() {
-    $scope.credentails = {};
+    $scope.credentials = {
+      email_address: ""
+    };
   };
   $scope.signInClicked = function() {
     auth.logIn($scope.credentials).then(function(response) {
