@@ -14,7 +14,7 @@ var cors = require('cors');
 
 var User = require('./models/user');
 
-var WWWPORT = process.env.WWWPORT || 3000;
+var WWWPORT = process.env.PORT || 3000;
 
 // use it before all route definitions
 app.use(cors({origin: 'http://localhost:' + WWWPORT}));

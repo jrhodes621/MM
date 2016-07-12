@@ -46,7 +46,7 @@ var domain = process.env.DOMAIN || 'membermoose.local';
 app.use(subdomain({
   domain: domain,
   namespace: 'accounts',
-  www: 'false'
+  www: 'true'
 }));
 
 app.param('subdomain', function(req, res, next, subdomain) {
