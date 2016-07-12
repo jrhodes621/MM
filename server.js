@@ -14,17 +14,18 @@ var cors = require('cors');
 
 var User = require('./models/user');
 
+var WWWPORT = process.env.WWWPORT || 3000;
+
 // use it before all route definitions
-app.use(cors({origin: 'http://localhost:3000'}));
+app.use(cors({origin: 'http://localhost:' + WWWPORT}));
 app.use(bodyParser.json());
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
 mongoose.connect(process.env.MONGODB_URI); // connect to our database
 
-console.log(process.env.PORT);
 //Initialize the app.
-var server = app.listen(process.env.PORT || 8080, function () {
+var server = app.listen(process.env.APIPORT || 8080, function () {
   var port = server.address().port;
   console.log(port);
   console.log("Server now running on port", port);
