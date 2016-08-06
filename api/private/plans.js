@@ -56,7 +56,7 @@ router.route('')
       console.log("getting plan");
 
       var user = req.user;
-
+      console.log(user);
       if(!user.stripe_connect.access_token) {
         return res.send([]);
       }

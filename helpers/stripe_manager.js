@@ -1,7 +1,7 @@
 var request = require('request');
 
 module.exports = {
-  createSubscription: function(stripe_api_key, customer_id, plan_id, callback) {
+  subscribeCustomerToPlan: function(stripe_api_key, customer_id, plan_id, callback) {
     var stripe = require('stripe')(stripe_api_key);
 
     stripe.subscriptions.create({
@@ -11,6 +11,17 @@ module.exports = {
         callback(err, subscription);
       }
     );
+  },
+  createSubscription: function(stripe_api_key, token, plan_id, email, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.customers.create({
+      source: token, // obtained with Stripe.js
+      plan: plan_id,
+      email: email
+    }, function(err, customer) {
+      callback(err, customer);
+    });
   },
   cancelSubscription: function(stripe_api_key, subscription_id, callback) {
     var stripe = require('stripe')(stripe_api_key);

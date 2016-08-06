@@ -1,0 +1,46 @@
+div
+  div.container-fluid.login-container.login-page(style='padding-top: 20px; background-color: inherit;')
+    div.row
+      div.col-sm-8.col-sm-offset-2.text-center
+        a(href="../")
+          img(src="/images/logo-black.png", width="300", style="margin-bottom: 20px;")
+        form.login-form.new-user(stripe-form="handleStripe", style="margin: 0px 40px 60px 40px;")
+          .plan-info.text-left
+            div Complete the form below to subscribe to the "#{plan.name}" plan.  You will be charged $#{plan.amount/100} immediately and your card wilil be automatically charged every #{plan.interval}.  You'll be able to cancel your subscription any time.
+
+          <!-- Errors container -->
+          .errors-container
+          .form-group
+            .row
+              .col-md-6
+                input.form-control.input-dark.input-lg(name="first_name", type="text" ,placeholder="First Name", autofocus="true", ng-model="subscription.first_name")
+              .col-md-6
+                input.form-control.input-dark.input-lg(name="last_name", type="text", placeholder="Last Name", ng-model="subscription.last_name")
+          .form-group
+            input.form-control.input-dark.input-lg(name="last_name", type="text", placeholder="Email Address", ng-model="subscription.email_address")
+          .form-group
+            input.form-control.input-dark.input-lg(name="password", type="text", placeholder="Password", ng-model="subscription.password")
+          hr
+          .form-group
+            input.form-control.input-dark.input-lg(name="name", type="text", placeholder="Name on Card", ng-model="name")
+          .form-group
+            input.form-control.input-dark.input-lg(name="number", type="text", placeholder="Card Number", ng-model="number" payments-validate="card" payments-type-model="type")
+          .form-group
+            .row
+              .col-md-6
+                input.form-control.input-dark.input-lg(name="exp_month", type="text", placeholder="Expiration Month", ng-model="expMonth")
+              .col-md-6
+                input.form-control.input-dark.input-lg(name="exp_year", type="text" placeholder="Expiration Year", ng-model="expYear")
+          .form-group
+            .row
+              .col-md-3
+                input.form-control.input-dark.input-lg(name="cvv", type="text", placeholder="CVV", ng-model="cvc" payments-validate="cvc"  payments-type-model="type")
+              .col-md-9.text-left
+                span.note 3 or 4 digit number located on the back of the card
+          .form-group
+            button.btn.btn-success.btn-block.text-center(type="submit") Subscribe to Plan
+          div.login-footer
+            .link-to(style="display: block;")
+              a(href="sign_up") Sign in
+            .link-to(style="display: block;")
+              a(href="") Forgot your password?

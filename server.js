@@ -26,6 +26,8 @@ var app = express();
 var db;
 mongoose.connect(process.env.MONGODB_URI); // connect to our database
 
+app.options('*', cors());
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -36,13 +38,15 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, '/partials/users')));
 app.use('/js', express.static(__dirname + '/node_modules/remodal/dist'));
 app.use('/js', express.static(__dirname + '/node_modules/angular'));
 app.use('/js', express.static(__dirname + '/node_modules/angular-route'));
 app.use('/js', express.static(__dirname + '/node_modules/ngstorage'));
 app.use('/js', express.static(__dirname + '/node_modules/angular-sanitize'));
 app.use('/js', express.static(__dirname + '/node_modules/angular-ui-bootstrap/dist'));
+app.use('/js', express.static(__dirname + '/node_modules/angular-payments/lib'));
 app.use('/js', express.static(__dirname + '/public/app/js'));
 app.use('/css', express.static(__dirname + '/node_modules/remodal/dist'));
 
@@ -63,13 +67,26 @@ app.param('subdomain', function(req, res, next, subdomain) {
 
 app.use('/accounts/:subdomain', plansRoutes);
 app.use('/', routes);
+app.use('/partials/users/:name', function(req, res) {
+  console.log("loading user partial");
+
+  var name = req.params.name;
+  res.render('partials/users/' + name);
+});
 app.use('/partials/dashboard/:name', function(req, res) {
   var name = req.params.name;
   res.render('partials/dashboard/' + name);
 });
 app.use('/partials/:name', function(req, res) {
+  console.log(req);
+
   var name = req.params.name;
   res.render('partials/' + name);
+});
+app.use('/accounts/:subdomain/partials/public/:name', function(req, res) {
+
+  var name = req.params.name;
+  res.render('partials/public/' + name);
 });
 app.use('/users', users);
 app.use('/dashboard', dashboard);
@@ -86,13 +103,14 @@ function handleError(res, reason, message, code) {
   console.log("ERROR: " + reason + ": " + code);
   res.status(code || 500).send({"error": message});
 }
-app.use(handleError);
+//app.use(handleError);
 
 var PublicFunnelRoutes = require('./api/public/funnel');
 var PublicUserRoutes = require('./api/public/users');
 var PublicFunnelRoutes = require('./api/public/funnel');
 var SessionsRoutes = require('./api/public/sessions');
 var OauthCallbackRoutes = require('./api/public/oauth');
+var SubscribeRoutes = require('./api/public/subscribe');
 
 router.use('/funnel/step1', PublicFunnelRoutes);
 router.use('/users/auth', OauthCallbackRoutes);
@@ -153,5 +171,7 @@ router.use('/plans', PlansRoutes);
 
 // apply the routes to our application with the prefix /api
 app.use('/api', router);
+app.use('/accounts/:subdomain/api/subscribe', SubscribeRoutes);
+
 
 module.exports = app;

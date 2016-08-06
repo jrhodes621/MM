@@ -1,5 +1,5 @@
 //app.module.js
-angular.module("membermooseApp", ['ngRoute', 'ngStorage', 'ui.bootstrap', 'ngSanitize']);
+angular.module("membermooseApp", ['ngRoute', 'ngStorage', 'ui.bootstrap', 'ngSanitize', 'angularPayments']);
 
 (function (angular) {
 

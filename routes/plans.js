@@ -25,5 +25,30 @@ router.get('/', function(req, res, next) {
       });
     });
   });
+router.get('/subscribe/:plan_id', function(req, res) {
+    var plan_id = req.params.plan_id;
+    console.log("the plan is " + plan_id);
+
+    User.findOne({ 'subdomain': req.subdomain}, function(err, user) {
+      if(err)
+        return res.status(404).send(err);
+
+      if(!user.stripe_connect || !user.stripe_connect.access_token) {
+        return res.render('public/plans', { user: user, plans: [] });
+      }
+      var stripe_api_key = user.stripe_connect.access_token;
+
+      StripeManager.getPlan(stripe_api_key, plan_id, function(err, plan) {
+        if(err) {
+          console.log(err);
+
+          return res.status(400).send({error: err});
+        }
+        console.log(plan);
+
+        res.render('public/subscribe', { user: user, plan: plan });
+      });
+    });
+  });
 
 module.exports = router;

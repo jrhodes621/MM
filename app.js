@@ -7,13 +7,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var subdomain = require('wildcard-subdomains');
 
 var dashboard = require('./routes/dashboard');
 var routes = require('./routes/index');
 var plansRoutes = require('./routes/plans');
 var users = require('./routes/users');
 var partials = require('./routes/partials');
-var subdomain = require('wildcard-subdomains');
+
 var User = require('./models/user');
 
 var app = express();
@@ -33,6 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/users')));
 app.use('/js', express.static(__dirname + '/node_modules/remodal/dist'));
 app.use('/js', express.static(__dirname + '/node_modules/angular'));
 app.use('/js', express.static(__dirname + '/node_modules/angular-route'));
@@ -58,14 +60,19 @@ app.param('subdomain', function(req, res, next, subdomain) {
 });
 
 app.use('/accounts/:subdomain', plansRoutes);
+app.use('/accounts/:subdomain/subscribe/:plan_id', function(req, res) {
+  res.render('public/subscribe');
+});
+
 app.use('/', routes);
 app.use('/partials/dashboard/:name', function(req, res) {
   var name = req.params.name;
   res.render('partials/dashboard/' + name);
 });
-app.use('/partials/:name', function(req, res) {
+app.use('/partials/users/:name', function(req, res) {
+  console.log('getting user partial');
   var name = req.params.name;
-  res.render('partials/' + name);
+  res.render('partials/users/' + name);
 });
 app.use('/users', users);
 app.use('/dashboard', dashboard);

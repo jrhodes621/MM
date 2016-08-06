@@ -1,5 +1,5 @@
 //app.module.js
-angular.module("membermooseApp", ['ngRoute', 'ngStorage', 'ui.bootstrap', 'ngSanitize']);
+angular.module("membermooseApp", ['ngRoute', 'ngStorage', 'ui.bootstrap', 'ngSanitize', 'angularPayments']);
 
 (function (angular) {
 
@@ -49,12 +49,20 @@ angular.module("membermooseApp")
 
     $routeProvider
       .when("/users/sign_in", {
-        templateUrl: "/partials/sign_in.jade",
+        templateUrl: "/partials/users/sign_in.jade",
         controller: "SignInController",
       })
       .when("/users/sign_up", {
-        templateUrl: "/partials/sign_up.jade",
+        templateUrl: "/partials/users/sign_up.jade",
         controller: "SignUpController",
+      })
+      .when("/subscribe/:plan_id", {
+        controller: "SubscribeController",
+        resolve: {
+          plan: function($route, PlansService) {
+            return PlansService.getPlan($route.current.params.plan_id);
+          }
+        }
       })
       .when("/dashboard/account", {
         templateUrl: "/partials/dashboard/account.jade",
@@ -246,7 +254,9 @@ angular.module("membermooseApp")
 angular.module("membermooseApp")
 .controller("SignInController", function($scope, $window, $localStorage, auth, session) {
   init = function() {
-    $scope.credentails = {};
+    $scope.credentials = {
+      email_address: ""
+    };
   };
   $scope.signInClicked = function() {
     auth.logIn($scope.credentials).then(function(response) {
@@ -295,6 +305,48 @@ angular.module("membermooseApp")
   init();
 });
 
+//subscribe.controller.js
+angular.module("membermooseApp")
+.controller("SubscribeController", function($scope, $localStorage, $window, SubscribeService) {
+  init = function() {
+    $window.Stripe.setPublishableKey("pk_test_4WpPoyEVIDzw8SkqQ6w0kRSq");
+    $scope.plan_id = $window.plan_id;
+    $window.scope = $scope;
+  };
+
+  $scope.handleStripe = function(status, response) {
+    console.log(status);
+    console.log(response);
+    var plan_id = $scope.plan_id;
+    var first_name = $scope.first_name;
+    var last_name = $scope.last_name;
+    var email_address = $scope.email_address;
+    var password = $scope.password;
+
+    if(response.error) {
+      // there was an error. Fix it.
+    } else {
+      var token = response.id;
+
+      var data = {
+        token: token,
+        plan_id: plan_id,
+        first_name: first_name,
+        last_name: last_name,
+        email_address: email_address,
+        password: password
+      };
+
+      SubscribeService.createSubscription(data).then(function(response) {
+        console.log(response);
+
+        $window.location = "/dashboard/plans";
+      });
+    }
+  };
+
+  init();
+});
 
 angular.module("membermooseApp")
 .controller("UpdatePlansController", function($scope, $localStorage, $window, PlansService, plan) {
@@ -443,7 +495,7 @@ angular.module("membermooseApp")
       });
     };
   this.getPlan = function(plan_id) {
-    return $http.get(ApiConfig.url + "/plans/" + plan_id).
+    return $http.get(ApiConfig.url + "/plans/" + encodeURIComponent(plan_id)).
       then(function(response) {
         return response.data;
       });
@@ -517,6 +569,17 @@ angular.module("membermooseApp")
     .service('session', sessionService);
 
 })(angular);
+
+//subscribe.service.js
+angular.module("membermooseApp")
+.service("SubscribeService", function($http, ApiConfig) {
+  this.createSubscription = function(data) {
+    return $http.post(ApiConfig.url + "/subscribe", data).
+      then(function(response) {
+        return response;
+      });
+    };
+  });
 
 //subscriptions.service.js
 angular.module("membermooseApp")

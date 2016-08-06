@@ -8,7 +8,7 @@ angular.module("membermooseApp")
       });
     };
   this.getPlan = function(plan_id) {
-    return $http.get(ApiConfig.url + "/plans/" + plan_id).
+    return $http.get(ApiConfig.url + "/plans/" + encodeURIComponent(plan_id)).
       then(function(response) {
         return response.data;
       });

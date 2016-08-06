@@ -11,4 +11,4 @@ block content
             h3 #{plan.name}
             span $#{(plan.amount/100).toFixed(2)}/#{plan.interval}
             div
-              button.btn.btn-primary.btn-default Subscribe
+              a.btn.btn-primary.btn-default(href="/subscribe/#{plan.id }") Subscribe

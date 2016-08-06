@@ -7,12 +7,20 @@ angular.module("membermooseApp")
 
     $routeProvider
       .when("/users/sign_in", {
-        templateUrl: "/partials/sign_in.jade",
+        templateUrl: "/partials/users/sign_in.jade",
         controller: "SignInController",
       })
       .when("/users/sign_up", {
-        templateUrl: "/partials/sign_up.jade",
+        templateUrl: "/partials/users/sign_up.jade",
         controller: "SignUpController",
+      })
+      .when("/subscribe/:plan_id", {
+        controller: "SubscribeController",
+        resolve: {
+          plan: function($route, PlansService) {
+            return PlansService.getPlan($route.current.params.plan_id);
+          }
+        }
       })
       .when("/dashboard/account", {
         templateUrl: "/partials/dashboard/account.jade",
