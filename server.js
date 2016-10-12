@@ -51,6 +51,7 @@ app.use('/js', express.static(__dirname + '/public/app/js'));
 app.use('/css', express.static(__dirname + '/node_modules/remodal/dist'));
 
 var domain = process.env.DOMAIN || 'membermoose.local';
+console.log(domain);
 app.use(subdomain({
   domain: domain,
   namespace: 'accounts',
