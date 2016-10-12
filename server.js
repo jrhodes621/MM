@@ -52,19 +52,19 @@ app.use('/css', express.static(__dirname + '/node_modules/remodal/dist'));
 
 var domain = process.env.DOMAIN || 'membermoose.local';
 console.log(domain);
-app.use(subdomain({
-  domain: domain,
-  namespace: 'accounts',
-  www: 'true'
-}));
-
-app.param('subdomain', function(req, res, next, subdomain) {
-    // save name to the request
-    console.log("found subdomain: " + subdomain);
-    req.subdomain = subdomain;
-
-    next();
-});
+// app.use(subdomain({
+//   domain: domain,
+//   namespace: 'accounts',
+//   www: 'true'
+// }));
+//
+// app.param('subdomain', function(req, res, next, subdomain) {
+//     // save name to the request
+//     console.log("found subdomain: " + subdomain);
+//     req.subdomain = subdomain;
+//
+//     next();
+// });
 
 //app.use('/accounts/:subdomain', plansRoutes);
 app.use('/', routes);
