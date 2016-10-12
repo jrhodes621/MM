@@ -66,7 +66,7 @@ app.param('subdomain', function(req, res, next, subdomain) {
     next();
 });
 
-app.use('/accounts/:subdomain', plansRoutes);
+//app.use('/accounts/:subdomain', plansRoutes);
 app.use('/', routes);
 app.use('/partials/users/:name', function(req, res) {
   console.log("loading user partial");
