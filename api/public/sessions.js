@@ -21,15 +21,20 @@ router.route('/')
         res.send(err);
 
       if (!user) {
+        console.log("user not found");
+
         res.send({success: false, msg: 'Authentication failed. User not found.'});
       } else {
+        console.log("comparing passwords");
         // check if password matches
         user.comparePassword(req.body.password, function (err, isMatch) {
           if (isMatch && !err) {
             var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
-            res.status(200).json({success: true, token: token, user: user});
+            res.status(200).json({success: true, token: token, user_id: user._id });
           } else {
+            console.log("authentication failed");
+
             res.send({success: false, msg: 'Authentication failed. Wrong password.'});
           }
         });
