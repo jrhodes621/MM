@@ -13,7 +13,7 @@ router.route('')
 
     var user = req.user;
 
-    if(!user.stripe_connect && !user.stripe_connect.access_token) {
+    if(!user.stripe_connect || !user.stripe_connect.access_token) {
       return res.send([]);
     }
     var stripe_api_key = user.stripe_connect.access_token;

@@ -23,9 +23,7 @@ var UserSchema   = new Schema({
   company_name: {
     type: String
   },
-  avatar: {
-    type: String
-  },
+  avatar: {},
   roles: [String],
   subdomain: {
     type: String

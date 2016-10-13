@@ -5,6 +5,7 @@ var router = express.Router();              // get an instance of the express Ro
 var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken');
 var User = require('../../models/user');
+var UserHelper = require('../../helpers/user_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var Upload = require('s3-uploader');
 var multer  = require('multer');
@@ -20,7 +21,7 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage  });
 
 router.route('/')
-  .post(upload.single('file'), function(req, res) {
+  .post(upload.single('file'), function(req, res, next) {
     console.log("Create new user");
 
     var user = new User();
@@ -52,17 +53,30 @@ router.route('/')
 
         user.subscriptions.push(subscription);
 
-        user.save(function(err) {
-          if(err) {
-            console.log(err);
+        if(req.file) {
+          console.log("found an avatar")
 
-            return res.status(400).send(err);
-          }
+          UserHelper.uploadAvatar(user, req.file.path, function(avatar_images) {
+            user.avatar = avatar_images;
+            console.log(avatar_images);
+            
+            user.save(function(err) {
+              if(err) { return next(err); }
 
-          var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+              var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
-          res.status(200).json({success: true, token: token, user_id: user._id});
-        });
+              res.status(200).json({success: true, token: token, user_id: user._id});
+            });
+          });
+        } else {
+          user.save(function(err) {
+            if(err) { return next(err); }
+
+            var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+
+            res.status(200).json({success: true, token: token, user_id: user._id});
+          });
+        }
       });
     });
 
