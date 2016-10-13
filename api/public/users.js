@@ -61,7 +61,7 @@ router.route('/')
 
           var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
-          res.status(200).json({success: true, token: token, user: user});
+          res.status(200).json({success: true, token: token, user_id: user._id});
         });
       });
     });
