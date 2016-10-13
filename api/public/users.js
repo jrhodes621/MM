@@ -6,9 +6,21 @@ var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken');
 var User = require('../../models/user');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
+var Upload = require('s3-uploader');
+var multer  = require('multer');
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null,  file.originalname );
+  }
+});
+var upload = multer({ storage: storage  });
 
 router.route('/')
-  .post(function(req, res) {
+  .post(upload.single('file'), function(req, res) {
     console.log("Create new user");
 
     var user = new User();
