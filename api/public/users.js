@@ -38,18 +38,26 @@ router.route('/')
     user.status = "Pending";
 
     SubscriptionHelper.getFreePlan(function(err, plan) {
-      if(err)
+      if(err) {
+        console.log(err);
         return res.status(400).send(err);
+      }
 
       SubscriptionHelper.subscribeToPlan(user, plan, function(err, subscription) {
-        if(err)
+        if(err) {
+          console.log(err);
+
           return res.status(400).send(err);
+        }
 
         user.subscriptions.push(subscription);
 
         user.save(function(err) {
-          if(err)
+          if(err) {
+            console.log(err);
+
             return res.status(400).send(err);
+          }
 
           var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 

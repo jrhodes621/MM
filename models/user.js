@@ -15,12 +15,10 @@ var UserSchema   = new Schema({
     required: true
   },
   first_name: {
-    type: String,
-    required: true
+    type: String
   },
   last_name: {
-    type: String,
-    required: true
+    type: String
   },
   company_name: {
     type: String
