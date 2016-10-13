@@ -165,10 +165,12 @@ router.use(function(req, res, next) {
 var MembersRoutes = require('./api/private/members.js');
 var PlansRoutes = require('./api/private/plans.js');
 var PrivateFunnelRoutes = require('./api/private/funnel');
+var PrivateUserRoutes = require('./api/private/users.js')
 
 router.use('/funnel', PrivateFunnelRoutes);
 router.use('/members', MembersRoutes);
 router.use('/plans', PlansRoutes);
+router.user('/users/:user_id', PrivateUserRoutes)
 
 // apply the routes to our application with the prefix /api
 app.use('/api', router);
