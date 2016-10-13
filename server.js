@@ -162,12 +162,14 @@ router.use(function(req, res, next) {
   }
 });
 
+var MeRoutes = require('./api/private/me.js');
 var MembersRoutes = require('./api/private/members.js');
 var PlansRoutes = require('./api/private/plans.js');
 var PrivateFunnelRoutes = require('./api/private/funnel');
 var PrivateUserRoutes = require('./api/private/users.js')
 
 router.use('/funnel', PrivateFunnelRoutes);
+router.use('/me', MeRoutes);
 router.use('/members', MembersRoutes);
 router.use('/plans', PlansRoutes);
 router.use('/users/:user_id', PrivateUserRoutes)
