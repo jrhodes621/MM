@@ -30,11 +30,18 @@ var UserSchema   = new Schema({
   },
   plans: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan'
+    ref: 'Plan',
+    default: []
+  }],
+  members: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Member',
+    default: []
   }],
   subscriptions: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Subscription'
+    ref: 'Subscription',
+    default: []
   }],
   status: {
     type: String,

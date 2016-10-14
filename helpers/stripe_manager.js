@@ -33,6 +33,18 @@ module.exports = {
       }
     );
   },
+  listSubscriptions: function(stripe_api_key, plan_id, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.subscriptions.list(
+      { plan: plan_id,
+        limit: 100
+      },
+      function(err, subscriptions) {
+        callback(err, subscriptions);
+      }
+    );
+  },
   listPlans: function(stripe_api_key, callback) {
     var stripe = require('stripe')(stripe_api_key);
 

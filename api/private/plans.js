@@ -13,20 +13,7 @@ router.route('')
 
     var user = req.user;
 
-    if(!user.stripe_connect || !user.stripe_connect.access_token) {
-      return res.send([]);
-    }
-    var stripe_api_key = user.stripe_connect.access_token;
-
-    StripeManager.listPlans(stripe_api_key, function(err, plans) {
-      if(err) {
-        console.log(err);
-
-        return res.status(400).send({error: err});
-      }
-
-      res.send(plans);
-    });
+    res.send(user.plans);
   })
   .post(function(req, res) {
     console.log("creating a plan");

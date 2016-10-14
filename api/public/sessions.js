@@ -17,8 +17,11 @@ router.route('/')
     User.findOne({ email_address: req.body.email_address })
     .populate('subscriptions')
     .exec(function(err, user) {
-      if (err)
-        res.send(err);
+      if (err) {
+        console.log(err);
+
+        return res.status(400).send(err);
+      }
 
       if (!user) {
         console.log("user not found");

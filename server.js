@@ -95,7 +95,7 @@ app.use('/users', users);
 app.use('/dashboard', dashboard);
 
 //Initialize the api.
-var server = app.listen(process.env.PORT || 8080, function () {
+var server = app.listen(process.env.PORT || 8080  , function () {
   var port = server.address().port;
   console.log(port);
   console.log("Server now running on port", port);
@@ -138,6 +138,8 @@ router.use(function(req, res, next) {
 
         User.findById(user_id)
         .populate('account')
+        .populate('plans')
+        .populate('members')
         .populate('subscriptions')
         .exec(function(err, user) {
           if (err) {

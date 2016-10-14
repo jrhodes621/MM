@@ -13,22 +13,7 @@ router.route('')
 
     var user = req.user;
 
-    if(!user.stripe_connect || !user.stripe_connect.access_token) {
-      return res.send([]);
-    }
-    var stripe_api_key = user.stripe_connect.access_token;
-
-    StripeManager.listMembers(stripe_api_key, function(err, members) {
-      if(err) {
-        console.log(err);
-
-        return res.status(400).send({error: err});
-      }
-
-      console.log(members);
-
-      res.send(members);
-    });
+    res.send(user.members);
   });
 router.route('/:member_id')
   .get(function(req, res) {
