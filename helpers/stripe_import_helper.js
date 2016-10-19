@@ -1,4 +1,5 @@
 var request = require('request');
+var PaymentCard = require('../models/payment_card');
 var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
 var StripeManager = require('./stripe_manager');
@@ -40,6 +41,8 @@ module.exports = {
     stripe_api_key = user.stripe_connect.access_token;
 
     StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, function(err, subscriptions) {
+      console.log(subscriptions);
+
       var errors = [];
       var members = [];
 
@@ -66,17 +69,52 @@ module.exports = {
 
             var memberUser = new User();
             memberUser.email_address = customer.email;
+            memberUser.password = "test123";
             memberUser.memberships.push({
               reference_id: customer.id,
               company_name: user.company_name,
-              plan_name: plan.name,
+              plan_names: [plan.name],
               member_since: customer.created,
               subscription: subscription
             })
-            members.push(memberUser);
+            memberUser.status = "Active";
 
-            if(subscriptionsCount == 0) {
-              callback(errors, members);
+            var numberOfPaymentCards = customer.sources.data.length;
+
+            if(numberOfPaymentCards > 0) {
+              customer.sources.data.forEach(function(source) {
+                var paymentCard = new PaymentCard();
+
+                paymentCard.reference_id = source.id;
+                paymentCard.name = source.name;
+                paymentCard.brand = source.brand;
+                paymentCard.last4 = source.last4;
+                paymentCard.exp_month = source.exp_month;
+                paymentCard.exp_year = source.exp_year;
+
+                paymentCard.save(function(err) {
+                  numberOfPaymentCards -= 1;
+
+                  if(err) {
+                    console.log(err);
+                  } else {
+                    memberUser.payment_cards.push(paymentCard);
+                  }
+                  if(numberOfPaymentCards == 0) {
+                    members.push(memberUser);
+
+                    if(subscriptionsCount == 0) {
+                      callback(errors, members);
+                    }
+                  }
+                });
+              });
+            } else {
+              members.push(memberUser);
+
+              if(subscriptionsCount == 0) {
+                callback(errors, members);
+              }
             }
           }
         });

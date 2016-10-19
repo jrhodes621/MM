@@ -5,6 +5,7 @@ var router = express.Router();              // get an instance of the express Ro
 var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken');
 var User = require('../../models/user');
+var PaymentCard = require('../../models/payment_card');
 var Plan = require('../../models/plan');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeImportHelper = require('../../helpers/stripe_import_helper');
@@ -46,13 +47,15 @@ router.route('/import_plans')
     console.log("Import Members");
 
     var user = req.user;
-    var plansToImport = req.body.plans
+    var plansToImport = req.body.plans;
+    console.log(plansToImport);
 
     var numberOfPlans = plansToImport.length;
     plansToImport.forEach(function(planToImport) {
       Plan.findById(planToImport, function(err, plan) {
         numberOfPlans = numberOfPlans - 1;
         StripeImportHelper.importMembersFromPlan(user, plan, function(errors, members) {
+          console.log(members);
           var numberOfMembers = members.length;
 
           members.forEach(function(member) {
@@ -60,6 +63,7 @@ router.route('/import_plans')
               numberOfMembers = numberOfMembers - 1;
 
               if(err) {
+                console.log(err);
                 if(numberOfMembers == 0  && numberOfPlans == 0) {
                   user.save(function(err) {
                     if(err) {
@@ -72,8 +76,8 @@ router.route('/import_plans')
                   });
                 }
               } else {
-                member.subscriptions.forEach(function(subscription) {
-                  subscription.save(function(err) {
+                member.memberships.forEach(function(membership) {
+                  membership.subscription.save(function(err) {
                     if(err) {
                       console.log(err)
                     }
@@ -91,10 +95,10 @@ router.route('/import_plans')
                       });
                     }
                   })
-                })
+                });
               }
             });
-          })
+          });
         });
       });
     });
