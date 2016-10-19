@@ -72,53 +72,61 @@ router.route('/')
       } else {
         var stripe_api_key = plan.user.stripe_connect.access_token;
         StripeManager.createCustomer(stripe_api_key, user, plan, function(err, customer) {
-          var member = new Member();
-          member.email_address = customer.email;
-          member.reference_id = customer.id;
-          member.member_since = customer.created;
 
-          user.member = member;
-          plan.user.members.push(member);
+          var numberOfSubscriptions = customer.subscriptions.data.length;
+          customer.subscriptions.data.forEach(function(stripe_subscription) {
+            var subscription = new Subscription();
+            subscription.plan = plan;
+            subscription.reference_id = stripe_subscription.id;
+            subscription.subscription_created_at = stripe_subscription.created_at;
+            subscription.subscription_canceled_at = stripe_subscription.canceled_at;
+            subscription.trial_start = stripe_subscription.trial_start;
+            subscription.trial_end = stripe_subscription.trial_end;
+            subscription.status = stripe_subscription.status;
 
-          SubscriptionHelper.subscribeToPlan(user, plan, function(err, subscription) {
-            if(err) {
-              console.log(err);
+            user.memberships.push({
+              reference_id: customer.id,
+              company_name: plan.user.company_name,
+              plan_names: [plan.name],
+              member_since: customer.created,
+              subscription: subscription
+            })
+            user.status = "Active";
 
-              return res.status(400).send(err);
-            }
+            subscription.save(function(err) {
+              if(err) { return next(err); }
 
-            user.member.subscriptions.push(subscription);
+              plan.user.members.push(user);
 
-            if(req.file) {
+              if(req.file) {
+                UserHelper.uploadAvatar(user, req.file.path, function(avatar_images) {
+                  user.avatar = avatar_images;
 
-              UserHelper.uploadAvatar(user, req.file.path, function(avatar_images) {
-                user.avatar = avatar_images;
-
-                user.save(function(err) {
-                  if(err) { return next(err); }
-
-                  plan.user.save(function(err) {
+                  user.save(function(err) {
                     if(err) { return next(err); }
 
-                    var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+                    plan.user.save(function(err) {
+                      if(err) { return next(err); }
 
-                    res.status(200).json({success: true, token: token, user_id: user._id});
-                  })
-                });
-              });
-            } else {
-              UserHelper.saveUser(user, function(err) {
-                if(err) { return next(err); }
+                      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
-                plan.user.save(function(err) {
-                  if(err) { return next(err); }
+                      res.status(200).json({success: true, token: token, user_id: user._id});
+                    })
+                  });
+                } else {
+                  user.save(user, function(err) {
+                    if(err) { return next(err); }
 
-                  var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+                    plan.user.save(function(err) {
+                      if(err) { return next(err); }
 
-                  res.status(200).json({success: true, token: token, user_id: user._id});
-                })
-              });
-            }
+                      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+
+                      res.status(200).json({success: true, token: token, user_id: user._id});
+                    })
+                  });
+                }
+            });
           });
         });
       }
