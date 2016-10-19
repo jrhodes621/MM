@@ -7,6 +7,7 @@ var jwt    = require('jsonwebtoken');
 var User = require('../../models/user');
 var UserHelper = require('../../helpers/user_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
+var StripeManager = require('../../helpers/stripe_manager')
 var Upload = require('s3-uploader');
 var multer  = require('multer');
 
@@ -43,24 +44,15 @@ router.route('/')
         console.log(err);
         return res.status(400).send(err);
       }
-
-      SubscriptionHelper.subscribeToPlan(user, plan, function(err, subscription) {
-        if(err) {
-          console.log(err);
-
-          return res.status(400).send(err);
-        }
-
-        user.subscriptions.push(subscription);
+      if(!plan) {
+        console.log("Membermoose Free Plan Not Found, so we'll create a user with no subscriptions!");
 
         if(req.file) {
-          console.log("found an avatar")
 
           UserHelper.uploadAvatar(user, req.file.path, function(avatar_images) {
             user.avatar = avatar_images;
-            console.log(avatar_images);
-            
-            user.save(function(err) {
+
+            user.save(user, function(err) {
               if(err) { return next(err); }
 
               var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
@@ -77,9 +69,60 @@ router.route('/')
             res.status(200).json({success: true, token: token, user_id: user._id});
           });
         }
-      });
-    });
+      } else {
+        var stripe_api_key = plan.user.stripe_connect.access_token;
+        StripeManager.createCustomer(stripe_api_key, user, plan, function(err, customer) {
+          var member = new Member();
+          member.email_address = customer.email;
+          member.reference_id = customer.id;
+          member.member_since = customer.created;
 
+          user.member = member;
+          plan.user.members.push(member);
+
+          SubscriptionHelper.subscribeToPlan(user, plan, function(err, subscription) {
+            if(err) {
+              console.log(err);
+
+              return res.status(400).send(err);
+            }
+
+            user.member.subscriptions.push(subscription);
+
+            if(req.file) {
+
+              UserHelper.uploadAvatar(user, req.file.path, function(avatar_images) {
+                user.avatar = avatar_images;
+
+                user.save(function(err) {
+                  if(err) { return next(err); }
+
+                  plan.user.save(function(err) {
+                    if(err) { return next(err); }
+
+                    var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+
+                    res.status(200).json({success: true, token: token, user_id: user._id});
+                  })
+                });
+              });
+            } else {
+              UserHelper.saveUser(user, function(err) {
+                if(err) { return next(err); }
+
+                plan.user.save(function(err) {
+                  if(err) { return next(err); }
+
+                  var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+
+                  res.status(200).json({success: true, token: token, user_id: user._id});
+                })
+              });
+            }
+          });
+        });
+      }
+    })
   });
 
 module.exports = router;

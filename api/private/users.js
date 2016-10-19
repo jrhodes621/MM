@@ -72,19 +72,26 @@ router.route('/import_plans')
                   });
                 }
               } else {
-                user.members.push(member);
-
-                if(numberOfMembers == 0  && numberOfPlans == 0) {
-                  user.save(function(err) {
+                member.subscriptions.forEach(function(subscription) {
+                  subscription.save(function(err) {
                     if(err) {
                       console.log(err)
-
-                      return res.status(400).send(err);
                     }
+                    user.members.push(member);
 
-                    res.status(200).json(user);
-                  });
-                }
+                    if(numberOfMembers == 0  && numberOfPlans == 0) {
+                      user.save(function(err) {
+                        if(err) {
+                          console.log(err)
+
+                          return res.status(400).send(err);
+                        }
+
+                        res.status(200).json(user);
+                      });
+                    }
+                  })
+                })
               }
             });
           })

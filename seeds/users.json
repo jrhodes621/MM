@@ -1,0 +1,26 @@
+[
+  {
+    "_id": {
+        "$oid": "57852c2cc1b0dc03001ce80a"
+    },
+    "last_name": "Rhodes",
+    "first_name": "James",
+    "company_name": "MemberMoose",
+    "subdomain": "mm.membermoose.com",
+    "password": "$2a$10$Bz1e0B..VTJUVI0YHukhT.vnSBatAUdbtq8JIC13IktMVR.V1npWW",
+    "email_address": "james@membermoose.com",
+    "roles": [
+        "Bull"
+    ],
+    "status": "Active",
+    "stripe_connect": {
+        "scope": "read_write",
+        "stripe_user_id": "acct_14Nll74IZxLlgOpC",
+        "stripe_publishable_key": "pk_live_27DNd5kuY1AVUvAph1IB69zK",
+        "token_type": "bearer",
+        "refresh_token": "rt_7Ac00J3xRh0zIbkLpZzUm9fUoipBl7po7oWZ6wopWjtiLUvg",
+        "livemode": true,
+        "access_token": "sk_live_BY1w4H8Ggdndgfww5wLPmTjJ"
+    }
+  }
+]

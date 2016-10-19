@@ -5,7 +5,6 @@ module.exports = {
   subscribeToPlan: function(user, plan, callback) {
     var subscription = new Subscription();
 
-    subscription.user = user;
     subscription.plan = plan;
 
     subscription.save(function(err) {

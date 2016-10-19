@@ -15,7 +15,10 @@ var AccountSchema   = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Plan'
   },
-  plans: [Plan],
+  plans: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plan'
+  }],
   status: {
     type: String,
     required: true

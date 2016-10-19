@@ -1,8 +1,8 @@
 var request = require('request');
-var Member = require('../models/member');
 var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
-var StripeManager = require('./stripe_manager')
+var StripeManager = require('./stripe_manager');
+var User = require('../models/user');
 
 module.exports = {
   importFromStripe: function(user, callback) {
@@ -48,19 +48,33 @@ module.exports = {
       if(subscriptionsCount == 0) {
         callback(errors, members);
       }
-      subscriptions.data.forEach(function(subscription) {
+      subscriptions.data.forEach(function(stripe_subscription) {
         StripeManager.getMember(stripe_api_key, subscription.customer, function(err, customer) {
           subscriptionsCount = subscriptionsCount - 1;
 
           if(err) {
             console.log(err);
           } else {
-            var member = new Member();
-            member.email_address = customer.email;
-            member.reference_id = customer.id;
-            member.member_since = customer.created;
+            var subscription = new Subscription();
+            subscription.plan = plan;
+            subscription.reference_id = stripe_subscription.id;
+            subscription.subscription_created_at = stripe_subscription.created_at;
+            subscription.subscription_canceled_at = stripe_subscription.canceled_at;
+            subscription.trial_start = stripe_subscription.trial_start;
+            subscription.trial_end = stripe_subscription.trial_end;
+            subscription.status = stripe_subscription.status;
 
-            members.push(member);
+            var user = new User();
+            user.email_address = customer.email;
+            user.memberships.push({
+              reference_id: customer.id,
+              company_name: plan.user.company_name,
+              plan_name: plan.name,
+              member_since: customer.created,
+              subscription: subscription
+            })
+            members.push(user);
+
             if(subscriptionsCount == 0) {
               callback(errors, members);
             }

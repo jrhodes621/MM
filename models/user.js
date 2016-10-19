@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
+var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
 var bcrypt = require('bcrypt');
 
@@ -28,6 +29,9 @@ var UserSchema   = new Schema({
   subdomain: {
     type: String
   },
+  reference_id: {
+    type: String
+  },
   plans: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Plan',
@@ -35,13 +39,25 @@ var UserSchema   = new Schema({
   }],
   members: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Member',
+    ref: 'User',
     default: []
   }],
-  subscriptions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Subscription',
-    default: []
+  memberships: [{
+    reference_id: {
+      type: String
+    },
+    company_name: {
+      type: String
+    },
+    plan_names: [String],
+    member_since: {
+      type: Date
+    },
+    subscription: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Subscription',
+      default: []
+    }
   }],
   status: {
     type: String,

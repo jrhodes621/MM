@@ -6,6 +6,9 @@ var PlanSchema   = new Schema({
     type: String,
     required: true
   },
+  internal_id: {
+    type: String
+  },
   reference_id: {
     type: String,
     required: true

@@ -1,6 +1,17 @@
 var request = require('request');
 
 module.exports = {
+  createCustomer: function(stripe_api_key, user, plan, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.customers.create({
+      email: user.email_address,
+      description: 'Customer for ' + user.email_address,
+      plan: plan.reference_id
+    }, function(err, customer) {
+      callback(err, customer)
+    });
+  },
   subscribeCustomerToPlan: function(stripe_api_key, customer_id, plan_id, callback) {
     var stripe = require('stripe')(stripe_api_key);
 
