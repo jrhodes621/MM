@@ -1,7 +1,13 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
+var User = require('../models/user');
 
 var PlanSchema   = new Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: []
+  },
   name: {
     type: String,
     required: true

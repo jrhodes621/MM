@@ -21,6 +21,7 @@ module.exports = {
 
       stripePlans.data.forEach(function(stripePlan) {
         var plan = new Plan();
+        plan.user = user;
         plan.name = stripePlan.name;
         plan.reference_id = stripePlan.id;
         plan.amount = stripePlan.amount;
