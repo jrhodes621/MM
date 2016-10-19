@@ -16,7 +16,9 @@ module.exports = {
 
   },
   getFreePlan: function(callback) {
-    Plan.findOne({}, function(err, plan) {
+    Plan.findOne({reference_id: 'MM_FREE'}
+    .populate('user')
+    .exec(function(err, plan) {
       if(err)
         callback(err, null);
 
