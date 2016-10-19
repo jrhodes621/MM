@@ -6,6 +6,7 @@ var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken');
 var User = require('../../models/user');
 var UserHelper = require('../../helpers/user_helper');
+var Subscription = require('../../models/subscription');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeManager = require('../../helpers/stripe_manager')
 var Upload = require('s3-uploader');
