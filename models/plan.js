@@ -5,8 +5,7 @@ var User = require('../models/user');
 var PlanSchema   = new Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: []
+    ref: 'User'
   },
   name: {
     type: String,
