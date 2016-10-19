@@ -1,5 +1,0 @@
-{
-	"undefined": "mongodb://heroku_23vgzslk:rdpv4hg2ddfqnet23r6hbl8rij@ds021462.mlab.com:21462/heroku_23vgzslk",
-	"dev": "mongodb://heroku_23vgzslk:rdpv4hg2ddfqnet23r6hbl8rij@ds021462.mlab.com:21462/heroku_23vgzslk",
-	"prod": "mongodb://heroku_23vgzslk:rdpv4hg2ddfqnet23r6hbl8rij@ds021462.mlab.com:21462/heroku_23vgzslk"
-}
