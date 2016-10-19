@@ -49,7 +49,7 @@ module.exports = {
         callback(errors, members);
       }
       subscriptions.data.forEach(function(stripe_subscription) {
-        StripeManager.getMember(stripe_api_key, subscription.customer, function(err, customer) {
+        StripeManager.getMember(stripe_api_key, stripe_subscription.customer, function(err, customer) {
           subscriptionsCount = subscriptionsCount - 1;
 
           if(err) {
