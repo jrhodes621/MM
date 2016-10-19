@@ -113,19 +113,20 @@ router.route('/')
                       res.status(200).json({success: true, token: token, user_id: user._id});
                     })
                   });
-                } else {
-                  user.save(user, function(err) {
+                })
+              } else {
+                user.save(user, function(err) {
+                  if(err) { return next(err); }
+
+                  plan.user.save(function(err) {
                     if(err) { return next(err); }
 
-                    plan.user.save(function(err) {
-                      if(err) { return next(err); }
+                    var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
-                      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
-
-                      res.status(200).json({success: true, token: token, user_id: user._id});
-                    })
-                  });
-                }
+                    res.status(200).json({success: true, token: token, user_id: user._id});
+                  })
+                });
+              }
             });
           });
         });
