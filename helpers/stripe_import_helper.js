@@ -39,7 +39,7 @@ module.exports = {
   importMembersFromPlan: function(user, plan, callback) {
     stripe_api_key = user.stripe_connect.access_token;
 
-    StripeManager.listSubscriptions(stripe_api_key, plan.refernce_id, function(err, subscriptions) {
+    StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, function(err, subscriptions) {
       var errors = [];
       var members = [];
 
@@ -64,16 +64,16 @@ module.exports = {
             subscription.trial_end = stripe_subscription.trial_end;
             subscription.status = stripe_subscription.status;
 
-            var user = new User();
-            user.email_address = customer.email;
-            user.memberships.push({
+            var memberUser = new User();
+            memberUser.email_address = customer.email;
+            memberUser.memberships.push({
               reference_id: customer.id,
-              company_name: plan.user.company_name,
+              company_name: user.company_name,
               plan_name: plan.name,
               member_since: customer.created,
               subscription: subscription
             })
-            members.push(user);
+            members.push(memberUser);
 
             if(subscriptionsCount == 0) {
               callback(errors, members);
