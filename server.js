@@ -185,6 +185,7 @@ router.use('/funnel', PrivateFunnelRoutes);
 router.use('/me', MeRoutes);
 router.use('/members', MembersRoutes);
 router.use('/plans', PlansRoutes);
+router.use('/users', PrivateUserRoutes)
 router.use('/users/:user_id', PrivateUserRoutes)
 
 // apply the routes to our application with the prefix /api
