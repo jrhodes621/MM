@@ -15,8 +15,7 @@ var PlanSchema   = new Schema({
     type: String
   },
   reference_id: {
-    type: String,
-    required: true
+    type: String
   },
   amount: {
     type: Number,
