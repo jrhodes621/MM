@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
+var Account = require('../models/account');
 var Charge = require('../models/charge');
 var PaymentCard = require('../models/payment_card');
 var Plan = require('../models/plan');
@@ -23,14 +24,12 @@ var UserSchema   = new Schema({
   last_name: {
     type: String
   },
-  company_name: {
-    type: String
+  account: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Account'
   },
   avatar: {},
   roles: [String],
-  subdomain: {
-    type: String
-  },
   reference_id: {
     type: String
   },
@@ -71,11 +70,11 @@ var UserSchema   = new Schema({
     ref: 'Charge',
     default: []
   }],
+  roles: [String],
   status: {
     type: String,
     required: true
-  },
-  stripe_connect: mongoose.Schema.Types.Mixed,
+  }
 },
 {
     timestamps: true

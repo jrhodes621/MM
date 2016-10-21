@@ -11,19 +11,21 @@ var AccountSchema   = new Schema({
     type: String,
     required: true
   },
+  avatar: {},
   subscription: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Plan'
   },
   plans: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan'
+    ref: 'Plan',
+    default: []
   }],
   status: {
     type: String,
     required: true
   },
-  stripe_connect: mongoose.Schema.Types.Mixed,
+  stripe_connect: mongoose.Schema.Types.Mixed
 });
 
 module.exports = mongoose.model('Account', AccountSchema);

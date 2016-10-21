@@ -4,6 +4,7 @@ var express    = require('express');        // call express
 var router = express.Router();              // get an instance of the express Router
 var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken');
+var Account = require('../../models/account');
 var User = require('../../models/user');
 var UserHelper = require('../../helpers/user_helper');
 var Subscription = require('../../models/subscription');
@@ -40,10 +41,13 @@ router.route('/')
       user.password = req.body.password;
       user.first_name = req.body.first_name;
       user.last_name = req.body.last_name;
-      user.company_name = company_name;
       user.roles.push(role);
-      user.subdomain = subdomain;
       user.status = "Pending";
+
+      var account = new Account();
+      account.company_name = company_name;
+      account.subdomain = subdomain;
+      account.status = "Pending"
 
       SubscriptionHelper.getFreePlan(function(err, plan) {
         if(err) {
@@ -54,25 +58,34 @@ router.route('/')
           console.log("Membermoose Free Plan Not Found, so we'll create a user with no subscriptions!");
 
           if(req.file) {
-
             UserHelper.uploadAvatar(user, req.file.path, function(avatar_images) {
-              user.avatar = avatar_images;
+              account.avatar = avatar_images;
 
-              user.save(user, function(err) {
+              account.save(function(err) {
+                if(err) { return next(err); }
+
+                user.account = account;
+                user.save(function(err) {
+                  if(err) { return next(err); }
+
+                  var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+
+                  res.status(200).json({success: true, token: token, user_id: user._id});
+                });
+              });
+            });
+          } else {
+            account.save(function(err) {
+              if(err) { return next(err); }
+
+              user.account = account;
+              user.save(function(err) {
                 if(err) { return next(err); }
 
                 var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
                 res.status(200).json({success: true, token: token, user_id: user._id});
               });
-            });
-          } else {
-            user.save(function(err) {
-              if(err) { return next(err); }
-
-              var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
-
-              res.status(200).json({success: true, token: token, user_id: user._id});
             });
           }
         } else {
@@ -106,8 +119,30 @@ router.route('/')
 
                 if(req.file) {
                   UserHelper.uploadAvatar(user, req.file.path, function(avatar_images) {
-                    user.avatar = avatar_images;
+                    account.avatar = avatar_images;
 
+                    account.save(function(err) {
+                      if(err) { return next(err); }
+
+                      user.account = account;
+                      user.save(function(err) {
+                        if(err) { return next(err); }
+
+                        plan.user.save(function(err) {
+                          if(err) { return next(err); }
+
+                          var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+
+                          res.status(200).json({success: true, token: token, user_id: user._id});
+                        })
+                      });
+                    });
+                  })
+                } else {
+                  account.sav(function(err){
+                    if(err) { return next(err); }
+
+                    user.account = account;
                     user.save(function(err) {
                       if(err) { return next(err); }
 
@@ -119,18 +154,6 @@ router.route('/')
                         res.status(200).json({success: true, token: token, user_id: user._id});
                       })
                     });
-                  })
-                } else {
-                  user.save(user, function(err) {
-                    if(err) { return next(err); }
-
-                    plan.user.save(function(err) {
-                      if(err) { return next(err); }
-
-                      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
-
-                      res.status(200).json({success: true, token: token, user_id: user._id});
-                    })
                   });
                 }
               });
