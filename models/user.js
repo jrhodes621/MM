@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
+var Charge = require('../models/charge');
 var PaymentCard = require('../models/payment_card');
 var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
@@ -63,6 +64,11 @@ var UserSchema   = new Schema({
   payment_cards: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PaymentCard',
+    default: []
+  }],
+  charges: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Charge',
     default: []
   }],
   status: {

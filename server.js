@@ -106,6 +106,12 @@ function handleError(res, reason, message, code) {
   console.log("ERROR: " + reason + ": " + code);
   res.status(code || 500).send({"error": message});
 }
+function errorNotification(err, str, req) {
+  console.log("error notification: " + err)
+  // airbrake.notify(err, function(err, url) {
+  //   if (err) throw err;
+  // });
+}
 //app.use(handleError);
 
 var PublicFunnelRoutes = require('./api/public/funnel');
@@ -179,18 +185,25 @@ var MeRoutes = require('./api/private/me.js');
 var MembersRoutes = require('./api/private/members.js');
 var PlansRoutes = require('./api/private/plans.js');
 var PrivateFunnelRoutes = require('./api/private/funnel');
+var PrivateSubscriptionRoutes = require('./api/private/subscriptions')
 var PrivateUserRoutes = require('./api/private/users.js')
 
 router.use('/funnel', PrivateFunnelRoutes);
 router.use('/me', MeRoutes);
 router.use('/members', MembersRoutes);
 router.use('/plans', PlansRoutes);
+router.use('/subscriptions', PrivateSubscriptionRoutes);
 router.use('/users', PrivateUserRoutes)
 router.use('/users/:user_id', PrivateUserRoutes)
 
 // apply the routes to our application with the prefix /api
 app.use('/api', router);
 app.use('/accounts/:subdomain/api/subscribe', SubscribeRoutes);
+app.use(function(err, req, res, next) {
+  errorNotification(err, 'err', req);
+  //next(err);
+  res.status(500).send({"error": err});
 
+});
 
 module.exports = app;
