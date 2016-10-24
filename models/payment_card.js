@@ -24,6 +24,10 @@ var PaymentCardSchema   = new Schema({
   exp_year: {
     type: Number,
     required: true
+  },
+  status: {
+    type: String,
+    required: true
   }
 });
 

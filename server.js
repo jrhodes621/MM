@@ -160,9 +160,8 @@ router.use(function(req, res, next) {
           if (err) {
             return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
           } else {
-            req.user = user;
+            req.current_user = user;
 
-            console.log(req.user);
             next();
           }
         });
@@ -184,6 +183,7 @@ router.use(function(req, res, next) {
 var MeRoutes = require('./api/private/me.js');
 var MembersRoutes = require('./api/private/members.js');
 var PlansRoutes = require('./api/private/plans.js');
+var PaymentCardRoutes = require('./api/private/payment_cards.js');
 var PrivateFunnelRoutes = require('./api/private/funnel');
 var PrivateSubscriptionRoutes = require('./api/private/subscriptions')
 var PrivateUserRoutes = require('./api/private/users.js')
@@ -195,7 +195,23 @@ router.use('/plans', PlansRoutes);
 router.use('/subscriptions', PrivateSubscriptionRoutes);
 router.use('/users', PrivateUserRoutes)
 router.use('/users/:user_id', PrivateUserRoutes)
+router.use('/users/:user_id/payment_cards', PaymentCardRoutes)
 
+router.param('user_id', function (req, res, next, user_id) {
+  console.log("Getting User for " + user_id);
+
+  User.findById(user_id)
+  .exec(function(err, user) {
+    if(err) { return next(err); }
+
+    if(!user) {
+      return handleError(res, "User Not Found", "Use Not Found.", 404);
+    }
+    req.user = user;
+
+    return next();
+  });
+});
 // apply the routes to our application with the prefix /api
 app.use('/api', router);
 app.use('/accounts/:subdomain/api/subscribe', SubscribeRoutes);

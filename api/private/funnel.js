@@ -10,7 +10,7 @@ var SubscriptionHelper = require('../../helpers/subscription_helper');
 
 router.route('/step2')
   .post(function(req, res) {
-    var user = req.user;
+    var user = req.current_user;
 
     var account = new Account();
 
@@ -48,7 +48,7 @@ router.route('/step2')
   });
 router.route('/step3')
   .post(function(req, res) {
-    var user = req.user;
+    var user = req.current_user;
 
     var email_address = req.body.email_address;
     var password = req.body.password;

@@ -64,7 +64,7 @@ router.route('/connect_stripe')
   .post(function(req, res) {
     console.log("Connect Stripe");
 
-    var user = req.user;
+    var user = req.current_user;
     user.stripe_connect = req.body.stripe_connect
 
     StripeImportHelper.importFromStripe(user, function(errors, plans) {
@@ -96,7 +96,7 @@ router.route('/import_plans')
   .post(function(req, res) {
     console.log("Import Members");
 
-    var user = req.user;
+    var user = req.current_user;
     var plansToImport = req.body.plans;
     console.log(plansToImport);
 

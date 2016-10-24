@@ -12,14 +12,14 @@ router.route('')
   .get(function(req, res) {
     console.log("getting plans");
 
-    var user = req.user;
+    var user = req.current_user;
 
     res.send(user.plans);
   })
   .post(function(req, res, next) {
     console.log("creating a plan");
 
-    var user = req.user;
+    var user = req.current_user;
 
     var plan = new Plan();
     plan.user = user._id;
@@ -68,7 +68,7 @@ router.route('')
     .get(function(req, res) {
       console.log("getting plan");
 
-      var user = req.user;
+      var user = req.current_user;
       console.log(user);
       if(!user.stripe_connect.access_token) {
         return res.send([]);
@@ -88,7 +88,7 @@ router.route('')
     .put(function(req, res) {
       console.log("updating a plan");
 
-      var user = req.user;
+      var user = req.current_user;
 
       if(!user.stripe_connect.access_token) {
         return res.send([]);

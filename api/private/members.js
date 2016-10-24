@@ -11,15 +11,38 @@ router.route('')
   .get(function(req, res) {
     console.log("getting members");
 
-    var user = req.user;
+    var user = req.current_user;
 
     res.send(user.members);
+  })
+  .post(function(req, res, next) {
+    console.log("adding member");
+    var current_user = req.current_user;
+
+    var user = new User();
+    user.email_address = req.body.email_address;
+    user.password = "test123";
+    user.first_name = req.body.first_name;
+    user.last_name = req.body.last_name;
+    user.status = "Pending";
+    user.roles = ['Calf'];
+
+    user.save(function(err) {
+      if(err) { return next(err); }
+
+      current_user.members.push(user);
+      current_user.save(function(err) {
+        if(err) { return next(err); }
+
+        res.status(201).send(user);
+      });
+    });
   });
 router.route('/:member_id')
   .get(function(req, res) {
     console.log("getting member");
 
-    var user = req.user;
+    var user = req.current_user;
 
     if(!user.stripe_connect.access_token) {
       return res.send([]);
@@ -40,7 +63,7 @@ router.route('/:member_id/charges')
   .get(function(req, res) {
     console.log("getting charges");
 
-    var user = req.user;
+    var user = req.current_user;
 
     if(!user.stripe_connect.access_token) {
       return res.send([]);

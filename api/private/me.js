@@ -6,7 +6,7 @@ var mongoose   = require('mongoose');
 // ----------------------------------------------------
 router.route('')
   .get(function(req, res) {
-    res.json(req.user);
+    res.json(req.current_user);
   });
 
 module.exports = router;
