@@ -31,13 +31,13 @@ router.route('')
     plan.trial_period_days = req.body.trial_period_days;
     plan.statement_description = req.body.statement_description;
 
-    if(user.stripe_connect) {
-      var stripe_api_key = user.stripe_connect.access_token;
+    if(user.account.stripe_connect) {
+      var stripe_api_key = user.account.stripe_connect.access_token;
 
-      StripeManager.createPlan(stripe_api_key, plan, function(err, plan) {
+      StripeManager.createPlan(stripe_api_key, plan, function(err, stripe_plan) {
         if(err) { return next(err); }
 
-        plan.reference_id = plan.id;
+        plan.reference_id = stripe_plan.id;
         plan.save(function(err) {
           if(err) { return next(err); }
 
@@ -70,10 +70,10 @@ router.route('')
 
       var user = req.current_user;
       console.log(user);
-      if(!user.stripe_connect.access_token) {
+      if(!user.account.stripe_connect.access_token) {
         return res.send([]);
       }
-      var stripe_api_key = user.stripe_connect.access_token;
+      var stripe_api_key = user.account.stripe_connect.access_token;
 
       StripeManager.getPlan(stripe_api_key, req.params.plan_id, function(err, plan) {
         if(err) {
@@ -90,10 +90,10 @@ router.route('')
 
       var user = req.current_user;
 
-      if(!user.stripe_connect.access_token) {
+      if(!user.account.stripe_connect.access_token) {
         return res.send([]);
       }
-      var stripe_api_key = user.stripe_connect.access_token;
+      var stripe_api_key = user.account.stripe_connect.access_token;
       var plan = req.body;
 
       StripeManager.updatePlan(stripe_api_key, plan, function(err, plan) {

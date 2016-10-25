@@ -56,8 +56,7 @@ var UserSchema   = new Schema({
     },
     subscription: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Subscription',
-      default: []
+      ref: 'Subscription'
     }
   }],
   payment_cards: [{
@@ -108,5 +107,16 @@ UserSchema.methods.comparePassword = function (passw, cb) {
         cb(null, isMatch);
     });
 };
+UserSchema.set('toJSON', {
+    getters: true,
+    virtuals: true,
+    transform: function(doc, ret, options) {
+        delete ret.password;
+        return ret;
+    }
+});
+UserSchema.virtual('member_count').get(function () {
+  return this.members.length;
+});
 
 module.exports = mongoose.model('User', UserSchema);

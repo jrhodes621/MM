@@ -160,6 +160,7 @@ router.use(function(req, res, next) {
           if (err) {
             return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
           } else {
+            console.log(user);
             req.current_user = user;
 
             next();

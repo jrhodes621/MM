@@ -26,7 +26,7 @@ router.route('')
 router.route('/:subscription_id')
   .delete(function(req, res, next) {
     var user = req.current_user;
-    var stripe_api_key = user.stripe_connect.access_token;
+    var stripe_api_key = user.account.stripe_connect.access_token;
 
     Subscription.findById(req.params.subscription_id, function(err, subscription) {
       if(err) { return next(err) }

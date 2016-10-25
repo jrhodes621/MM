@@ -89,7 +89,8 @@ router.route('/')
             });
           }
         } else {
-          var stripe_api_key = plan.user.stripe_connect.access_token;
+          console.log(plan);
+          var stripe_api_key = plan.user.account.stripe_connect.access_token;
           StripeManager.createCustomer(stripe_api_key, user, plan, function(err, customer) {
 
             var numberOfSubscriptions = customer.subscriptions.data.length;
@@ -139,7 +140,7 @@ router.route('/')
                     });
                   })
                 } else {
-                  account.sav(function(err){
+                  account.save(function(err){
                     if(err) { return next(err); }
 
                     user.account = account;

@@ -18,6 +18,12 @@ module.exports = {
   getFreePlan: function(callback) {
     Plan.findOne({reference_id: 'MM_FREE'})
     .populate('user')
+    .populate({
+      path: 'user',
+      populate: [{
+        path: 'account'
+      }]
+    })
     .exec(function(err, plan) {
       if(err)
         callback(err, null);

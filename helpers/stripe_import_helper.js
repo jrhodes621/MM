@@ -8,7 +8,7 @@ var User = require('../models/user');
 
 module.exports = {
   importFromStripe: function(user, callback) {
-    stripe_api_key = user.stripe_connect.access_token;
+    stripe_api_key = user.account.stripe_connect.access_token;
 
     StripeManager.listPlans(stripe_api_key, function(err, stripePlans) {
       var errors = [];
@@ -40,7 +40,7 @@ module.exports = {
     })
   },
   importMembersFromPlan: function(user, plan, callback) {
-    var stripe_api_key = user.stripe_connect.access_token;
+    var stripe_api_key = user.account.stripe_connect.access_token;
 
     StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, function(err, subscriptions) {
       console.log(subscriptions);
@@ -124,7 +124,7 @@ module.exports = {
     });
   },
   importChargesForCustomers: function(user, callback) {
-    var stripe_api_key = user.stripe_connect.access_token;
+    var stripe_api_key = user.account.stripe_connect.access_token;
     var user_charges = [];
 
     StripeManager.listCharges(stripe_api_key, user.reference_id, function(err, charges) {

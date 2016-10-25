@@ -44,10 +44,10 @@ router.route('/:member_id')
 
     var user = req.current_user;
 
-    if(!user.stripe_connect.access_token) {
+    if(!user.account.stripe_connect.access_token) {
       return res.send([]);
     }
-    var stripe_api_key = user.stripe_connect.access_token;
+    var stripe_api_key = user.account.stripe_connect.access_token;
 
     StripeManager.getMember(stripe_api_key, req.params.member_id, function(err, member) {
       if(err) {
@@ -65,10 +65,10 @@ router.route('/:member_id/charges')
 
     var user = req.current_user;
 
-    if(!user.stripe_connect.access_token) {
+    if(!user.account.stripe_connect.access_token) {
       return res.send([]);
     }
-    var stripe_api_key = user.stripe_connect.access_token;
+    var stripe_api_key = user.account.stripe_connect.access_token;
 
     StripeManager.listCharges(stripe_api_key, req.params.member_id, function(err, charges) {
       if(err) {

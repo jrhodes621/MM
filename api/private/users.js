@@ -61,12 +61,13 @@ router.route('/:user_id')
     })
   });
 router.route('/connect_stripe')
-  .post(function(req, res) {
+  .post(function(req, res, next) {
     console.log("Connect Stripe");
 
     var user = req.current_user;
-    user.stripe_connect = req.body.stripe_connect
+    user.account.stripe_connect = req.body.stripe_connect;
 
+    console.log(req.body.stripe_connect);
     StripeImportHelper.importFromStripe(user, function(errors, plans) {
       numberOfPlans = plans.length;
       plans.forEach(function(plan) {
@@ -80,11 +81,13 @@ router.route('/connect_stripe')
             user.plans.push(plan);
 
             if(numberOfPlans == 0) {
-              user.save(function(err) {
-                if(err)
-                  return res.status(400).send(err);
+              user.account.save(function(err) {
+                if(err) { return next(err); }
+                user.save(function(err) {
+                  if(err) { return next(err) };
 
-                res.status(200).json(user);
+                  res.status(200).json(user);
+                });
               });
             }
           }

@@ -23,11 +23,11 @@ router.route('')
       if(!bull)
         return res.status(404).send("Bull not found");
 
-      if(!bull.stripe_connect || !bull.stripe_connect.access_token) {
+      if(!bull.stripe_connect || !bull.account.stripe_connect.access_token) {
         return res.status(400).send("The bull must connect their stripe api key.");
       }
 
-      var stripe_api_key = bull.stripe_connect.access_token;
+      var stripe_api_key = bull.account.stripe_connect.access_token;
 
       User.findOne({ 'email_address': email}, function(err, user) {
         if(user)

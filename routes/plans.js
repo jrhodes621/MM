@@ -8,10 +8,10 @@ router.get('/', function(req, res, next) {
       if(err)
         return res.status(404).send(err);
 
-      if(!user.stripe_connect || !user.stripe_connect.access_token) {
+      if(!user.account.stripe_connect || !user.account.stripe_connect.access_token) {
         return res.render('public/plans', { user: user, plans: [] });
       }
-      var stripe_api_key = user.stripe_connect.access_token;
+      var stripe_api_key = user.account.stripe_connect.access_token;
 
       StripeManager.listPlans(stripe_api_key, function(err, plans) {
         if(err) {
@@ -33,10 +33,10 @@ router.get('/subscribe/:plan_id', function(req, res) {
       if(err)
         return res.status(404).send(err);
 
-      if(!user.stripe_connect || !user.stripe_connect.access_token) {
+      if(!user.account.stripe_connect || !user.account.stripe_connect.access_token) {
         return res.render('public/plans', { user: user, plans: [] });
       }
-      var stripe_api_key = user.stripe_connect.access_token;
+      var stripe_api_key = user.account.stripe_connect.access_token;
 
       StripeManager.getPlan(stripe_api_key, plan_id, function(err, plan) {
         if(err) {
