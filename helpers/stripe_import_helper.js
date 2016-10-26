@@ -74,7 +74,8 @@ module.exports = {
             memberUser.password = "test123";
             memberUser.memberships.push({
               reference_id: customer.id,
-              company_name: user.company_name,
+              company_name: user.account.company_name,
+              account_id: user.account._id,
               plan_names: [plan.name],
               member_since: customer.created,
               subscription: subscription

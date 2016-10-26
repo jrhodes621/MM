@@ -8,12 +8,32 @@ var User = require('../../models/user');
 var StripeManager = require("../../helpers/stripe_manager");
 
 router.route('')
-  .get(function(req, res) {
+  .get(function(req, res, next) {
     console.log("getting members");
 
     var user = req.current_user;
+    var page_size = 10;
+    var page = req.query.page || 1;
+    var offset = (page-1)*page_size;
 
-    res.send(user.members);
+    if(!user.account) { return next(new Error("No Members")); }
+
+    User.paginate({ "memberships.account_id": user.account._id }, { offset: offset, limit: page_size, populate: [{
+          path: 'memberships.subscription'
+        }, {
+          path: 'payment_cards'
+        }, {
+          path: 'charges'
+        }, {
+          path: 'memberships.subscription',
+          populate: { path: 'plan' }
+        }] }, function(err, result) {
+      if(err) { return next(err) };
+
+      console.log(result);
+
+      res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset });
+    });
   })
   .post(function(req, res, next) {
     console.log("adding member");

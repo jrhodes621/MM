@@ -5,6 +5,7 @@ var Charge = require('../models/charge');
 var PaymentCard = require('../models/payment_card');
 var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
+var mongoosePaginate = require('mongoose-paginate');
 var bcrypt = require('bcrypt');
 
 var UserSchema   = new Schema({
@@ -46,6 +47,10 @@ var UserSchema   = new Schema({
   memberships: [{
     reference_id: {
       type: String
+    },
+    account_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
     },
     company_name: {
       type: String
@@ -118,5 +123,6 @@ UserSchema.set('toJSON', {
 UserSchema.virtual('member_count').get(function () {
   return this.members.length;
 });
+UserSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('User', UserSchema);

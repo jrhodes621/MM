@@ -107,7 +107,8 @@ router.route('/')
 
               user.memberships.push({
                 reference_id: customer.id,
-                company_name: plan.user.company_name,
+                account_id: plan.user.account._id,
+                company_name: plan.user.account.company_name,
                 plan_names: [plan.name],
                 member_since: customer.created,
                 subscription: subscription
