@@ -107,6 +107,7 @@ router.route('/import_plans')
     plansToImport.forEach(function(planToImport) {
       Plan.findById(planToImport, function(err, plan) {
         numberOfPlans = numberOfPlans - 1;
+        console.log(numberOfPlans);
         StripeImportHelper.importMembersFromPlan(user, plan, function(errors, members) {
           console.log(members);
           var numberOfMembers = members.length;
@@ -114,7 +115,7 @@ router.route('/import_plans')
           members.forEach(function(member) {
             member.save(function(err) {
               numberOfMembers = numberOfMembers - 1;
-
+              console.log(numberOfMembers);
               if(err) {
                 console.log(err);
                 if(numberOfMembers == 0  && numberOfPlans == 0) {

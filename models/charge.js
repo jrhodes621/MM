@@ -30,7 +30,8 @@ var ChargeSchema   = new Schema({
     required: true
   },
   description: {
-    type: String
+    type: String,
+    required: true
   },
   destination: {
     type: String
@@ -71,7 +72,15 @@ var ChargeSchema   = new Schema({
   status: {
     type: String,
     required: true
+  },
+  card_info: {
+    type: String,
+    required: true,
+    default: 'unknown card'
   }
+},
+{
+    timestamps: true
 });
 
 module.exports = mongoose.model('Charge', ChargeSchema);

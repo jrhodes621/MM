@@ -127,6 +127,18 @@ module.exports = {
       }
     );
   },
+  createCharge: function(stripe_api_key, customer, amount, currency, description, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.charges.create({
+      amount: amount*100,
+      currency: currency,
+      customer: customer,
+      description: description
+    }, function(err, charge) {
+      callback(err, charge);
+    });
+  },
   listCharges: function(stripe_api_key, customer_id, callback) {
     var stripe = require('stripe')(stripe_api_key);
 

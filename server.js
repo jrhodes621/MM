@@ -20,6 +20,7 @@ var plansRoutes = require('./routes/plans');
 var users = require('./routes/users');
 var partials = require('./routes/partials');
 var subdomain = require('wildcard-subdomains');
+var PaymentCard = require('./models/payment_card');
 var User = require('./models/user');
 
 var app = express();
@@ -145,12 +146,16 @@ router.use(function(req, res, next) {
         User.findById(user_id)
         .populate('account')
         .populate('plans')
+        .populate('charges')
+        .populate('payment_cards')
         .populate({
           path: 'members',
           populate: [{
             path: 'memberships.subscription'
           }, {
             path: 'payment_cards'
+          }, {
+            path: 'charges'
           }, {
             path: 'memberships.subscription',
             populate: { path: 'plan' }
@@ -181,6 +186,7 @@ router.use(function(req, res, next) {
   }
 });
 
+var ChargesRoutes = require('./api/private/charge.js');
 var MeRoutes = require('./api/private/me.js');
 var MembersRoutes = require('./api/private/members.js');
 var PlansRoutes = require('./api/private/plans.js');
@@ -194,8 +200,9 @@ router.use('/me', MeRoutes);
 router.use('/members', MembersRoutes);
 router.use('/plans', PlansRoutes);
 router.use('/subscriptions', PrivateSubscriptionRoutes);
-router.use('/users', PrivateUserRoutes)
-router.use('/users/:user_id', PrivateUserRoutes)
+router.use('/users', PrivateUserRoutes);
+router.use('/users/:user_id', PrivateUserRoutes);
+router.use('/users/:user_id/charges', ChargesRoutes);
 router.use('/users/:user_id/payment_cards', PaymentCardRoutes)
 
 router.param('user_id', function (req, res, next, user_id) {

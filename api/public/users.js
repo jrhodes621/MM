@@ -54,6 +54,7 @@ router.route('/')
           console.log(err);
           return res.status(400).send(err);
         }
+        console.log(plan);
         if(!plan) {
           console.log("Membermoose Free Plan Not Found, so we'll create a user with no subscriptions!");
 
