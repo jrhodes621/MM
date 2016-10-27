@@ -7,41 +7,28 @@ var jwt    = require('jsonwebtoken');
 var User = require('../../models/user');
 
 router.route('/')
-  .post(function(req, res) {
+  .post(function(req, res, next) {
     console.log("authenicating user");
 
     var email_address = req.body.email_address;
     var password = req.body.password;
 
-    console.log(req.body.email_address);
     User.findOne({ email_address: req.body.email_address })
     .populate('subscriptions')
     .exec(function(err, user) {
-      if (err) {
-        console.log(err);
-
-        return res.status(400).send(err);
-      }
+      if (err) { return next(err); }
 
       if (!user) {
-        console.log("user not found");
-
-        res.send({success: false, msg: 'Authentication failed. User not found.'});
+        return res.status(403).send({ success: false, minor_code: 1004, message: 'Authentication failed. User not found.' });
       } else {
-        console.log("comparing passwords");
         // check if password matches
         user.comparePassword(req.body.password, function (err, isMatch) {
-          console.log(isMatch);
-          isMatch = true
-          console.log(user);
           if (isMatch && !err) {
             var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
             res.status(200).json({success: true, token: token, user_id: user._id });
           } else {
-            console.log("authentication failed");
-
-            res.send({success: false, msg: 'Authentication failed. Wrong password.'});
+            return res.status(403).send({ success: false, minor_code: 1005, message: 'Authentication failed.' });
           }
         });
       }
