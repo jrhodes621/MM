@@ -26,6 +26,9 @@ var AccountSchema   = new Schema({
     required: true
   },
   stripe_connect: mongoose.Schema.Types.Mixed
+},
+{
+    timestamps: true
 });
 
 module.exports = mongoose.model('Account', AccountSchema);

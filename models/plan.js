@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
 var User = require('../models/user');
+var mongoosePaginate = require('mongoose-paginate');
 
 var PlanSchema   = new Schema({
   user: {
@@ -40,6 +41,10 @@ var PlanSchema   = new Schema({
   statement_description: {
     type: String
   }
+},
+{
+    timestamps: true
 });
+PlanSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Plan', PlanSchema);
