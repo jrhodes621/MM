@@ -14,5 +14,23 @@ module.exports = {
       //   return membership;
       // }
     });
+  },
+  saveMemberships: function(memberships, callback) {
+    var numberOfMemberships = memberships.length;
+
+    if(numberOfMemberships == 0) {
+      callback(null, []);
+    }
+    memberships.forEach(function(membership) {
+      numberOfMemberships -= 1;
+
+      membership.subscription.save(function(err) {
+        if(err) { console.log(err); }
+
+        if(numberOfMemberships == 0) {
+          callback(err, memberships)
+        }
+      });
+    });
   }
 }

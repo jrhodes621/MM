@@ -60,7 +60,9 @@ module.exports = {
     var stripe = require('stripe')(stripe_api_key);
 
     stripe.plans.list(
-      {},
+      {
+        limit: 100
+      },
       function(err, plans) {
         callback(err, plans);
       }

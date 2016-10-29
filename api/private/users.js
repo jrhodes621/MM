@@ -7,11 +7,14 @@ var jwt    = require('jsonwebtoken');
 var User = require('../../models/user');
 var PaymentCard = require('../../models/payment_card');
 var Plan = require('../../models/plan');
+var MemberHelper = require('../../helpers/member_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeImportHelper = require('../../helpers/stripe_import_helper');
 var UserHelper = require('../../helpers/user_helper');
 var Upload = require('s3-uploader');
 var multer  = require('multer');
+var Step = require('step');
+var Q = require('q');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -69,30 +72,41 @@ router.route('/connect_stripe')
 
     console.log(req.body.stripe_connect);
     StripeImportHelper.importFromStripe(user, function(errors, plans) {
+      console.log("number of plans " + plans.length);
       numberOfPlans = plans.length;
-      plans.forEach(function(plan) {
+      if(numberOfPlans == 0) {
+        user.account.save(function(err) {
+          if(err) { return next(err); }
+          user.save(function(err) {
+            if(err) { return next(err) };
 
-        plan.save(function(err) {
-          numberOfPlans = numberOfPlans - 1;
-
-          if(err) {
-            console.log(err);
-          } else {
-            user.plans.push(plan);
-
-            if(numberOfPlans == 0) {
-              user.account.save(function(err) {
-                if(err) { return next(err); }
-                user.save(function(err) {
-                  if(err) { return next(err) };
-
-                  res.status(200).json(user);
-                });
-              });
-            }
-          }
+            res.status(200).json(user);
+          });
         });
-      })
+      } else {
+        plans.forEach(function(plan) {
+          plan.save(function(err) {
+            numberOfPlans = numberOfPlans - 1;
+
+            if(err) {
+              console.log(err);
+            } else {
+              user.plans.push(plan);
+
+              if(numberOfPlans == 0) {
+                user.account.save(function(err) {
+                  if(err) { return next(err); }
+                  user.save(function(err) {
+                    if(err) { return next(err) };
+
+                    res.status(200).json(user);
+                  });
+                });
+              }
+            }
+          });
+        });
+      }
     });
   });
 router.route('/import_plans')
@@ -101,60 +115,67 @@ router.route('/import_plans')
 
     var user = req.current_user;
     var plansToImport = req.body.plans;
-    console.log(plansToImport);
-
     var numberOfPlans = plansToImport.length;
+
+    if(numberOfPlans == 0) {
+      return res.status(200).json(user);
+    }
     plansToImport.forEach(function(planToImport) {
-      Plan.findById(planToImport, function(err, plan) {
-        numberOfPlans = numberOfPlans - 1;
-        console.log(numberOfPlans);
-        StripeImportHelper.importMembersFromPlan(user, plan, function(errors, members) {
+      Step(
+        function getPlan() {
+          console.log("****Getting Plan****");
+          Plan.findById(planToImport)
+          .populate('user')
+          .populate({
+            path: 'user',
+            populate: [{
+              path: 'account'
+            }]
+          })
+          .exec(this);
+        },
+        function getMembersFromStripe(err, plan) {
+          console.log("****Plan****");
+          console.log(plan);
+
+          if(err) { console.log(err); }
+          console.log("****Get members from Stripe****");
+          StripeImportHelper.importMembersFromPlan(user, plan, this);
+        },
+        function saveMembers(err, members) {
+          console.log("****Members****")
+          console.log(members)
+          if(err) { console.log(err); }
+          console.log("****Save Members****");
+
+          MemberHelper.saveMembers(members, this);
+        },
+        function doCallBack(err, members) {
+          numberOfPlans -= 1;
+
+          if(err) { console.log(err); }
+          console.log("****Do Callback****");
+          console.log(numberOfPlans);
+          console.log(members.length);
           console.log(members);
-          var numberOfMembers = members.length;
+          user.members.push(...members);
+          console.log(user.members.length);
 
-          members.forEach(function(member) {
-            member.save(function(err) {
-              numberOfMembers = numberOfMembers - 1;
-              console.log(numberOfMembers);
+          if(numberOfPlans == 0) {
+            console.log("****Save User****");
+
+            user.save(function(err) {
               if(err) {
-                console.log(err);
-                if(numberOfMembers == 0  && numberOfPlans == 0) {
-                  user.save(function(err) {
-                    if(err) {
-                      console.log(err)
+                console.log(err)
 
-                      return res.status(400).send(err);
-                    }
-
-                    res.status(200).json(user);
-                  });
-                }
-              } else {
-                member.memberships.forEach(function(membership) {
-                  membership.subscription.save(function(err) {
-                    if(err) {
-                      console.log(err)
-                    }
-                    user.members.push(member);
-
-                    if(numberOfMembers == 0  && numberOfPlans == 0) {
-                      user.save(function(err) {
-                        if(err) {
-                          console.log(err)
-
-                          return res.status(400).send(err);
-                        }
-
-                        res.status(200).json(user);
-                      });
-                    }
-                  })
-                });
+                return res.status(400).send(err);
               }
+
+              res.status(200).json(user);
             });
-          });
-        });
-      });
+          }
+        }
+      );
     });
   })
 module.exports = router;
