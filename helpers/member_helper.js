@@ -1,4 +1,6 @@
 var MembershipHelper  = require('./membership_helper');
+var SourceHelper      = require('./source_helper');
+var Step = require('step');
 
 module.exports = {
   saveMembers(members, callback) {
@@ -8,16 +10,23 @@ module.exports = {
       callback(null, []);
     }
     members.forEach(function(member) {
-      numberOfMembers -= 1;
-
       member.save(function(err) {
         if(err) { console.log(err); }
 
-        MembershipHelper.saveMemberships(member.memberships, function(err, memberships) {
-          if(numberOfMembers == 0) {
-            callback(err, members);
+        Step(
+          function saveMemberships() {
+            MembershipHelper.saveMemberships(member.memberships, this);
+          },
+          function doCallback(err, sources) {
+            if(err) { console.log(err); }
+
+            numberOfMembers -= 1;
+
+            if(numberOfMembers == 0) {
+              callback(err, members);
+            }
           }
-        });
+        )
       });
     });
   }

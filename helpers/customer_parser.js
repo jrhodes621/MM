@@ -1,6 +1,8 @@
 var StripeManager = require('./stripe_manager');
 var User = require('../models/user');
+var PaymentCard = require('../models/payment_card');
 var Subscription = require('../models/subscription');
+var SourceHelper      = require('./source_helper');
 var Step = require('step');
 
 module.exports = {
@@ -20,7 +22,14 @@ module.exports = {
 
         return user;
       },
+      function parseSources(err, user) {
+        SourceHelper.parse(user, customer, this);
+      },
       function parseMemberUser(err, memberUser) {
+        if(err) { console.log(err); }
+        console.log("parse member");
+        console.log(memberUser);
+        
         var subscription = new Subscription();
 
         subscription.plan = plan;
@@ -44,6 +53,9 @@ module.exports = {
         return memberUser
       },
       function addMember(err, memberUser) {
+        if(err) { console.log(err); }
+        console.log("adding members");
+
         callback(err, memberUser);
       }
     )
