@@ -123,7 +123,6 @@ router.route('/import_plans')
     plansToImport.forEach(function(planToImport) {
       Step(
         function getPlan() {
-          console.log("****Getting Plan****");
           Plan.findById(planToImport)
           .populate('user')
           .populate({
@@ -135,18 +134,12 @@ router.route('/import_plans')
           .exec(this);
         },
         function getMembersFromStripe(err, plan) {
-          console.log("****Plan****");
-          console.log(plan);
-
           if(err) { console.log(err); }
-          console.log("****Get members from Stripe****");
+
           StripeImportHelper.importMembersFromPlan(user, plan, this);
         },
         function saveMembers(err, members) {
-          console.log("****Members****")
-          console.log(members)
           if(err) { console.log(err); }
-          console.log("****Save Members****");
 
           MemberHelper.saveMembers(members, this);
         },
@@ -154,16 +147,9 @@ router.route('/import_plans')
           numberOfPlans -= 1;
 
           if(err) { console.log(err); }
-          console.log("****Do Callback****");
-          console.log(numberOfPlans);
-          console.log(members.length);
-          console.log(members);
-          user.members.push(...members);
-          console.log(user.members.length);
+        //  user.members.push(...members);
 
           if(numberOfPlans == 0) {
-            console.log("****Save User****");
-
             user.save(function(err) {
               if(err) {
                 console.log(err)

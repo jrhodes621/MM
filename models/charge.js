@@ -30,8 +30,7 @@ var ChargeSchema   = new Schema({
     required: true
   },
   description: {
-    type: String,
-    required: true
+    type: String
   },
   destination: {
     type: String
