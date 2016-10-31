@@ -133,7 +133,7 @@ router.route('/import_plans')
           .exec(this);
         },
         function getMembersFromStripe(err, plan) {
-          console.log("***Parsing StripeSubscriptions");
+          console.log("***Getting Members from Stripe");
           console.log("plan " + plan.name);
 
           if(err) { console.log(err); }

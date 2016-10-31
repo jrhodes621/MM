@@ -50,7 +50,7 @@ module.exports = {
       },
       function parseSubscriptions(err, stripe_subscriptions) {
         console.log("***Parsing StripeSubscriptions");
-        console.log("found " + stripe_subscriptions.length);
+        console.log("found " + stripe_subscriptions);
 
         if(err) { console.log(err); }
 
