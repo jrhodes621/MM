@@ -51,11 +51,11 @@ module.exports = {
 
         SubscriptionHelper.parse(stripe_api_key, stripe_subscriptions.data, plan, this);
       },
-      function importCharges(err, memberUsers) {
-        if(err) { console.log(err); }
-
-        module.exports.importChargesForUsers(stripe_api_key, memberUsers, this);
-      },
+      // function importCharges(err, memberUsers) {
+      //   if(err) { console.log(err); }
+      //
+      //   module.exports.importChargesForUsers(stripe_api_key, memberUsers, this);
+      // },
       function returnMembers(err, memberUsers) {
         if(err) { console.log(err); }
 
