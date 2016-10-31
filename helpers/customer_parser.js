@@ -27,9 +27,7 @@ module.exports = {
       },
       function parseMemberUser(err, memberUser) {
         if(err) { console.log(err); }
-        console.log("parse member");
-        console.log(memberUser);
-        
+
         var subscription = new Subscription();
 
         subscription.plan = plan;
@@ -54,7 +52,6 @@ module.exports = {
       },
       function addMember(err, memberUser) {
         if(err) { console.log(err); }
-        console.log("adding members");
 
         callback(err, memberUser);
       }

@@ -2,8 +2,6 @@ var PaymentCard = require('../models/payment_card');
 
 module.exports = {
   parse: function(user, customer, callback) {
-    console.log("adding a payment card");
-
     var numberOfSources = customer.sources.data.length;
 
     if(numberOfSources == 0) {
@@ -39,8 +37,6 @@ module.exports = {
     }
     sources.forEach(function(source) {
       numberOfSources -= 1;
-      console.log("***Source***");
-      console.log(source);
 
       source.save(function(err) {
         if(err) { console.log(err); }
