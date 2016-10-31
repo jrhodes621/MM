@@ -14,7 +14,6 @@ var UserHelper = require('../../helpers/user_helper');
 var Upload = require('s3-uploader');
 var multer  = require('multer');
 var Step = require('step');
-var Q = require('q');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
