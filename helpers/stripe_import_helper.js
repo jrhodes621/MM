@@ -44,9 +44,14 @@ module.exports = {
 
     Step(
       function getSubscriptionsFromStripe() {
+        console.log("***Getting Subscriptions from Stripe");
+
         StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, this);
       },
       function parseSubscriptions(err, stripe_subscriptions) {
+        console.log("***Parsing StripeSubscriptions");
+        console.log("found " + stripe_subscriptions.length);
+
         if(err) { console.log(err); }
 
         SubscriptionHelper.parse(stripe_api_key, stripe_subscriptions.data, plan, this);
@@ -57,6 +62,9 @@ module.exports = {
       //   module.exports.importChargesForUsers(stripe_api_key, memberUsers, this);
       // },
       function returnMembers(err, memberUsers) {
+        console.log("***Do importMembersFromStripe callback");
+        console.log("found " + memberUsers.length);
+
         if(err) { console.log(err); }
 
         callback(err, memberUsers);

@@ -133,16 +133,25 @@ router.route('/import_plans')
           .exec(this);
         },
         function getMembersFromStripe(err, plan) {
+          console.log("***Parsing StripeSubscriptions");
+          console.log("plan " + plan.name);
+
           if(err) { console.log(err); }
 
           StripeImportHelper.importMembersFromPlan(user, plan, this);
         },
         function saveMembers(err, members) {
+          console.log("***Saving Members");
+          console.log("found " + members.length);
+
           if(err) { console.log(err); }
 
           MemberHelper.saveMembers(members, this);
         },
         function doCallBack(err, members) {
+          console.log("***do import_plans Callback");
+          console.log("found " + members.length);
+
           numberOfPlans -= 1;
 
           if(err) { console.log(err); }
