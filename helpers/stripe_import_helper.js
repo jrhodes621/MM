@@ -49,23 +49,26 @@ module.exports = {
         StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, this);
       },
       function parseSubscriptions(err, stripe_subscriptions) {
-        console.log("***Parsing StripeSubscriptions");
-        console.log("found " + stripe_subscriptions);
-
         if(err) { console.log(err); }
 
+        console.log("***Parsing StripeSubscriptions");
+        console.log("found " + stripe_subscriptions.data);
+        console.log("here");
         SubscriptionHelper.parse(stripe_api_key, stripe_subscriptions.data, plan, this);
       },
-      // function importCharges(err, memberUsers) {
-      //   if(err) { console.log(err); }
-      //
-      //   module.exports.importChargesForUsers(stripe_api_key, memberUsers, this);
-      // },
-      function returnMembers(err, memberUsers) {
-        console.log("***Do importMembersFromStripe callback");
+      function importCharges(err, memberUsers) {
+        if(err) { console.log(err); }
+
+        console.log("***Import Charges");
         console.log("found " + memberUsers.length);
 
+        module.exports.importChargesForUsers(stripe_api_key, memberUsers, this);
+      },
+      function returnMembers(err, memberUsers) {
         if(err) { console.log(err); }
+
+        console.log("***Do importMembersFromStripe callback");
+        console.log("found " + memberUsers.length);
 
         callback(err, memberUsers);
       }

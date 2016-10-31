@@ -2,10 +2,11 @@ var PaymentCard = require('../models/payment_card');
 
 module.exports = {
   parse: function(user, customer, callback) {
+
     var numberOfSources = customer.sources.data.length;
 
     if(numberOfSources == 0) {
-      return user;
+      callback(null, user);
     }
     customer.sources.data.forEach(function(source) {
       var payment_card = new PaymentCard();

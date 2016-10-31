@@ -9,9 +9,15 @@ module.exports = {
   parse: function(customer, stripe_subscription, plan, callback) {
     Step(
       function getUser() {
+        console.log("***Getting User: " + customer.email + '***');
+
         User.findOne({"email_address": customer.email}, this);
       },
       function parseUser(err, user) {
+        if(err) { console.log(err); }
+
+        console.log("***Parsing User: " + customer.email + '***');
+
         if(!user) {
           user = new User();
           user.email_address = customer.email;
@@ -23,10 +29,16 @@ module.exports = {
         return user;
       },
       function parseSources(err, user) {
+        if(err) { console.log(err); }
+
+        console.log("***Parsing Sources for User");
+
         SourceHelper.parse(user, customer, this);
       },
       function parseMemberUser(err, memberUser) {
         if(err) { console.log(err); }
+
+        console.log("***Parsing Member User ***");
 
         var subscription = new Subscription();
 
@@ -52,6 +64,8 @@ module.exports = {
       },
       function addMember(err, memberUser) {
         if(err) { console.log(err); }
+
+        console.log("*** Add Member**");
 
         callback(err, memberUser);
       }

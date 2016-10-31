@@ -6,6 +6,9 @@ var Step = require('step');
 
 module.exports = {
   parse: function(stripe_api_key, subscriptions, plan, callback) {
+    console.log("***Parse Subscriptions***");
+    console.log(subscriptions.length);
+
     var numberOfSubscriptions = subscriptions.length;
     var users = [];
 
@@ -15,17 +18,31 @@ module.exports = {
     subscriptions.forEach(function(subscription) {
       Step(
         function getStripeCustomer() {
+          console.log("***Get Customer from Stripe***");
+
           StripeManager.getMember(stripe_api_key, subscription.customer, this);
         },
         function parseCustomer(err, customer) {
+          if(err) { console.log(err) }
+
+          console.log("***Parse Customer***");
+
           CustomerParser.parse(customer, subscription, plan, this)
         },
         function addMember(err, user) {
+          if(err) { console.log(err) }
+
+          console.log("***Add Member to Users***");
+
           users.push(user);
 
           return users;
         },
         function doCallback(err, users) {
+          if(err) { console.log(err) }
+
+          console.log("***Do Callback***");
+
           numberOfSubscriptions -= 1;
           if(numberOfSubscriptions == 0) {
             callback(err, users)
