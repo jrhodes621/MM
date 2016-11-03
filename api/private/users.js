@@ -8,6 +8,7 @@ var User = require('../../models/user');
 var PaymentCard = require('../../models/payment_card');
 var Plan = require('../../models/plan');
 var MemberHelper = require('../../helpers/member_helper');
+var ReferencePlanHelper = require('../../helpers/reference_plan_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeImportHelper = require('../../helpers/stripe_import_helper');
 var UserHelper = require('../../helpers/user_helper');
@@ -54,10 +55,12 @@ router.route('/:user_id')
           });
         });
       } else {
-        user.save(function(err) {
-          if(err) { return next(err); }
+        UserHelper.uploadInitialsAvatar(user, function(err, user) {
+          user.save(function(err) {
+            if(err) { return next(err); }
 
-          res.status(200).json(user);
+            res.status(200).json(user);
+          });
         });
       }
     })
@@ -71,41 +74,19 @@ router.route('/connect_stripe')
 
     console.log(req.body.stripe_connect);
     StripeImportHelper.importFromStripe(user, function(errors, plans) {
-      console.log("number of plans " + plans.length);
-      numberOfPlans = plans.length;
-      if(numberOfPlans == 0) {
-        user.account.save(function(err) {
-          if(err) { return next(err); }
-          user.save(function(err) {
-            if(err) { return next(err) };
+      console.log("***Reference Plans***");
+      console.log(plans);
 
-            res.status(200).json(user);
-          });
+      user.account.reference_plans = plans;
+
+      user.account.save(function(err) {
+        if(err) { return next(err); }
+        user.save(function(err) {
+          if(err) { return next(err) };
+
+          res.status(200).json(user);
         });
-      } else {
-        plans.forEach(function(plan) {
-          plan.save(function(err) {
-            numberOfPlans = numberOfPlans - 1;
-
-            if(err) {
-              console.log(err);
-            } else {
-              user.plans.push(plan);
-
-              if(numberOfPlans == 0) {
-                user.account.save(function(err) {
-                  if(err) { return next(err); }
-                  user.save(function(err) {
-                    if(err) { return next(err) };
-
-                    res.status(200).json(user);
-                  });
-                });
-              }
-            }
-          });
-        });
-      }
+      });
     });
   });
 router.route('/import_plans')
@@ -122,7 +103,10 @@ router.route('/import_plans')
     plansToImport.forEach(function(planToImport) {
       Step(
         function getPlan() {
-          Plan.findById(planToImport)
+          console.log("***Import Plan");
+          console.log(planToImport);
+
+          Plan.findOne({ "reference_id": planToImport, "user": user })
           .populate('user')
           .populate({
             path: 'user',
@@ -131,6 +115,19 @@ router.route('/import_plans')
             }]
           })
           .exec(this);
+        },
+        function parsePlan(err, plan) {
+          if(err) { console.log(err); }
+
+          console.log("***Parsing Plan");
+          console.log(plan);
+          console.log(user);
+
+          if(!plan) {
+            ReferencePlanHelper.parse(user, planToImport, this);
+          } else {
+            return plan;
+          }
         },
         function getMembersFromStripe(err, plan) {
           if(err) { console.log(err); }

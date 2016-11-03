@@ -20,17 +20,10 @@ module.exports = {
       function parsePlans(err, stripePlans) {
         var plans = [];
         stripePlans.data.forEach(function(stripePlan) {
-          var plan = new Plan();
-          plan.user = user._id;
-          plan.name = stripePlan.name;
-          plan.reference_id = stripePlan.id;
-          plan.amount = stripePlan.amount;
-          plan.created = stripePlan.created;
-          plan.currency = stripePlan.currency;
-          plan.interval = stripePlan.interval;
-          plan.interval_count = stripePlan.interval_count;
-          plan.statement_descriptor = stripePlan.statement_descriptor;
-          plan.trial_period_days = 0 //stripePlan.trial_period_days;
+          var plan = {
+            reference_id: stripePlan.id,
+            plan_name: stripePlan.name
+          }
 
           plans.push(plan);
         });

@@ -26,6 +26,7 @@ module.exports = {
           if(err) { console.log(err) }
 
           console.log("***Parse Customer***");
+          console.log(plan);
 
           CustomerParser.parse(customer, subscription, plan, this)
         },

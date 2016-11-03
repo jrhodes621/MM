@@ -3,6 +3,7 @@ var User = require('../models/user');
 var PaymentCard = require('../models/payment_card');
 var Subscription = require('../models/subscription');
 var SourceHelper      = require('./source_helper');
+var UserHelper   = require('./user_helper');
 var Step = require('step');
 
 module.exports = {
@@ -27,6 +28,13 @@ module.exports = {
         }
 
         return user;
+      },
+      function generateInitialsAvatar(err, user) {
+        if(err) { console.log(err); }
+
+        console.log("***Upload Initials Avatar***");
+
+        UserHelper.uploadInitialsAvatar(user, this);
       },
       function parseSources(err, user) {
         if(err) { console.log(err); }

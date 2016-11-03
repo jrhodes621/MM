@@ -21,6 +21,16 @@ var AccountSchema   = new Schema({
     ref: 'Plan',
     default: []
   }],
+  reference_plans: [{
+    reference_id: {
+      type: String,
+      required: true
+    },
+    plan_name: {
+      type: String,
+      required: true
+    }
+  }],
   status: {
     type: String,
     required: true
