@@ -12,11 +12,17 @@ var PlanSchema   = new Schema({
     type: String,
     required: true
   },
+  description: {
+    type: String
+  },
   internal_id: {
     type: String
   },
   reference_id: {
     type: String
+  },
+  one_time_amount: {
+    type: Number
   },
   amount: {
     type: Number,
@@ -40,11 +46,30 @@ var PlanSchema   = new Schema({
   },
   statement_description: {
     type: String
-  }
+  },
+  terms_of_server: {
+    type: String
+  },
+  members: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 },
 {
     timestamps: true
 });
+PlanSchema.set('toJSON', {
+    getters: true,
+    virtuals: true,
+    transform: function(doc, ret, options) {
+        delete ret.password;
+        return ret;
+    }
+});
 PlanSchema.plugin(mongoosePaginate);
+
+PlanSchema.virtual('member_count').get(function () {
+  return this.members.length;
+});
 
 module.exports = mongoose.model('Plan', PlanSchema);

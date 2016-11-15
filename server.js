@@ -20,6 +20,7 @@ var plansRoutes = require('./routes/plans');
 var users = require('./routes/users');
 var partials = require('./routes/partials');
 var subdomain = require('wildcard-subdomains');
+var Plan = require('./models/plan');
 var PaymentCard = require('./models/payment_card');
 var User = require('./models/user');
 
@@ -165,7 +166,6 @@ router.use(function(req, res, next) {
           if (err) {
             return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
           } else {
-            console.log(user);
             req.current_user = user;
 
             next();
@@ -191,6 +191,7 @@ var ChargesRoutes = require('./api/private/charge.js');
 var MeRoutes = require('./api/private/me.js');
 var MembersRoutes = require('./api/private/members.js');
 var PlansRoutes = require('./api/private/plans.js');
+var PlanRoutes = require('./api/private/plan.js');
 var PaymentCardRoutes = require('./api/private/payment_cards.js');
 var PrivateFunnelRoutes = require('./api/private/funnel');
 var PrivateSubscriptionRoutes = require('./api/private/subscriptions')
@@ -201,12 +202,28 @@ router.use('/funnel', PrivateFunnelRoutes);
 router.use('/me', MeRoutes);
 router.use('/members', MembersRoutes);
 router.use('/plans', PlansRoutes);
+router.use('/plans/:plan_id', PlanRoutes);
 router.use('/subscriptions', PrivateSubscriptionRoutes);
 router.use('/users', PrivateUserRoutes);
 router.use('/users/:user_id', PrivateUserRoutes);
 router.use('/users/:user_id/charges', ChargesRoutes);
 router.use('/users/:user_id/payment_cards', PaymentCardRoutes)
 
+router.param(':plan_id', function (req, res, next, plan_id) {
+  console.log("Getting Plan for " + plan_id);
+
+  Plan.findById(plan_id)
+  .exec(function(err, plan) {
+    if(err) { return next(err); }
+
+    if(!plan) {
+      return handleError(res, "Plan Not Found", "Plan Not Found.", 404);
+    }
+    req.plan = plan;
+
+    return next();
+  });
+});
 router.param('user_id', function (req, res, next, user_id) {
   console.log("Getting User for " + user_id);
 

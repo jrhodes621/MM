@@ -7,6 +7,7 @@ var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
 var mongoosePaginate = require('mongoose-paginate');
 var bcrypt = require('bcrypt');
+var gravatar = require('gravatar');
 
 var UserSchema   = new Schema({
   email_address: {
@@ -122,6 +123,9 @@ UserSchema.set('toJSON', {
 });
 UserSchema.virtual('member_count').get(function () {
   return this.members.length;
+});
+UserSchema.virtual('gravatar_url').get(function() {
+  return gravatar.url(this.email_address, {s: '100', r: 'x', d: 'retro'}, true);
 });
 UserSchema.plugin(mongoosePaginate);
 

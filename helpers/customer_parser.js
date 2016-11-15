@@ -29,13 +29,6 @@ module.exports = {
 
         return user;
       },
-      function generateInitialsAvatar(err, user) {
-        if(err) { console.log(err); }
-
-        console.log("***Upload Initials Avatar***");
-
-        UserHelper.uploadInitialsAvatar(user, this);
-      },
       function parseSources(err, user) {
         if(err) { console.log(err); }
 
@@ -70,7 +63,7 @@ module.exports = {
 
         return memberUser
       },
-      function addMember(err, memberUser) {
+      function doCallback(err, memberUser) {
         if(err) { console.log(err); }
 
         console.log("*** Add Member**");

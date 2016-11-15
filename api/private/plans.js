@@ -71,49 +71,5 @@ router.route('')
       });
     }
   });
-  router.route('/:plan_id')
-    .get(function(req, res) {
-      console.log("getting plan");
-
-      var user = req.current_user;
-      console.log(user);
-      if(!user.account.stripe_connect.access_token) {
-        return res.send([]);
-      }
-      var stripe_api_key = user.account.stripe_connect.access_token;
-
-      StripeManager.getPlan(stripe_api_key, req.params.plan_id, function(err, plan) {
-        if(err) {
-          console.log(err);
-
-          return res.status(400).send({error: err});
-        }
-
-        res.send(plan);
-      });
-    })
-    .put(function(req, res) {
-      console.log("updating a plan");
-
-      var user = req.current_user;
-
-      if(!user.account.stripe_connect.access_token) {
-        return res.send([]);
-      }
-      var stripe_api_key = user.account.stripe_connect.access_token;
-      var plan = req.body;
-
-      StripeManager.updatePlan(stripe_api_key, plan, function(err, plan) {
-        if(err) {
-          console.log(err);
-
-          return res.status(400).send({error: err});
-        }
-
-        console.log(plan);
-
-        res.status(200).send(plan);
-      });
-    });
 
 module.exports = router;

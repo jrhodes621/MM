@@ -120,8 +120,6 @@ router.route('/import_plans')
           if(err) { console.log(err); }
 
           console.log("***Parsing Plan");
-          console.log(plan);
-          console.log(user);
 
           if(!plan) {
             ReferencePlanHelper.parse(user, planToImport, this);
@@ -135,21 +133,27 @@ router.route('/import_plans')
           console.log("***Getting Members from Stripe");
           console.log("plan " + plan.name);
 
-          StripeImportHelper.importMembersFromPlan(user, plan, this);
+          StripeImportHelper.importMembersForPlan(user, plan, this);
         },
-        function saveMembers(err, members) {
+        function saveMembers(err, plan, members) {
           if(err) { console.log(err); }
 
           console.log("***Saving Members");
           console.log("found " + members.length);
 
-          MemberHelper.saveMembers(members, this);
+          MemberHelper.saveMembers(plan, members, this);
         },
-        function doCallBack(err, members) {
+        function savePlan(err, plan) {
           if(err) { console.log(err); }
 
+          plan.save(this);
+        },
+        function doCallBack(err, plan) {
+          if(err) { console.log(err); }
+
+
           console.log("***do import_plans Callback");
-          console.log("found " + members.length);
+          console.log("found " + plan.members.length);
 
           numberOfPlans -= 1;
 

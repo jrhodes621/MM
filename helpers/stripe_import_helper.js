@@ -32,7 +32,7 @@ module.exports = {
       }
     );
   },
-  importMembersFromPlan: function(user, plan, callback) {
+  importMembersForPlan: function(user, plan, callback) {
     var stripe_api_key = user.account.stripe_connect.access_token;
 
     Step(
@@ -49,23 +49,52 @@ module.exports = {
         console.log("here");
         SubscriptionHelper.parse(stripe_api_key, stripe_subscriptions.data, plan, this);
       },
-      function importCharges(err, memberUsers) {
+      function addMembersToPlan(err, members) {
+        if(err) { throw err; }
+
+        module.exports.addMembersToPlan(plan, members, this);
+      },
+      function importCharges(err, members) {
         if(err) { console.log(err); }
 
         console.log("***Import Charges");
-        console.log("found " + memberUsers.length);
+        console.log("found " + members.length);
 
-        module.exports.importChargesForUsers(stripe_api_key, memberUsers, this);
+        module.exports.importChargesForUsers(stripe_api_key, members, this);
       },
-      function returnMembers(err, memberUsers) {
+      function doCallback(err, members) {
         if(err) { console.log(err); }
 
         console.log("***Do importMembersFromStripe callback");
-        console.log("found " + memberUsers.length);
+        console.log("found " + members.length);
 
-        callback(err, memberUsers);
+        callback(err, plan, members);
       }
     );
+  },
+  addMembersToPlan:function(plan, members, callback) {
+    var numberOfMembers = members.length;
+
+    if(numberOfMembers == 0) {
+      callback(null, members);
+    }
+    members.forEach(function(member) {
+      Step(
+        function addMemberToPlan() {
+          plan.members.push(member);
+
+          return member
+        },
+        function doCallback(err, member) {
+          if(err) {console.log(err); }
+
+          numberOfMembers -= 1;
+          if(numberOfMembers == 0) {
+            callback(err, members);
+          }
+        }
+      )
+    });
   },
   importChargesForUsers:function(stripe_api_key, users, callback) {
     var numberOfUsers = users.length;
