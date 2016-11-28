@@ -207,7 +207,7 @@ router.use('/messages', MessagesRoutes);
 router.use('/messages/:user_id', MessageRoutes);
 router.use('/plans', PlansRoutes);
 router.use('/plans/:plan_id', PlanRoutes);
-router.use('/subscriptions', PrivateSubscriptionRoutes);
+router.use('/users/:user_id/subscriptions', PrivateSubscriptionRoutes);
 router.use('/users', PrivateUserRoutes);
 router.use('/users/:user_id', PrivateUserRoutes);
 router.use('/users/:user_id/charges', ChargesRoutes);

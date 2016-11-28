@@ -44,6 +44,17 @@ module.exports = {
       }
     );
   },
+  updateSubscription: function(stripe_api_key, subscription_id, plan_id, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.subscriptions.update(
+      subscription_id,
+      { plan: plan_id },
+      function(err, subscription) {
+        callback(err, subscription);
+      }
+    );
+  },
   listSubscriptions: function(stripe_api_key, plan_id, callback) {
     var stripe = require('stripe')(stripe_api_key);
 

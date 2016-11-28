@@ -18,6 +18,12 @@ router.route('')
 
     Message.find({"recipient": recipient})
     .populate('sender')
+    .populate({
+      path: 'sender',
+      populate: [{
+        path: 'account'
+      }]
+    })
     .populate('recipient')
     .exec(function(err, messages) {
       if(err) { next(err); }
