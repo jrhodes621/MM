@@ -27,25 +27,55 @@ router.route('')
   });
 router.route('/:subscription_id')
   .delete(function(req, res, next) {
-    var user = req.current_user;
-    var stripe_api_key = user.account.stripe_connect.access_token;
+    var user = req.user;
+    var current_user = req.current_user;
+    var stripe_api_key = current_user.account.stripe_connect.access_token;
 
     Subscription.findById(req.params.subscription_id, function(err, subscription) {
       if(err) { return next(err) }
       if(!subscription) { return next(new Error("Subscription not found")) }
 
-      StripeManager.cancelSubscription(stripe_api_key, subscription.reference_id, function(err, confirmation) {
-        if(err) {
-          console.log(err);
+      StripeManager.getSubscription(stripe_api_key, subscription.reference_id, function(err, stripe_subscription){
+        if(!stripe_subscription) {
+          var membership = MembershipHelper.getMembership(user, current_user.account.name, function(membership) {
+            if(!membership) { return next(new Error("Can't find a membership")) }
 
-          return next(err);
+            membership.plan_names = [];
+            membership.subscription = null;
+
+            subscription.status = "Cancelled";
+            subscription.save(function(err) {
+              if(err) { return next(err) }
+
+              user.save(function(err) {
+                if(err) { return next(err); }
+
+                res.sendStatus(200);
+              });
+            })
+          });
+        } else {
+          StripeManager.cancelSubscription(stripe_api_key, subscription.reference_id, function(err, confirmation) {
+            if(err) { return next(err); }
+
+            var membership = MembershipHelper.getMembership(user, current_user.account.name, function(membership) {
+              if(!membership) { return next(new Error("Can't find a membership")) }
+
+              membership.plan_names = [];
+
+              subscription.status = "Cancelled";
+              subscription.save(function(err) {
+                if(err) { return next(err) }
+
+                user.save(function(err) {
+                  if(err) { return next(err); }
+
+                  res.sendStatus(200);
+                });
+              })
+            });
+          });
         }
-        subcription.status = "Cancelled";
-        subscription.save(function(err) {
-          if(err) { return next(err) }
-
-          res.sendStatus(200);
-        })
       });
     });
   });

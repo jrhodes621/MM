@@ -40,6 +40,7 @@ module.exports = {
     stripe.subscriptions.del(
       subscription_id,
       function(err, confirmation) {
+        console.log(err.type);
         callback(err, confirmation);
       }
     );
@@ -64,6 +65,16 @@ module.exports = {
       },
       function(err, subscriptions) {
         callback(err, subscriptions);
+      }
+    );
+  },
+  getSubscription: function(stripe_api_key, subscription_id, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.subscriptions.retrieve(
+      subscription_id,
+      function(err, subscription) {
+        callback(err, subscription);
       }
     );
   },
@@ -110,7 +121,7 @@ module.exports = {
   updatePlan: function(stripe_api_key, plan, callback) {
     var stripe = require('stripe')(stripe_api_key);
 
-    stripe.plans.update(plan.id, {
+    stripe.plans.update(plan.reference_id, {
       name: plan.name,
       metadata: {
         'description': plan.description,

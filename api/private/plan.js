@@ -19,36 +19,42 @@ router.route('')
     var stripe_api_key = user.account.stripe_connect.access_token;
 
     StripeManager.getPlan(stripe_api_key, req.params.plan_id, function(err, plan) {
-      if(err) {
-        console.log(err);
-
-        return res.status(400).send({error: err});
-      }
+      if(err) { return next(err); }
 
       res.send(plan);
     });
   })
-  .put(function(req, res) {
+  .put(function(req, res, next) {
     console.log("updating a plan");
 
-    var user = req.current_user;
+    var current_user = req.current_user;
+    var plan = req.plan;
 
-    if(!user.account.stripe_connect.access_token) {
-      return res.send([]);
+
+    plan.name = req.body.name;
+    plan.description = req.body.description;
+    plan.terms_of_service = req.body.terms_of_service;
+
+    if(!current_user.account.stripe_connect.access_token) {
+      plan.save(function(err) {
+        if(err) { return next(err); }
+
+        res.status(200).send(plan);
+      });
     }
-    var stripe_api_key = user.account.stripe_connect.access_token;
-    var plan = req.body;
+    var stripe_api_key = current_user.account.stripe_connect.access_token;
+    console.log(stripe_api_key);
 
-    StripeManager.updatePlan(stripe_api_key, plan, function(err, plan) {
-      if(err) {
-        console.log(err);
+    console.log(plan);
+    plan.save(function(err) {
+      if(err) { return next(err); }
 
-        return res.status(400).send({error: err});
-      }
+      StripeManager.updatePlan(stripe_api_key, plan, function(err, plan) {
+        if(err) { return next(err); }
 
-      console.log(plan);
 
-      res.status(200).send(plan);
+        res.status(200).send(plan);
+      });
     });
   });
 router.route('/members')
