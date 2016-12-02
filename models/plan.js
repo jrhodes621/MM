@@ -15,6 +15,9 @@ var PlanSchema   = new Schema({
   description: {
     type: String
   },
+  features: [{
+    type: String
+  }],
   internal_id: {
     type: String
   },
