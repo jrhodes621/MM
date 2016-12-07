@@ -7,6 +7,19 @@ var jwt    = require('jsonwebtoken');
 var Plan = require('../../models/plan');
 var User = require('../../models/user');
 var StripeManager = require("../../helpers/stripe_manager");
+var Upload = require('s3-uploader');
+var multer  = require('multer');
+var PlanHelper = require('../../helpers/plan_helper');
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null,  file.originalname );
+  }
+});
+var upload = multer({ storage: storage  });
 
 router.route('')
   .get(function(req, res) {
@@ -24,12 +37,11 @@ router.route('')
       res.send(plan);
     });
   })
-  .put(function(req, res, next) {
+  .put(upload.single('file'), function(req, res, next) {
     console.log("updating a plan");
 
     var current_user = req.current_user;
     var plan = req.plan;
-
 
     plan.name = req.body.name;
     plan.one_time_amount = req.body.one_time_amount;
@@ -42,7 +54,20 @@ router.route('')
       plan.save(function(err) {
         if(err) { return next(err); }
 
-        res.status(200).send(plan);
+        if(req.file) {
+          PlanHelper.uploadAvatar(plan, req.file.path, function(avatar_images) {
+            console.log(avatar_images);
+            plan.avatar = avatar_images;
+
+            plan.save(function(err) {
+              if(err) { return next(err); }
+
+              res.status(200).send(plan)
+            })
+          });
+        } else {
+          res.status(200).send(plan);
+        }
       });
     }
     var stripe_api_key = current_user.account.stripe_connect.access_token;
@@ -52,11 +77,23 @@ router.route('')
     plan.save(function(err) {
       if(err) { return next(err); }
 
-      StripeManager.updatePlan(stripe_api_key, plan, function(err, plan) {
+      StripeManager.updatePlan(stripe_api_key, plan, function(err, stripe_plan) {
         if(err) { return next(err); }
 
+        if(req.file) {
+          PlanHelper.uploadAvatar(plan, req.file.path, function(avatar_images) {
+            console.log(avatar_images);
+            plan.avatar = avatar_images;
 
-        res.status(200).send(plan);
+            plan.save(function(err) {
+              if(err) { return next(err); }
+
+              res.status(200).send(plan)
+            });
+          });
+        } else {
+          res.status(200).send(plan);
+        }
       });
     });
   });

@@ -12,6 +12,7 @@ var PlanSchema   = new Schema({
     type: String,
     required: true
   },
+  avatar: {},
   description: {
     type: String
   },
