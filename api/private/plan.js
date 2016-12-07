@@ -34,6 +34,7 @@ router.route('')
     plan.name = req.body.name;
     plan.one_time_amount = req.body.one_time_amount;
     plan.description = req.body.description;
+    plan.trial_period_days = req.body.trial_period_days;
     plan.features = req.body.features;
     plan.terms_of_service = req.body.terms_of_service;
 

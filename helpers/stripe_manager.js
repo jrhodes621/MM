@@ -123,6 +123,7 @@ module.exports = {
 
     stripe.plans.update(plan.reference_id, {
       name: plan.name,
+      trial_period_days: plan.trial_period_days,
       metadata: {
         'description': plan.description,
         'termsofservice': plan.terms_of_service,
