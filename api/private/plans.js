@@ -31,12 +31,15 @@ router.route('')
     var plan = new Plan();
     plan.user = user._id;
     plan.name = req.body.name;
+    plan.description = req.body.description;
+    plan.features = req.body.features;
     plan.amount = req.body.amount;
     plan.interval = req.body.interval;
     plan.interval_count = req.body.interval_count;
     plan.statement_descriptor = req.body.statement_descriptor;
     plan.trial_period_days = req.body.trial_period_days;
     plan.statement_description = req.body.statement_description;
+    plan.terms_of_service = req.body.terms_of_service;
 
     if(user.account.stripe_connect) {
       var stripe_api_key = user.account.stripe_connect.access_token;

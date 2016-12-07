@@ -34,6 +34,7 @@ router.route('')
     plan.name = req.body.name;
     plan.one_time_amount = req.body.one_time_amount;
     plan.description = req.body.description;
+    plan.features = req.body.features;
     plan.terms_of_service = req.body.terms_of_service;
 
     if(!current_user.account.stripe_connect.access_token) {

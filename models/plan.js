@@ -50,7 +50,7 @@ var PlanSchema   = new Schema({
   statement_description: {
     type: String
   },
-  terms_of_server: {
+  terms_of_service: {
     type: String
   },
   members: [{
