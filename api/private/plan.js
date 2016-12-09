@@ -96,6 +96,32 @@ router.route('')
         }
       });
     });
+  })
+  .delete(function(req, res) {
+    var current_user = req.current_user;
+    var plan = req.plan;
+    plan.archive = true;
+
+    if(current_user.account.stripe_connect.access_token) {
+      var stripe_api_key = current_user.account.stripe_connect.access_token;
+
+      StripeManager.deletePlan(stripe_api_key, plan, function(err, confirmation) {
+        if(err) { return next(err); }
+        console.log(confirmation);
+
+        plan.save(function(err) {
+          if(err) { return next(err); }
+
+          res.sendStatus(202);
+        });
+      });
+    } else {
+      plan.save(function(err) {
+        if(err) { return next(err); }
+
+        res.sendStatus(202);
+      });
+    }
   });
 router.route('/members')
   .get(function(req, res, next) {

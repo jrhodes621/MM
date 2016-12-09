@@ -57,7 +57,12 @@ var PlanSchema   = new Schema({
   members: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+  archive: {
+    type: Boolean,
+    required: true,
+    default: false
+  }
 },
 {
     timestamps: true

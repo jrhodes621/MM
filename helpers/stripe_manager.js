@@ -132,6 +132,16 @@ module.exports = {
       callback(err, plan);
     });
   },
+  deletePlan: function(stripe_api_key, plan, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.plans.del(
+      plan.reference_id,
+      function(err, confirmation) {
+        callback(err, confirmation)
+      }
+    );
+  },
   listMembers: function(stripe_api_key, callback) {
     var stripe = require('stripe')(stripe_api_key);
 
