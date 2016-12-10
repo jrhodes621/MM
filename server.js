@@ -122,6 +122,7 @@ var PublicFunnelRoutes = require('./api/public/funnel');
 var SessionsRoutes = require('./api/public/sessions');
 var OauthCallbackRoutes = require('./api/public/oauth');
 var SubscribeRoutes = require('./api/public/subscribe');
+var StripeEventRoutes = require('./api/public/stripe_events')
 
 router.use('/funnel/step1', PublicFunnelRoutes);
 router.use('/users/auth', OauthCallbackRoutes);
