@@ -8,11 +8,12 @@ var StripeEvent = require('../../models/stripe_event');
 router.route('')
   .post(function(req, res, next) {
     // Retrieve the request's body and parse it as JSON
-    var event_json = JSON.parse(req.body);
+    console.log(req.body);
+    var event_json = req.body
     var event_id = event_json.id
     var event_type = event_json.type;
     var request_id = event_json.request;
-    var livemodemode = event_json.livemode;
+    var livemode = event_json.livemode;
     var object_json = event_json.data.object;
 
     var stripe_event = new StripeEvent();
@@ -28,7 +29,7 @@ router.route('')
 
       // Do something with event_json
       //var event_types = ['charge_failed', 'charge_refunded', 'charge_succeeded']
-      response.send(200);
+      res.send(200);
     });
   });
 
