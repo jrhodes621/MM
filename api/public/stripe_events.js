@@ -5,7 +5,7 @@ var router = express.Router();              // get an instance of the express Ro
 var mongoose   = require('mongoose');
 var StripeEvent = require('../../models/stripe_event');
 
-router.route('stripe_events')
+router.route('')
   .post(function(req, res, next) {
     // Retrieve the request's body and parse it as JSON
     var event_json = JSON.parse(request.body);
