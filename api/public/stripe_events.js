@@ -8,7 +8,7 @@ var StripeEvent = require('../../models/stripe_event');
 router.route('')
   .post(function(req, res, next) {
     // Retrieve the request's body and parse it as JSON
-    var event_json = JSON.parse(request.body);
+    var event_json = JSON.parse(req.body);
     var event_id = event_json.id
     var event_type = event_json.type;
     var request_id = event_json.request;
