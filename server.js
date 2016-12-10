@@ -128,6 +128,7 @@ router.use('/funnel/step1', PublicFunnelRoutes);
 router.use('/users/auth', OauthCallbackRoutes);
 router.use('/sessions', SessionsRoutes);
 router.use('/users', PublicUserRoutes);
+router.use('/stripe_events', StripeEventRoutes);
 
 router.use(function(req, res, next) {
   console.log("looking for token");
