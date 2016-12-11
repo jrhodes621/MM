@@ -22,14 +22,22 @@ router.route('')
     stripe_event.type = event_type;
     stripe_event.request_id = request_id;
     stripe_event.livemode = livemode;
-    stripe_event.raw_object = object_json;
+    stripe_event.raw_object = event_json;
 
     stripe_event.save(function(err) {
       if(err) { return next(err); }
 
+      console.log(stripe_event);
       // Do something with event_json
-      //var event_types = ['charge_failed', 'charge_refunded', 'charge_succeeded']
-      res.send(200);
+      //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
+      if(stripe_event.type == 'charge.succeeded') {
+        ChargeSucceedProcessor.process(stripe_event, function(err, activity) {
+          if(err) { return next(err) }
+          console.log(activity);
+
+          res.send(200);
+        });
+      };
     });
   });
 
