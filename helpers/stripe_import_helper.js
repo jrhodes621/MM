@@ -32,8 +32,8 @@ module.exports = {
       }
     );
   },
-  importMembersForPlan: function(user, plan, callback) {
-    var stripe_api_key = user.account.stripe_connect.access_token;
+  importMembersForPlan: function(bull, plan, callback) {
+    var stripe_api_key = bull.account.stripe_connect.access_token;
 
     Step(
       function getSubscriptionsFromStripe() {
@@ -47,7 +47,7 @@ module.exports = {
         console.log("***Parsing StripeSubscriptions");
         console.log("found " + stripe_subscriptions.data);
         console.log("here");
-        SubscriptionHelper.parse(stripe_api_key, stripe_subscriptions.data, plan, this);
+        SubscriptionHelper.parse(bull, stripe_api_key, stripe_subscriptions.data, plan, this);
       },
       function addMembersToPlan(err, members) {
         if(err) { throw err; }

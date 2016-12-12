@@ -18,25 +18,22 @@ router.route('')
 
     if(!user.account) { return next(new Error("No Members")); }
 
-    User.paginate({ "memberships.account_id": user.account._id }, { offset: offset, limit: page_size, populate: [{
-          path: 'memberships.subscription'
+    User.paginate({ "memberships.account": user.account }, { offset: offset, limit: page_size, populate: [{
+          path: 'memberships.subscriptions'
         }, {
           path: 'payment_cards'
         }, {
           path: 'charges'
         }, {
-          path: 'memberships.subscription',
+          path: 'memberships.subscriptions',
           populate: { path: 'plan' }
         }] }, function(err, result) {
       if(err) { return next(err) };
-
-      console.log(result);
 
       res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset });
     });
   })
   .post(function(req, res, next) {
-    console.log("adding member");
     var current_user = req.current_user;
 
     var user = new User();

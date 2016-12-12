@@ -10,22 +10,16 @@ module.exports = {
       callback(null, plan);
     }
     members.forEach(function(member) {
+      console.log("member: ");
+      console.log(member)
+
       member.save(function(err) {
         if(err) { console.log(err); }
 
-        Step(
-          function saveMemberships() {
-            MembershipHelper.saveMemberships(member.memberships, this);
-          },
-          function doCallback(err, sources) {
-            if(err) { console.log(err); }
-
-            numberOfMembers -= 1;
-            if(numberOfMembers == 0) {
-              callback(err, plan);
-            }
-          }
-        )
+        numberOfMembers -= 1;
+        if(numberOfMembers == 0) {
+          callback(err, plan);
+        }
       });
     });
   }

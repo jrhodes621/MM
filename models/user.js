@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
 var Account = require('../models/account');
 var Charge = require('../models/charge');
+var Membership = require('../models/membership');
 var PaymentCard = require('../models/payment_card');
 var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
@@ -45,26 +46,7 @@ var UserSchema   = new Schema({
     ref: 'User',
     default: []
   }],
-  memberships: [{
-    reference_id: {
-      type: String
-    },
-    account_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true
-    },
-    company_name: {
-      type: String
-    },
-    plan_names: [String],
-    member_since: {
-      type: Date
-    },
-    subscription: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Subscription'
-    }
-  }],
+  memberships: [Membership.schema],
   payment_cards: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PaymentCard',

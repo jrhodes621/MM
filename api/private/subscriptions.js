@@ -37,7 +37,7 @@ router.route('/:subscription_id')
 
       StripeManager.getSubscription(stripe_api_key, subscription.reference_id, function(err, stripe_subscription){
         if(!stripe_subscription) {
-          var membership = MembershipHelper.getMembership(user, current_user.account.name, function(membership) {
+          var membership = MembershipHelper.getMembership(user, current_user.account, function(membership) {
             if(!membership) { return next(new Error("Can't find a membership")) }
 
             membership.plan_names = [];
@@ -58,7 +58,7 @@ router.route('/:subscription_id')
           StripeManager.cancelSubscription(stripe_api_key, subscription.reference_id, function(err, confirmation) {
             if(err) { return next(err); }
 
-            var membership = MembershipHelper.getMembership(user, current_user.account.name, function(membership) {
+            var membership = MembershipHelper.getMembership(user, current_user.account, function(membership) {
               if(!membership) { return next(new Error("Can't find a membership")) }
 
               membership.plan_names = [];
@@ -105,7 +105,7 @@ router.route('/:subscription_id/upgrade')
           new_subscription.trial_end = stripe_subscription.trial_end;
           new_subscription.status = stripe_subscription.status;
 
-          var membership = MembershipHelper.getMembership(user, current_user.account.name, function(membership) {
+          var membership = MembershipHelper.getMembership(user, current_user.account, function(membership) {
             if(!membership) { return next(new Error("Can't find a membership")) }
 
             membership.plan_names = [];

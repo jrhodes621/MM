@@ -1,5 +1,7 @@
 var StripeManager = require('./stripe_manager');
 var User = require('../models/user');
+var Membership = require('../models/membership');
+var MembershipHelper  = require('../helpers/membership_helper');
 var PaymentCard = require('../models/payment_card');
 var Subscription = require('../models/subscription');
 var SourceHelper      = require('./source_helper');
@@ -7,7 +9,7 @@ var UserHelper   = require('./user_helper');
 var Step = require('step');
 
 module.exports = {
-  parse: function(customer, stripe_subscription, plan, callback) {
+  parse: function(bull, customer, stripe_subscription, plan, callback) {
     Step(
       function getUser() {
         console.log("***Getting User: " + customer.email + '***');
@@ -36,32 +38,10 @@ module.exports = {
 
         SourceHelper.parse(user, customer, this);
       },
-      function parseMemberUser(err, memberUser) {
+      function addMembership(err, user) {
         if(err) { console.log(err); }
 
-        console.log("***Parsing Member User ***");
-
-        var subscription = new Subscription();
-
-        subscription.plan = plan;
-        subscription.reference_id = stripe_subscription.id;
-        subscription.subscription_created_at = stripe_subscription.created_at;
-        subscription.subscription_canceled_at = stripe_subscription.canceled_at;
-        subscription.trial_start = stripe_subscription.trial_start;
-        subscription.trial_end = stripe_subscription.trial_end;
-        subscription.status = stripe_subscription.status;
-
-        memberUser.memberships = [];
-        memberUser.memberships.push({
-          reference_id: customer.id,
-          company_name: plan.user.account.company_name,
-          account_id: plan.user.account._id,
-          plan_names: [plan.name],
-          member_since: customer.created,
-          subscription: subscription
-        });
-
-        return memberUser
+        MembershipHelper.parse(bull, user, customer, stripe_subscription, plan, this);
       },
       function doCallback(err, memberUser) {
         if(err) { console.log(err); }

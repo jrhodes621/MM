@@ -5,7 +5,7 @@ var StripeManager = require('./stripe_manager');
 var Step = require('step');
 
 module.exports = {
-  parse: function(stripe_api_key, subscriptions, plan, callback) {
+  parse: function(bull, stripe_api_key, subscriptions, plan, callback) {
     console.log("***Parse Subscriptions***");
     console.log(subscriptions.length);
 
@@ -26,9 +26,8 @@ module.exports = {
           if(err) { console.log(err) }
 
           console.log("***Parse Customer***");
-          console.log(plan);
 
-          CustomerParser.parse(customer, subscription, plan, this)
+          CustomerParser.parse(bull, customer, subscription, plan, this)
         },
         function addMember(err, user) {
           if(err) { console.log(err) }
