@@ -30,7 +30,6 @@ module.exports = {
           membership.reference_id = stripe_customer.id;
           membership.company_name = bull.account.company_name;
           membership.account = bull.account;
-          membership.plans.push(plan);
           membership.member_since = stripe_customer.created;
           membership.subscriptions.push(subscription);
 

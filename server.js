@@ -154,14 +154,14 @@ router.use(function(req, res, next) {
         .populate({
           path: 'members',
           populate: [{
-            path: 'memberships.subscription'
+            path: 'memberships.subscriptions'
           }, {
             path: 'payment_cards'
           }, {
             path: 'charges'
           }, {
-            path: 'memberships.subscription',
-            populate: { path: 'plan' }
+            path: 'memberships.subscriptions',
+            populate: { path: 'subscriptions.plan' }
           }]
         })
         .exec(function(err, user) {

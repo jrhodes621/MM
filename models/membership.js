@@ -12,11 +12,6 @@ var MembershipSchema   = new Schema({
   company_name: {
     type: String
   },
-  plans: [{
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    default: []
-  }],
   member_since: {
     type: Date
   },

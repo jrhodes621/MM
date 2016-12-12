@@ -4,6 +4,7 @@ var express    = require('express');        // call express
 var router = express.Router();              // get an instance of the express Router
 var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken');
+var Membership = require('../../models/membership');
 var User = require('../../models/user');
 var StripeManager = require("../../helpers/stripe_manager");
 
@@ -17,20 +18,33 @@ router.route('')
     var offset = (page-1)*page_size;
 
     if(!user.account) { return next(new Error("No Members")); }
+    // Map the docs into an array of just the _ids
 
-    User.paginate({ "memberships.account": user.account }, { offset: offset, limit: page_size, populate: [{
-          path: 'memberships.subscriptions'
-        }, {
-          path: 'payment_cards'
-        }, {
-          path: 'charges'
-        }, {
-          path: 'memberships.subscriptions',
-          populate: { path: 'plan' }
-        }] }, function(err, result) {
+    Membership.find({'account': user.account}, function(err, memberships) {
+      var ids = memberships.map(function(doc) { return doc._id; });
+
+      User.paginate({ 'memberships': { $in: ids } }, { offset: offset, limit: page_size, populate: [{
+        path: 'memberships',
+        populate: {
+          path: 'account'
+        }
+      }, {
+        path: 'payment_cards'
+      }, {
+        path: 'charges'
+      }, {
+        path: 'memberships',
+        populate: {
+          path: 'subscriptions',
+          populate: {
+            path: 'plan',
+            model: 'Plan'
+          }
+        }
+      }] }, function(err, result) {
       if(err) { return next(err) };
-
-      res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset });
+        res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset });
+      });
     });
   })
   .post(function(req, res, next) {

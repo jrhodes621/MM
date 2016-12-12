@@ -46,7 +46,11 @@ var UserSchema   = new Schema({
     ref: 'User',
     default: []
   }],
-  memberships: [Membership.schema],
+  memberships: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Membership',
+    default: []
+  }],
   payment_cards: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PaymentCard',
