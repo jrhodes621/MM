@@ -4,6 +4,7 @@ var express    = require('express');        // call express
 var router = express.Router();              // get an instance of the express Router
 var mongoose   = require('mongoose');
 var StripeEvent = require('../../models/stripe_event');
+var ChargeSucceededProcessor = require('../../helpers/stripe_event_processors/charge_succeeded_processor');
 
 router.route('')
   .post(function(req, res, next) {
@@ -31,7 +32,7 @@ router.route('')
       // Do something with event_json
       //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
       if(stripe_event.type == 'charge.succeeded') {
-        ChargeSucceedProcessor.process(stripe_event, function(err, activity) {
+        ChargeSucceededProcessor.process(stripe_event, function(err, activity) {
           if(err) { return next(err) }
           console.log(activity);
 
