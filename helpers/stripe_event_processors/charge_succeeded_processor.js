@@ -1,25 +1,27 @@
 var request = require('request');
-var Charge = require('../models/charge')
-var PaymentCard = require('../models/payment_card');
-var Plan = require('../models/plan');
-var Subscription = require('../models/subscription');
-var StripeManager = require('./stripe_manager');
-var ChargeHelper = require('./charge_helper');
-var SubscriptionHelper = require('./subscription_helper')
-var User = require('../models/user');
+var Charge = require('../../models/charge')
+var Plan = require('../../models/plan');
+var Subscription = require('../../models/subscription');
+var StripeManager = require('../stripe_manager');
+var User = require('../../models/user');
 var Step = require('step');
 
 module.exports = {
   process: function(stripe_event, callback) {
     // Do something with event_json
     //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
-    var reference_id = stripe_event.raw_object.customer;
-    var invoice_id = stripe_event.raw_object.invoice;
+    var reference_id = stripe_event.raw_object.data.object.customer;
+    var invoice_id = stripe_event.raw_object.data.object.invoice;
+
+    console.log(reference_id);
 
     User.findOne({ "reference_id": reference_id})
     .exec(function(err, calf) {
-      if(err) { callback(err, null); }
-      if(!calf) { callback(new Error("Calf not found"), null) }
+      if(err) { return callback(err, null); }
+      if(!calf) { return callback(new Error("Calf not found"), null) }
+      console.log(calf);
+      if(!calf.account || !calf.account.stripe_connect);
+      var stripe_api_key = calf.account.stripe_connect.access_token;
 
       //find invoice
       StripeManager.getInvoice(stripe_api_key, invoice_id, function(err, invoice) {
@@ -54,4 +56,5 @@ module.exports = {
         });
       });
     });
-  });
+  }
+};
