@@ -65,6 +65,9 @@ var UserSchema   = new Schema({
   status: {
     type: String,
     required: true
+  },
+  refresh_token: {
+    type: String
   }
 },
 {

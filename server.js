@@ -152,7 +152,11 @@ router.use(function(req, res, next) {
     // verifies secret and checks exp
     jwt.verify(token, process.env.SECRET, { header: 'JWT' }, function(err, decoded) {
       if (err) {
-        return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
+        if(err.name == 'TokenExpiredError') {
+          return res.status(401).send({ success: false, message: 'Token expired.' });
+        } else {
+          return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
+        }
       } else {
         // if everything is good, save to request for use in other routes
         req.decoded = decoded;
