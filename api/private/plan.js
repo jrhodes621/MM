@@ -10,6 +10,7 @@ var StripeManager = require("../../helpers/stripe_manager");
 var Upload = require('s3-uploader');
 var multer  = require('multer');
 var PlanHelper = require('../../helpers/plan_helper');
+var Activity = require('../../models/activity');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -138,5 +139,21 @@ router.route('/members')
         res.status(200).send(plan.members);
       });
     });
+router.route('/activities')
+.get(function(req, res, next) {
+    console.log("getting activity for plan");
 
+    var current_user = req.current_user;
+    var plan = req.plan;
+
+    Activity.find({ "plan": plan})
+    .populate('bull')
+    .populate('calf')
+    .populate('plan')
+    .exec(function(err, activities) {
+      if(err) { return next(err) }
+
+      res.status(200).send(activities);
+    })
+  });
 module.exports = router;
