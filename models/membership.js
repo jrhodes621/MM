@@ -5,8 +5,14 @@ var MembershipSchema   = new Schema({
   reference_id: {
     type: String
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   account: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'Account',
     required: true
   },
   company_name: {

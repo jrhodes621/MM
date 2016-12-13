@@ -21,7 +21,11 @@ var ActivitySchema   = new Schema({
     type: String,
     required: true
   },
-  message: {
+  message_calf: {
+    type: String,
+    required: true
+  },
+  message_bull: {
     type: String,
     required: true
   },
@@ -31,7 +35,7 @@ var ActivitySchema   = new Schema({
   source: {
     type: String
   },
-}},
+},
 {
     timestamps: true
 });

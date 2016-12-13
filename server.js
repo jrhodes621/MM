@@ -10,6 +10,7 @@ var upload = multer({ dest: 'uploads/' });
 var cookieParser = require('cookie-parser');
 var path = require("path");
 var bodyParser = require("body-parser");
+var errorHandler = require('api-error-handler');
 var mongoose = require("mongoose");
 var jwt    = require('jsonwebtoken');
 var cors = require('cors');
@@ -104,9 +105,20 @@ var server = app.listen(process.env.PORT || 8080  , function () {
 });
 
 // Generic error handler used by all endpoints.
-function handleError(res, reason, message, code) {
-  console.log("ERROR: " + reason + ": " + code);
-  res.status(code || 500).send({"error": message});
+function logErrors (err, req, res, next) {
+  console.error(err.stack)
+  next(err)
+}
+function clientErrorHandler (err, req, res, next) {
+  if (req.xhr) {
+    res.status(500).send({ error: err })
+  } else {
+    next(err)
+  }
+}
+function errorHandler (err, req, res, next) {
+  res.status(500)
+  res.render('error', { error: err })
 }
 function errorNotification(err, str, req) {
   console.log("error notification: " + err)
@@ -245,14 +257,9 @@ router.param('user_id', function (req, res, next, user_id) {
     return next();
   });
 });
+router.use(errorHandler());
 // apply the routes to our application with the prefix /api
 app.use('/api', router);
 app.use('/accounts/:subdomain/api/subscribe', SubscribeRoutes);
-app.use(function(err, req, res, next) {
-  errorNotification(err, 'err', req);
-  //next(err);
-  res.status(500).send({"error": err});
-
-});
 
 module.exports = app;

@@ -5,7 +5,8 @@ var router = express.Router();              // get an instance of the express Ro
 var mongoose   = require('mongoose');
 var StripeEvent = require('../../models/stripe_event');
 var ChargeSucceededProcessor = require('../../helpers/stripe_event_processors/charge_succeeded_processor');
-
+var ChargeFailedProcessor = require('../../helpers/stripe_event_processors/charge_failed_processor');
+var ChargeRefundedProcessor = require('../../helpers/stripe_event_processors/charge_refunded_processor');
 router.route('')
   .post(function(req, res, next) {
     // Retrieve the request's body and parse it as JSON
@@ -31,14 +32,33 @@ router.route('')
       console.log(stripe_event);
       // Do something with event_json
       //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
-      if(stripe_event.type == 'charge.succeeded') {
-        ChargeSucceededProcessor.process(stripe_event, function(err, activity) {
-          if(err) { return next(err) }
-          console.log(activity);
+      switch(stripe_event.type) {
+        case "charge.succeeded":
+          ChargeSucceededProcessor.process(stripe_event, function(err, activity) {
+            if(err) { return next(err) }
 
-          res.send(200);
-        });
-      };
+            res.send(200);
+          });
+          break;
+        case "charge.failed":
+          ChargeFailedProcessor.process(stripe_event, function(err, activity) {
+            if(err) { return next(err) }
+
+            res.send(200);
+          });
+          break;
+        case "charge.refunded":
+          ChargeRefundedProcessor.process(stripe_event, function(err, activity) {
+            if(err) { return next(err) }
+
+            res.send(200);
+          });
+          break;
+        default:
+          console.log("Don't know how to handle " + stripe_event.type);
+
+          return next(new Error("Don't know how to handled " + stripe_event.type));
+      }
     });
   });
 

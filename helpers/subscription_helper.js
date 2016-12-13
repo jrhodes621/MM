@@ -64,6 +64,19 @@ module.exports = {
     });
 
   },
+  getSubscription: function(subscription_id, callback) {
+    Subscription.findOne({ "reference_id": subscription_id })
+    .populate('plan')
+    .populate({
+      path: 'plan',
+      populate: [{
+        path: 'user'
+      }]
+    })
+    .exec(function(err, subscription) {
+      callback(err, subscription)
+    })
+  },
   getFreePlan: function(callback) {
     Plan.findOne({reference_id: 'MM_FREE'})
     .populate('user')

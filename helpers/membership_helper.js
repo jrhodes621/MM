@@ -28,6 +28,7 @@ module.exports = {
           var membership = new Membership();
 
           membership.reference_id = stripe_customer.id;
+          membership.user = user;
           membership.company_name = bull.account.company_name;
           membership.account = bull.account;
           membership.member_since = stripe_customer.created;
@@ -48,6 +49,21 @@ module.exports = {
     console.log("getting membership for " + account_id);
 
     Membership.findOne({"account": account }, function(err, membership) {
+      callback(err, membership);
+    });
+  },
+  getMembershipByReference: function(reference_id, callback) {
+    Membership.findOne({ "reference_id": reference_id})
+    .populate('user')
+    .populate('account')
+    .populate({
+        path: 'subscriptions',
+        populate: {
+          path: 'plan'
+        }
+      }
+    )
+    .exec(function(err, membership) {
       callback(err, membership);
     });
   },
