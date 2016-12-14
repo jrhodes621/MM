@@ -7,7 +7,7 @@ var StripeEvent = require('../../models/stripe_event');
 var ChargeSucceededProcessor = require('../../helpers/stripe_event_processors/charge_succeeded_processor');
 var ChargeFailedProcessor = require('../../helpers/stripe_event_processors/charge_failed_processor');
 var ChargeRefundedProcessor = require('../../helpers/stripe_event_processors/charge_refunded_processor');
-var InvoiceSuccededProcessor = require('../../helpers/stripe_event_processors/invoice_succeeded_processor');
+var InvoiceSucceededProcessor = require('../../helpers/stripe_event_processors/invoice_succeeded_processor');
 
 router.route('')
   .post(function(req, res, next) {
