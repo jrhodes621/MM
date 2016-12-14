@@ -6,7 +6,8 @@ module.exports = {
     // Create a connection to the service using mostly default parameters.
     var options = {
       key: "dev_certs/key.pem",
-      cert: "dev_certs/cert.pem"
+      cert: "dev_certs/cert.pem",
+      production: true
     };
 
     var service = new apn.Provider(options);
