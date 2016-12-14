@@ -5,8 +5,8 @@ module.exports = {
   sendPushNotification: function(device, alertMessage, payload) {
     // Create a connection to the service using mostly default parameters.
     var options = {
-      key: "dev_certs/key.pem",
-      cert: "dev_certs/cert.pem",
+      key: "prod_certs/key.pem",
+      cert: "prod_certs/cert.pem",
       production: true
     };
 
