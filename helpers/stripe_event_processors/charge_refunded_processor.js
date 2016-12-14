@@ -29,6 +29,12 @@ module.exports = {
           var message_calf = "Your payment of $4.00 for " + subscription.plan.name + " was refunded.";
           var message_bull= "A payment of $4.00 for " + subscription.plan.name + " from " + membership.user.email + " was refuned.";
 
+          var payload = {'messageFrom': 'MemberMoose',
+                        'type': "payment_refunded"};
+          var devices = subscription.plan.user.devices;
+          devices.forEach(function(device) {
+            PushNotificationHelper.sendPushNotification(device, message_bull, payload);
+          });
           ActivityHelper.createActivity(subscription.plan.user, membership.user, subscription.plan, "payment_refunded", message_calf, message_bull,
             source, received_at, function(err, activity) {
               callback(err, activity);

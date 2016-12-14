@@ -163,5 +163,22 @@ module.exports = {
 
       callback(avatar_images);
     });
+  },
+  addDevice: function(user, new_device, callback) {
+    console.log(new_device);
+
+    var device_found = false;
+    user.devices.forEach(function(device) {
+      if(device.device_identifier == new_device.device_identifier) {
+        device.token = new_device.token;
+
+        device_found = true;
+      }
+    });
+
+    user.devices.push(new_device);
+    user.save(function(err) {
+      callback(err)
+    });
   }
 };

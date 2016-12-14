@@ -25,7 +25,7 @@ router.route('/')
         // check if password matches
         user.comparePassword(req.body.password, function (err, isMatch) {
           if (isMatch && !err) {
-            var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 100 });
+            var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
             var refresh_token = randtoken.uid(256)
 
             user.refresh_token = refresh_token;
@@ -48,7 +48,7 @@ router.route('/verify')
       if(err) { return next(err); }
       if(!user) { return next(new Error("User Not Found")) }
 
-      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 100 });
+      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
       var refresh_token = randtoken.uid(256)
 
       user.refresh_token = refresh_token;

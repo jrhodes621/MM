@@ -1,5 +1,6 @@
 var ActivityHelper = require('../../helpers/activity_helper');
 var MembershipHelper = require('../../helpers/membership_helper');
+var PushNotificationHelper = require('../../helpers/push_notification_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeManager = require('../stripe_manager');
 
@@ -27,7 +28,14 @@ module.exports = {
           if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
           var message_calf = "Your payment of $4.00 for " + subscription.plan.name + " was successfully processed.";
-          var message_bull= "You received a payment of $4.00 for " + subscription.plan.name + " from " + membership.user.email + ".";
+          var message_bull= "You received a payment of $4.00 for " + subscription.plan.name + " from " + membership.user.email_address + ".";
+
+          var payload = {'messageFrom': 'MemberMoose',
+                        'type': "payment_processed"};
+          var devices = subscription.plan.user.devices;
+          devices.forEach(function(device) {
+            PushNotificationHelper.sendPushNotification(device, message_bull, payload);
+          });
 
           ActivityHelper.createActivity(subscription.plan.user, membership.user, subscription.plan, "payment_processed", message_calf, message_bull,
             source, received_at, function(err, activity) {

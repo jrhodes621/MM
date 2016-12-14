@@ -228,6 +228,7 @@ router.use('/plans/:plan_id', PlanRoutes);
 router.use('/users/:user_id/subscriptions', PrivateSubscriptionRoutes);
 router.use('/users', PrivateUserRoutes);
 router.use('/users/:user_id', PrivateUserRoutes);
+router.use('/users/:user_id/devices', PrivateUserRoutes);
 router.use('/users/:user_id/charges', ChargesRoutes);
 router.use('/users/:user_id/payment_cards', PaymentCardRoutes)
 

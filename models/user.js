@@ -68,7 +68,22 @@ var UserSchema   = new Schema({
   },
   refresh_token: {
     type: String
-  }
+  },
+  devices: [{
+    device_type: {
+      type: String,
+      required: true,
+      default: "iPhone"
+    },
+    device_identifier: {
+      type: String,
+      required: true
+    },
+    token: {
+      type: String,
+      required: true
+    }
+  }]
 },
 {
     timestamps: true

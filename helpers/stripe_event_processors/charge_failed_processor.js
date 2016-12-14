@@ -27,8 +27,14 @@ module.exports = {
           if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
           var message_calf = "Your payment of $4.00 for " + subscription.plan.name + " failed.";
-          var message_bull= "A payment of $4.00 for " + subscription.plan.name + " from " + membership.user.email + " failed.";
+          var message_bull= "A payment of $4.00 for " + subscription.plan.name + " from " + membership.user.email_address + " failed.";
 
+          var payload = {'messageFrom': 'MemberMoose',
+                        'type': "payment_failed"};
+          var devices = subscription.plan.user.devices;
+          devices.forEach(function(device) {
+            PushNotificationHelper.sendPushNotification(device, message_bull, payload);
+          });
           ActivityHelper.createActivity(subscription.plan.user, membership.user, subscription.plan, "payment_failed", message_calf, message_bull,
             source, received_at, function(err, activity) {
               callback(err, activity);

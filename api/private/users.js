@@ -65,6 +65,24 @@ router.route('/:user_id')
       }
     })
   });
+router.route('/:user_id/devices')
+  .post(function(req, res, next) {
+    console.log("adding a device");
+
+    var current_user = req.current_user;
+
+    var device = {
+      device_type: req.body.device_type,
+      device_identifier: req.body.device_identifier,
+      token: req.body.device_token
+    }
+
+    UserHelper.addDevice(current_user, device, function(err) {
+      if(err) { return next(err); }
+
+      res.status(201).send(current_user);
+    });
+  });
 router.route('/connect_stripe')
   .post(function(req, res, next) {
     console.log("Connect Stripe");
