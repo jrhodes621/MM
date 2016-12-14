@@ -7,6 +7,8 @@ var StripeEvent = require('../../models/stripe_event');
 var ChargeSucceededProcessor = require('../../helpers/stripe_event_processors/charge_succeeded_processor');
 var ChargeFailedProcessor = require('../../helpers/stripe_event_processors/charge_failed_processor');
 var ChargeRefundedProcessor = require('../../helpers/stripe_event_processors/charge_refunded_processor');
+var InvoiceSuccededProcessor = require('../../helpers/stripe_event_processors/invoice_succeeded_processor');
+
 router.route('')
   .post(function(req, res, next) {
     // Retrieve the request's body and parse it as JSON
@@ -33,6 +35,13 @@ router.route('')
       // Do something with event_json
       //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
       switch(stripe_event.type) {
+        case "invoice.succeeded":
+          InvoiceSucceededProcessor.process(stripe_event, function(err, activity) {
+            if(err) { return next(err) }
+
+            res.send(200);
+          });
+          break;
         case "charge.succeeded":
           ChargeSucceededProcessor.process(stripe_event, function(err, activity) {
             if(err) { return next(err) }
