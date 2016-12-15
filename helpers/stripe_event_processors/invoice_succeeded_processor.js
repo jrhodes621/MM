@@ -3,6 +3,7 @@ var MembershipHelper = require('../../helpers/membership_helper');
 var PushNotificationHelper = require('../../helpers/push_notification_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeManager = require('../stripe_manager');
+const FormatCurrency = require('format-currency')
 
 module.exports = {
   process: function(stripe_event, callback) {
@@ -12,6 +13,11 @@ module.exports = {
     var invoice_id = stripe_event.raw_object.data.object.id;
     var subscription_id = stripe_event.raw_object.data.object.subscription;
     var total = stripe_event.raw_object.data.object.total;
+
+    // now include the currency symbol
+    let opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
+    let payment_formatted = FormatCurrency(total, opts)
+
     var source = "Stripe";
     var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
 
@@ -23,6 +29,9 @@ module.exports = {
 
       //find invoice
       StripeManager.getInvoice(stripe_api_key, invoice_id, function(err, stripe_invoice) {
+        if(err) { return callback(err, null); }
+        if(!stripe_invoice) { return callback(new Error("Invoice not found"), null) }
+
         var subscription_id = stripe_invoice.subscription;
 
         SubscriptionHelper.getSubscription(subscription_id, function(err, subscription) {
