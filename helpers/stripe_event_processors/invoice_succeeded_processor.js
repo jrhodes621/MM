@@ -12,11 +12,11 @@ module.exports = {
     var reference_id = stripe_event.raw_object.data.object.customer;
     var invoice_id = stripe_event.raw_object.data.object.id;
     var subscription_id = stripe_event.raw_object.data.object.subscription;
-    var total = stripe_event.raw_object.data.object.total;
+    var payment_total = stripe_event.raw_object.data.object.total;
 
     // now include the currency symbol
     let opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
-    let payment_formatted = FormatCurrency(total, opts)
+    let payment_total_formatted = FormatCurrency(payment_total, opts)
 
     var source = "Stripe";
     var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
@@ -38,8 +38,8 @@ module.exports = {
           if(err) { return callback(err, null); }
           if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
-          var message_calf = "Your payment of " + total + " for " + subscription.plan.name + " was successful.";
-          var message_bull= "You received a payment of " + total + " for " + subscription.plan.name + " from " + membership.user.email_address + ".";
+          var message_calf = "Your payment of " + payment_total_formatted + " for " + subscription.plan.name + " was successful.";
+          var message_bull= "You received a payment of " + payment_total_formatted + " for " + subscription.plan.name + " from " + membership.user.email_address + ".";
 
           var payload = {'messageFrom': 'MemberMoose',
                         'type': "payment_succeeded"};
