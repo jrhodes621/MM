@@ -20,6 +20,9 @@ router.route('')
     var livemode = event_json.livemode;
     var object_json = event_json.data.object;
 
+    if(livemode != process.env.STRIPE_LIVEMODE) {
+      return res.sen
+    }
     var stripe_event = new StripeEvent();
 
     stripe_event.event_id = event_id;
@@ -31,10 +34,14 @@ router.route('')
     stripe_event.save(function(err) {
       if(err) { return next(err); }
 
-      console.log(stripe_event);
-      // Do something with event_json
-      //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
       switch(stripe_event.type) {
+        case "customer.subscription.created":
+        CustomerSubscriptionCreatedProcessor.process(stripe_event, function(err, activity) {
+          if(err) { return next(err) }
+
+          res.send(200);
+        });
+          break;
         case "invoice.succeeded":
           InvoiceSucceededProcessor.process(stripe_event, function(err, activity) {
             if(err) { return next(err) }

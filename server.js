@@ -205,6 +205,7 @@ router.use(function(req, res, next) {
 });
 
 var AccountRoutes = require('./api/private/account.js');
+var ActivityRoutes = require('./api/private/activities.js');
 var ChargesRoutes = require('./api/private/charge.js');
 var MeRoutes = require('./api/private/me.js');
 var MembersRoutes = require('./api/private/members.js');
@@ -218,6 +219,7 @@ var PrivateSubscriptionRoutes = require('./api/private/subscriptions')
 var PrivateUserRoutes = require('./api/private/users.js')
 
 router.use('/accounts', AccountRoutes);
+router.use('/activities', ActivityRoutes);
 router.use('/funnel', PrivateFunnelRoutes);
 router.use('/me', MeRoutes);
 router.use('/members', MembersRoutes);
