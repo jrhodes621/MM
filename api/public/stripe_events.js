@@ -12,7 +12,6 @@ var InvoiceSucceededProcessor = require('../../helpers/stripe_event_processors/i
 router.route('')
   .post(function(req, res, next) {
     // Retrieve the request's body and parse it as JSON
-    console.log(req.body);
     var event_json = req.body
     var event_id = event_json.id
     var event_type = event_json.type;
@@ -20,9 +19,6 @@ router.route('')
     var livemode = event_json.livemode;
     var object_json = event_json.data.object;
 
-    if(livemode != process.env.STRIPE_LIVEMODE) {
-      return res.sen
-    }
     var stripe_event = new StripeEvent();
 
     stripe_event.event_id = event_id;
