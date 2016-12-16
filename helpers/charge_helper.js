@@ -16,6 +16,7 @@ module.exports = {
         function getCharge() {
           Charge.findOne({"reference_id": stripe_charge.id}, this);
         },
+
         function parseCharge(err, charge) {
           if(err) { console.log(err); }
 
@@ -68,6 +69,8 @@ module.exports = {
     charges.forEach(function(charge) {
       Step(
         function saveCharge() {
+          charge.user = user;
+
           charge.save(this);
         },
         function doCallback(err, charge) {

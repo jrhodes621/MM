@@ -2,6 +2,10 @@ var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var ChargeSchema   = new Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   reference_id: {
     type: String,
     required: true

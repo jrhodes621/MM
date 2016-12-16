@@ -4,6 +4,8 @@ var express    = require('express');        // call express
 var router = express.Router();              // get an instance of the express Router
 var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken');
+var Activity = require('../../models/activity');
+var Charge = require('../../models/charge');
 var User = require('../../models/user');
 var PaymentCard = require('../../models/payment_card');
 var Plan = require('../../models/plan');
@@ -83,6 +85,36 @@ router.route('/:user_id/devices')
       res.status(201).send(current_user);
     });
   });
+router.route('/:user_id/activities')
+  .get(function(req, res, next) {
+      console.log("getting activity for plan");
+
+      var current_user = req.current_user;
+
+      Activity.find({ "calf._id": req.body.user_id})
+      .populate('bull')
+      .populate('calf')
+      .populate('plan')
+      .exec(function(err, activities) {
+        if(err) { return next(err) }
+
+        res.status(200).send(activities);
+      });
+    });
+router.route('/:user_id/charges')
+  .get(function(req, res, next) {
+      console.log("getting charges for plan");
+
+      var current_user = req.current_user;
+
+      Charge.find({ "user._id": req.body.user_id})
+      .exec(function(err, charges) {
+        if(err) { return next(err) }
+
+        res.status(200).send(charges);
+      });
+    });
+
 router.route('/connect_stripe')
   .post(function(req, res, next) {
     console.log("Connect Stripe");
