@@ -56,9 +56,8 @@ module.exports = {
       }
     );
   },
-  listSubscriptions: function(stripe_api_key, plan_id, last_subscription_id, callback) {
+  listSubscriptions: function(stripe_api_key, plan_id, last_subscription_id, stripe_subscriptions, callback) {
     var stripe = require('stripe')(stripe_api_key);
-    var stripe_subscriptions = [];
 
     var options = {
       plan: plan_id,
@@ -81,7 +80,7 @@ module.exports = {
         } else {
           var last_id = subscriptions.data[subscriptions.data.length -1].id;
 
-          module.exports.listSubscriptions(stripe_api_key, plan_id, last_id, callback);
+          module.exports.listSubscriptions(stripe_api_key, plan_id, last_id, stripe_subscriptions, callback);
         }
       }
     );

@@ -39,7 +39,7 @@ module.exports = {
       function getSubscriptionsFromStripe() {
         console.log("***Getting Subscriptions from Stripe");
 
-        StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, null, this);
+        StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, null, [], this);
       },
       function parseSubscriptions(err, stripe_subscriptions) {
         if(err) { console.log(err); }
