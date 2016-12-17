@@ -39,15 +39,14 @@ module.exports = {
       function getSubscriptionsFromStripe() {
         console.log("***Getting Subscriptions from Stripe");
 
-        StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, this);
+        StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, null, this);
       },
       function parseSubscriptions(err, stripe_subscriptions) {
         if(err) { console.log(err); }
 
         console.log("***Parsing StripeSubscriptions");
-        console.log("found " + stripe_subscriptions.data);
-        console.log("here");
-        SubscriptionHelper.parse(bull, stripe_api_key, stripe_subscriptions.data, plan, this);
+        console.log("found " + stripe_subscriptions);
+        SubscriptionHelper.parse(bull, stripe_api_key, stripe_subscriptions, plan, this);
       },
       function addMembersToPlan(err, members) {
         if(err) { throw err; }

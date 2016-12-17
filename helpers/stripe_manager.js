@@ -56,15 +56,33 @@ module.exports = {
       }
     );
   },
-  listSubscriptions: function(stripe_api_key, plan_id, callback) {
+  listSubscriptions: function(stripe_api_key, plan_id, last_subscription_id, callback) {
     var stripe = require('stripe')(stripe_api_key);
+    var stripe_subscriptions = [];
+
+    var options = {
+      plan: plan_id,
+      limit: 100
+    }
+    if(last_subscription_id) {
+      options["starting_after"] = last_subscription_id;
+    }
 
     stripe.subscriptions.list(
-      { plan: plan_id,
-        limit: 100
-      },
+      options,
       function(err, subscriptions) {
-        callback(err, subscriptions);
+        if(err) { return callback(err, stripe_subscriptions); }
+
+        subscriptions.data.forEach(function(subscription) {
+          stripe_subscriptions.push(subscription);
+        });
+        if(!subscriptions.has_more) {
+          callback(err, stripe_subscriptions);
+        } else {
+          var last_id = subscriptions.data[subscriptions.data.length -1].id;
+
+          module.exports.listSubscriptions(stripe_api_key, plan_id, last_id, callback);
+        }
       }
     );
   },

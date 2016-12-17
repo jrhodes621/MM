@@ -34,6 +34,7 @@
     "morgan": "~1.7.0",
     "multer": "^1.2.0",
     "ngstorage": "^0.3.10",
+    "postmark": "^1.3.1",
     "rand-token": "^0.3.0",
     "randomstring": "^1.1.5",
     "remodal": "^1.1.0",

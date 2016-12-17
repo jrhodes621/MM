@@ -7,7 +7,10 @@ var StripeEvent = require('../../models/stripe_event');
 var ChargeSucceededProcessor = require('../../helpers/stripe_event_processors/charge_succeeded_processor');
 var ChargeFailedProcessor = require('../../helpers/stripe_event_processors/charge_failed_processor');
 var ChargeRefundedProcessor = require('../../helpers/stripe_event_processors/charge_refunded_processor');
+var CustomerSubscriptionCreatedProcessor = require('../../helpers/stripe_event_processors/customer_subscription_created_processor');
+var CustomerSubscriptionUpdatedProcessor = require('../../helpers/stripe_event_processors/customer_subscription_updated_processor');
 var InvoiceSucceededProcessor = require('../../helpers/stripe_event_processors/invoice_succeeded_processor');
+var InvoiceCreatedProcessor = require('../../helpers/stripe_event_processors/invoice_created_processor');
 
 router.route('')
   .post(function(req, res, next) {
@@ -32,11 +35,18 @@ router.route('')
 
       switch(stripe_event.type) {
         case "customer.subscription.created":
-        CustomerSubscriptionCreatedProcessor.process(stripe_event, function(err, activity) {
-          if(err) { return next(err) }
+          CustomerSubscriptionCreatedProcessor.process(stripe_event, function(err, activity) {
+            if(err) { return next(err) }
 
-          res.send(200);
-        });
+            res.send(200);
+          });
+          break;
+        case "customer.subscription.update":
+          CustomerSubscriptionUpdatedProcessor.process(stripe_event, function(err, activity) {
+            if(err) { return next(err) }
+
+            res.send(200);
+          });
           break;
         case "invoice.succeeded":
           InvoiceSucceededProcessor.process(stripe_event, function(err, activity) {
@@ -61,6 +71,13 @@ router.route('')
           break;
         case "charge.refunded":
           ChargeRefundedProcessor.process(stripe_event, function(err, activity) {
+            if(err) { return next(err) }
+
+            res.send(200);
+          });
+          break;
+        case "invoice.created":
+          InvoiceCreatedProcessor.process(stripe_event, function(err, activity) {
             if(err) { return next(err) }
 
             res.send(200);
