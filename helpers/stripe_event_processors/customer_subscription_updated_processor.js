@@ -29,7 +29,7 @@ module.exports = {
           var message_bull= membership.user.email_address + "'s subscription to   " + subscription.plan.name + " was updated.";
 
           var payload = {'messageFrom': 'MemberMoose',
-                        'type': "customer_subscription_created"};
+                        'type': "customer_subscription_updated"};
           var devices = subscription.plan.user.devices;
           devices.forEach(function(device) {
             PushNotificationHelper.sendPushNotification(device, message_bull, payload);
