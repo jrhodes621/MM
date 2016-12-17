@@ -55,7 +55,7 @@ router.route('')
             res.send(200);
           });
           break;
-        case "invoice.succeeded":
+        case "invoice.payment_succeeded":
           InvoiceSucceededProcessor.process(stripe_event, function(err, activity) {
             if(err) { return next(err) }
 
