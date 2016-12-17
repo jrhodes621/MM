@@ -91,14 +91,17 @@ router.route('/:user_id/activities')
 
       var current_user = req.current_user;
 
-      Activity.find({ "calf._id": req.body.user_id})
-      .populate('bull')
-      .populate('calf')
-      .populate('plan')
-      .exec(function(err, activities) {
-        if(err) { return next(err) }
+      User.findById(req.params.user_id, function(err, user) {
+        if(err) { return next(err); }
+        Activity.find({ "calf": user})
+        .populate('bull')
+        .populate('calf')
+        .populate('plan')
+        .exec(function(err, activities) {
+          if(err) { return next(err) }
 
-        res.status(200).send(activities);
+          res.status(200).send(activities);
+        });
       });
     });
 router.route('/:user_id/charges')
@@ -107,11 +110,15 @@ router.route('/:user_id/charges')
 
       var current_user = req.current_user;
 
-      Charge.find({ "user._id": req.body.user_id})
-      .exec(function(err, charges) {
-        if(err) { return next(err) }
+      User.findById(req.params.user_id, function(err, user) {
+        if(err) { return next(err); }
 
-        res.status(200).send(charges);
+        Charge.find({ "user": user })
+        .exec(function(err, charges) {
+          if(err) { return next(err) }
+
+          res.status(200).send(charges);
+        });
       });
     });
 
