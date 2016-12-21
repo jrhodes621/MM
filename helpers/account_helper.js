@@ -1,8 +1,14 @@
 var multer  = require('multer');
 var Upload = require('s3-uploader');
 var multer  = require('multer');
+var Activity = require('../models/activity');
 
 module.exports = {
+  getAccount: function(account_id, callback) {
+    Account.findById(account_id, function(err, account) {
+      callback(err, account);
+    });
+  },
   uploadAvatar: function(account, avatar_path, callback) {
     var s3BucketName = process.env.S3_BUCKET_NAME;
 

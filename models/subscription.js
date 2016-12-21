@@ -7,6 +7,11 @@ var SubscriptionSchema   = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Plan'
   },
+  membership: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Membership',
+    required: true
+  },
   reference_id: {
     type: String,
     required: true

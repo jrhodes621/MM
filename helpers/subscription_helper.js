@@ -20,7 +20,7 @@ module.exports = {
         function getStripeCustomer() {
           console.log("***Get Customer from Stripe***");
 
-          StripeManager.getMember(stripe_api_key, subscription.customer, this);
+          StripeManager.getCustomer(stripe_api_key, subscription.customer, this);
         },
         function parseCustomer(err, customer) {
           if(err) { console.log(err) }

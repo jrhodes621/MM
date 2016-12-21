@@ -80,7 +80,7 @@ router.route('/:member_id')
     }
     var stripe_api_key = user.account.stripe_connect.access_token;
 
-    StripeManager.getMember(stripe_api_key, req.params.member_id, function(err, member) {
+    StripeManager.getCustomer(stripe_api_key, req.params.member_id, function(err, member) {
       if(err) {
         console.log(err);
 

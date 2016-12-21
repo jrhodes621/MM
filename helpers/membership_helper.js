@@ -8,9 +8,18 @@ module.exports = {
       function addSubscription() {
         console.log("***adding subscriptiion");
 
+        var membership = new Membership();
+
+        membership.reference_id = stripe_customer.id;
+        membership.user = user;
+        membership.company_name = bull.account.company_name;
+        membership.account = bull.account;
+        membership.member_since = stripe_customer.created;
+
         var subscription = new Subscription();
 
         subscription.plan = plan;
+        subscription.membership = membership;
         subscription.reference_id = stripe_subscription.id;
         subscription.subscription_created_at = stripe_subscription.created_at;
         subscription.subscription_canceled_at = stripe_subscription.canceled_at;
@@ -21,19 +30,7 @@ module.exports = {
         subscription.save(function(err) {
           if (err) throw err;
 
-          console.log("Subscription saved");
-
-          console.log("***creating membership");
-
-          var membership = new Membership();
-
-          membership.reference_id = stripe_customer.id;
-          membership.user = user;
-          membership.company_name = bull.account.company_name;
-          membership.account = bull.account;
-          membership.member_since = stripe_customer.created;
           membership.subscriptions.push(subscription);
-
           membership.save(function(err) {
             if (err) throw err;
 

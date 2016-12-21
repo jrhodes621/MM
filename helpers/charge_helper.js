@@ -3,6 +3,13 @@ var StripeManager = require('./stripe_manager');
 var Step = require('step');
 
 module.exports = {
+  getCharge: function(charge_id, callback) {
+    Subscription.findOne({ "reference_id": charge_id })
+    .populate('user')
+    .exec(function(err, charge) {
+      callback(err, charge)
+    })
+  },
   parse: function(stripe_charges, callback) {
     var numberOfCharges = stripe_charges.data.length;
     var charges = [];
