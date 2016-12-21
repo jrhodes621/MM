@@ -15,6 +15,8 @@ var InvoiceSucceededProcessor = require('./stripe_event_processors/invoice_succe
 
 module.exports = {
   processEvent: function(stripe_event, callback) {
+    console.log("Processing Stripe Event: " + stripe_event.type);
+
     switch(stripe_event.type) {
       case "customer.subscription.created":
         CustomerSubscriptionCreatedProcessor.process(stripe_event, function(err, activity) {
