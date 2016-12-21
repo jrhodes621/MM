@@ -1,7 +1,7 @@
 var multer  = require('multer');
 var Upload = require('s3-uploader');
 var multer  = require('multer');
-var Activity = require('../models/activity');
+var Account = require('../models/account');
 
 module.exports = {
   getAccount: function(account_id, callback) {
