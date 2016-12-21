@@ -3,6 +3,10 @@ var Schema   = mongoose.Schema;
 var Plan     = require('../models/plan');
 
 var AccountSchema   = new Schema({
+  reference_id: {
+    type: String,
+    required: true
+  },
   company_name: {
     type: String,
     required: true

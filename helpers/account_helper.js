@@ -5,7 +5,7 @@ var Account = require('../models/account');
 
 module.exports = {
   getAccount: function(account_id, callback) {
-    Account.findById(account_id, function(err, account) {
+    Account.findOne({ "reference_id": account_id }, function(err, account) {
       callback(err, account);
     });
   },

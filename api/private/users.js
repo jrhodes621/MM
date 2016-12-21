@@ -129,11 +129,8 @@ router.route('/connect_stripe')
     var user = req.current_user;
     user.account.stripe_connect = req.body.stripe_connect;
 
-    console.log(req.body.stripe_connect);
     StripeImportHelper.importFromStripe(user, function(errors, plans) {
-      console.log("***Reference Plans***");
-      console.log(plans);
-
+      user.account.reference_id = user.account.stripe_connect.stripe_user_id;
       user.account.reference_plans = plans;
 
       user.account.save(function(err) {
