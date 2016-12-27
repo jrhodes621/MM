@@ -169,7 +169,7 @@ module.exports = {
       }
     );
   },
-  getMember: function(stripe_api_key, customer_id, callback) {
+  getCustomer: function(stripe_api_key, customer_id, callback) {
     var stripe = require('stripe')(stripe_api_key);
 
     stripe.customers.retrieve(

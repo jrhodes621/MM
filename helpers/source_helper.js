@@ -13,19 +13,16 @@ module.exports = {
       Step(
         function getPaymentCard() {
           console.log("getting payment card");
-          console.log(source);
 
           PaymentCard.findOne({"reference_id": source.id}, this);
         },
         function parsePaymentCard(err, payment_card) {
-          if(err) { console.log(err); }
+          if(err) { throw err; }
 
           console.log("Parse Payment Card")
-          console.log(payment_card);
 
           if(!payment_card) {
             console.log("Adding Payment Card");
-            console.log(payment_card);
 
             payment_card = new PaymentCard();
 
@@ -38,7 +35,7 @@ module.exports = {
             payment_card.status = "Active";
 
             payment_card.save(function(err) {
-              if(err) { console.log(err); }
+              if(err) { throw err; }
 
               console.log("Payment Card Saved");
 

@@ -27,7 +27,7 @@ module.exports = {
 
           console.log("***Parse Customer***");
 
-          CustomerParser.parse(bull, customer, subscription, plan, this)
+          CustomerParser.parse(customer, subscription, plan, this)
         },
         function addMember(err, user) {
           if(err) { console.log(err) }
@@ -45,10 +45,23 @@ module.exports = {
 
           numberOfSubscriptions -= 1;
           if(numberOfSubscriptions == 0) {
-            callback(err, users)
+            callback(err, users);
           }
         }
       );
+    });
+  },
+  saveSubscriptions: function(subscriptions, callback) {
+    var numberOfSubscriptions = subscriptions.length;
+
+    subscriptions.forEach(function(subscription) {
+      if(err) { throw err; }
+
+      numberOfSubscriptions -= 1;
+
+      if(numberOfSubscriptions == 0) {
+        callback(err);
+      }
     });
   },
   subscribeToPlan: function(user, plan, callback) {

@@ -164,22 +164,6 @@ router.use(function(req, res, next) {
 
         User.findById(user_id)
         .populate('account')
-        .populate('plans')
-        .populate('charges')
-        .populate('payment_cards')
-        .populate({
-          path: 'members',
-          populate: [{
-            path: 'memberships.subscriptions'
-          }, {
-            path: 'payment_cards'
-          }, {
-            path: 'charges'
-          }, {
-            path: 'memberships.subscriptions',
-            populate: { path: 'subscriptions.plan' }
-          }]
-        })
         .exec(function(err, user) {
           if (err) {
             return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });

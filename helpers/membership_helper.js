@@ -1,5 +1,6 @@
 var Membership = require('../models/membership');
 var Subscription = require('../models/subscription');
+var SubscriptionHelper = require('./subscription_helper');
 var Step = require('step');
 
 module.exports = {
@@ -43,9 +44,7 @@ module.exports = {
     )
   },
   getMembership: function(user, account, callback) {
-    console.log("getting membership for " + account_id);
-
-    Membership.findOne({"account": account }, function(err, membership) {
+    Membership.findOne({"account": account, "user": user }, function(err, membership) {
       callback(err, membership);
     });
   },
@@ -62,31 +61,6 @@ module.exports = {
     )
     .exec(function(err, membership) {
       callback(err, membership);
-    });
-  },
-  saveMemberships: function(memberships, callback) {
-    var numberOfMemberships = memberships.length;
-
-    if(numberOfMemberships == 0) {
-      callback(null, []);
-    }
-    memberships.forEach(function(membership) {
-      numberOfMemberships -= 1;
-      console.log(membership);
-
-      var numberOfSubscriptions = membership.subscriptions.length;
-
-      membership.subscriptions.forEach(function(subscription) {
-        subscription.save(function(err) {
-          numberOfSubscriptions -= 1;
-
-          if(err) { console.log(err); }
-
-          if(numberOfMemberships == 0  && numberOfSubscriptions == 0) {
-            callback(err, memberships)
-          }
-        });
-      });
     });
   }
 }

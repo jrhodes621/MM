@@ -3,10 +3,26 @@ var router = express.Router();              // get an instance of the express Ro
 var mongoose   = require('mongoose');
 var Charge = require('../../models/charge');
 var StripeManager = require('../../helpers/stripe_manager');
+var MembershipHelper = require('../../helpers/membership_helper');
 
 // on routes that end in /me
 // ----------------------------------------------------
 router.route('')
+  .get(function(req, res, next) {
+    var current_user = req.current_user;
+    var user = req.user;
+
+    MembershipHelper.getMembership(user, current_user.account, function(err, membership) {
+      if(err) { return next(err); }
+      if(!membership) { return next(new Error("No membership for user")) }
+
+      Charge.find({'membership': membership}, function(err, charges) {
+        if(err) { return next(err); }
+
+        res.status(200).send(charges);
+      });
+    });
+  })
   .post(function(req, res, next) {
     var current_user = req.current_user;
     var user = req.user;
@@ -43,7 +59,7 @@ router.route('')
       charge.save(function(err) {
         if(err) { return next(err) }
 
-        user.charges.push(charge);
+        //user.charges.push(charge);
         user.save(function(err) {
           if(err) { return next(err) }
 

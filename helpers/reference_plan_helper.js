@@ -7,23 +7,14 @@ module.exports = {
     Step(
       function getPlan() {
         console.log("***Getting Plan***");
-        console.log(reference_id);
 
         Plan.findOne({ "reference_id": reference_id, "user": user })
-        .populate('user')
-        .populate({
-          path: 'user',
-          populate: [{
-            path: 'account'
-          }]
-        })
         .exec(this);
       },
       function parsePlan(err, plan) {
         if(err) { console.log(err); }
 
         console.log("***Parse Referencce Plan***");
-        console.log(plan);
 
         if(!plan) {
           module.exports.createPlan(user, reference_id, this);
@@ -65,25 +56,22 @@ module.exports = {
         plan.interval = stripe_plan.interval;
         plan.interval_count = stripe_plan.interval_count;
         plan.statement_descriptor = stripe_plan.statement_descriptor;
-        plan.trial_period_days = 0 //stripePlan.trial_period_days;
+        plan.trial_period_days = stripe_plan.trial_period_days || 0;
 
         return plan;
       },
       function savePlan(err, plan) {
-        if(err) { console.log(err); }
-
-        console.log("***Save Plan***");
-        console.log(plan);
+        if(err) { throw err; }
 
         plan.save(function(err) {
-          if(err) { console.log(err); }
+          if(err) { throw err; }
 
           user.plans.push(plan);
 
           console.log("***Saved Plan***");
 
           user.save(function(err) {
-            if(err) { console.log(err); }
+            if(err) { throw err; }
 
             console.log("***Saved User***");
 

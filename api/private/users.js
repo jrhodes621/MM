@@ -9,6 +9,7 @@ var Charge = require('../../models/charge');
 var User = require('../../models/user');
 var PaymentCard = require('../../models/payment_card');
 var Plan = require('../../models/plan');
+var ActivityHelper = require('../../helpers/activity_helper');
 var MemberHelper = require('../../helpers/member_helper');
 var ReferencePlanHelper = require('../../helpers/reference_plan_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
@@ -28,6 +29,15 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage  });
 
+function logImportActivity(user, plan, callback) {
+  var message_calf = "Successfully imported " + plan.name + " from Stripe.";
+  var message_bull = "Successfully imported " + plan.name + " from Stripe.";
+  var received_at = new Date();
+
+  ActivityHelper.createActivity(user, null, plan, "import_success", message_calf, message_bull, "Stripe", received_at, function(err, activity) {
+    callback(err, this);
+  });
+}
 router.route('/:user_id')
   .put(upload.single('file'), function(req, res, next) {
     console.log("updating a user");
@@ -104,23 +114,6 @@ router.route('/:user_id/activities')
         });
       });
     });
-router.route('/:user_id/charges')
-  .get(function(req, res, next) {
-      console.log("getting charges for plan");
-
-      var current_user = req.current_user;
-
-      User.findById(req.params.user_id, function(err, user) {
-        if(err) { return next(err); }
-
-        Charge.find({ "user": user })
-        .exec(function(err, charges) {
-          if(err) { return next(err) }
-
-          res.status(200).send(charges);
-        });
-      });
-    });
 
 router.route('/connect_stripe')
   .post(function(req, res, next) {
@@ -147,7 +140,7 @@ router.route('/import_plans')
   .post(function(req, res) {
     console.log("Import Members");
 
-    var user = req.current_user;
+    var current_user = req.current_user;
     var plansToImport = req.body.plans;
     var numberOfPlans = plansToImport.length;
 
@@ -157,10 +150,7 @@ router.route('/import_plans')
     plansToImport.forEach(function(planToImport) {
       Step(
         function getPlan() {
-          console.log("***Import Plan");
-          console.log(planToImport);
-
-          Plan.findOne({ "reference_id": planToImport, "user": user })
+          Plan.findOne({ "reference_id": planToImport, "user": current_user })
           .populate('user')
           .populate({
             path: 'user',
@@ -171,57 +161,55 @@ router.route('/import_plans')
           .exec(this);
         },
         function parsePlan(err, plan) {
-          if(err) { console.log(err); }
-
-          console.log("***Parsing Plan");
+          if(err) { throw err; }
 
           if(!plan) {
-            ReferencePlanHelper.parse(user, planToImport, this);
+            ReferencePlanHelper.parse(current_user, planToImport, this);
           } else {
             return plan;
           }
         },
         function getMembersFromStripe(err, plan) {
-          if(err) { console.log(err); }
+          if(err) { throw err; }
 
-          console.log("***Getting Members from Stripe");
-          console.log("plan " + plan.name);
-
-          StripeImportHelper.importMembersForPlan(user, plan, this);
+          StripeImportHelper.importMembersForPlan(current_user, plan, this);
         },
         function saveMembers(err, plan, members) {
-          if(err) { console.log(err); }
-
-          console.log("***Saving Members");
-          console.log("found " + members.length);
+          if(err) { throw err; }
 
           MemberHelper.saveMembers(plan, members, this);
         },
-        function savePlan(err, plan) {
-          if(err) { console.log(err); }
+        function getChargesForMembers(err, plan, members) {
+          if(err) { throw err; }
+
+          StripeImportHelper.importChargesForMembers(current_user, plan, members, this);
+        },
+        function savePlan(err, plan, users) {
+          if(err) { throw err; }
 
           plan.save(this);
         },
+        // function updateReferencePlan(err, plan, users) {
+        //   if(err) { throw err; }
+        //
+        //   planToImport.imported = true;
+        //   planToImport.save(function(err) {
+        //     return plan
+        //   });
+        // },
+        function createActivity(err, plan) {
+          logImportActivity(current_user, plan, this);
+        },
         function doCallBack(err, plan) {
-          if(err) { console.log(err); }
-
-
-          console.log("***do import_plans Callback");
-          console.log("found " + plan.members.length);
+          if(err) { throw err; }
 
           numberOfPlans -= 1;
 
-        //  user.members.push(...members);
-
           if(numberOfPlans == 0) {
-            user.save(function(err) {
-              if(err) {
-                console.log(err)
+            current_user.save(function(err) {
+              if(err) { throw err; }
 
-                return res.status(400).send(err);
-              }
-
-              res.status(200).json(user);
+              res.status(200).json(current_user);
             });
           }
         }

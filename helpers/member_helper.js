@@ -7,18 +7,15 @@ module.exports = {
     var numberOfMembers = members.length;
 
     if(numberOfMembers == 0) {
-      callback(null, plan);
+      callback(null, plan, members);
     }
     members.forEach(function(member) {
-      console.log("member: ");
-      console.log(member)
-
       member.save(function(err) {
-        if(err) { console.log(err); }
+        if(err) { throw err; }
 
         numberOfMembers -= 1;
         if(numberOfMembers == 0) {
-          callback(err, plan);
+          callback(err, plan, members);
         }
       });
     });

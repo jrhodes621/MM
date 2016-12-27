@@ -1,10 +1,16 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
+var Plan     = require('../models/membership');
 
 var ChargeSchema   = new Schema({
   membership: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Membership',
+    required: true
+  },
+  payment_card: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PaymentCard',
     required: true
   },
   reference_id: {

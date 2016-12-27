@@ -1,7 +1,13 @@
 var Charge = require('../models/charge');
+var PaymentCard = require('../models/payment_card');
 var StripeManager = require('./stripe_manager');
 var Step = require('step');
 
+function getPaymentCardForCharge(charge, reference_id, callback) {
+    PaymentCard.findOne({ 'reference_id': reference_id }, function(err, payment_card) {
+      callback(err, charge, payment_card);
+    });
+}
 module.exports = {
   getCharge: function(charge_id, callback) {
     Subscription.findOne({ "reference_id": charge_id })
@@ -10,7 +16,7 @@ module.exports = {
       callback(err, charge)
     })
   },
-  parse: function(stripe_charges, callback) {
+  parse: function(stripe_charges, membership, callback) {
     var numberOfCharges = stripe_charges.data.length;
     var charges = [];
 
@@ -23,10 +29,15 @@ module.exports = {
         function getCharge() {
           Charge.findOne({"reference_id": stripe_charge.id}, this);
         },
+        function getPaymentCard(err, charge) {
+          if(err) { throw err; }
 
-        function parseCharge(err, charge) {
+          getPaymentCardForCharge(charge, stripe_charge.source.id, this);
+        },
+        function parseCharge(err, charge, payment_card) {
           if(err) { console.log(err); }
 
+          //ToDo Handle no Payment Card in DB
           if(!charge) {
             charge = new Charge();
           }
@@ -51,6 +62,8 @@ module.exports = {
           charge.source_transfer = stripe_charge.source_transfer;
           charge.statement_descriptor = stripe_charge.statement_descriptor;
           charge.status = stripe_charge.status;
+          charge.membership = membership._id;
+          charge.payment_card = payment_card;
 
           return charge;
         },
@@ -82,8 +95,6 @@ module.exports = {
         },
         function doCallback(err, charge) {
           if(err) { console.log(err); }
-
-          user.charges.push(charge);
 
           numberOfCharges -= 1;
           if(numberOfCharges == 0) {

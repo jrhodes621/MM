@@ -4,8 +4,7 @@ var Plan     = require('../models/plan');
 
 var AccountSchema   = new Schema({
   reference_id: {
-    type: String,
-    required: true
+    type: String
   },
   company_name: {
     type: String,
@@ -33,6 +32,11 @@ var AccountSchema   = new Schema({
     plan_name: {
       type: String,
       required: true
+    },
+    imported: {
+      type: Boolean,
+      required: true,
+      default: false
     }
   }],
   status: {
