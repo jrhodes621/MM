@@ -51,19 +51,6 @@ module.exports = {
       );
     });
   },
-  saveSubscriptions: function(subscriptions, callback) {
-    var numberOfSubscriptions = subscriptions.length;
-
-    subscriptions.forEach(function(subscription) {
-      if(err) { throw err; }
-
-      numberOfSubscriptions -= 1;
-
-      if(numberOfSubscriptions == 0) {
-        callback(err);
-      }
-    });
-  },
   subscribeToPlan: function(user, plan, callback) {
     var subscription = new Subscription();
 

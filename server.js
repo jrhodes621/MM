@@ -106,10 +106,14 @@ var server = app.listen(process.env.PORT || 8080  , function () {
 
 // Generic error handler used by all endpoints.
 function logErrors (err, req, res, next) {
+  console.log("logging error");
+
   console.error(err.stack)
   next(err)
 }
 function clientErrorHandler (err, req, res, next) {
+  console.log("client error handler");
+
   if (req.xhr) {
     res.status(500).send({ error: err })
   } else {
@@ -117,6 +121,8 @@ function clientErrorHandler (err, req, res, next) {
   }
 }
 function errorHandler (err, req, res, next) {
+  console.log("error handler");
+
   res.status(500)
   res.render('error', { error: err })
 }

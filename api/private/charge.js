@@ -16,7 +16,9 @@ router.route('')
       if(err) { return next(err); }
       if(!membership) { return next(new Error("No membership for user")) }
 
-      Charge.find({'membership': membership}, function(err, charges) {
+      Charge.find({'membership': membership})
+      .populate('payment_card')
+      .exec(function(err, charges) {
         if(err) { return next(err); }
 
         res.status(200).send(charges);

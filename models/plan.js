@@ -33,7 +33,7 @@ var PlanSchema   = new Schema({
     required: true
   },
   interval: {
-    type: String,
+    type: Number,
     required: true
   },
   interval_count: {
