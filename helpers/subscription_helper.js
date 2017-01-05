@@ -62,6 +62,8 @@ module.exports = {
         },
         function saveUser(user, callback) {
           user.save(function(err) {
+            plan.members.push(user);
+            
             callback(err, user);
           })
         }

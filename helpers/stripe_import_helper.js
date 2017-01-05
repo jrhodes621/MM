@@ -54,6 +54,10 @@ module.exports = {
         SubscriptionHelper.parse(bull, stripe_api_key, stripe_subscriptions, plan, function(err, users) {
           callback(err, users);
         });
+      }, function savePlan(users, callback) {
+        plan.save(function(err) {
+          callback(err, users);
+        })
       }
     ], function(err, users) {
       callback(err, users);
