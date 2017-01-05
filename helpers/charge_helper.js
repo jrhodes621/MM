@@ -1,11 +1,11 @@
 var Charge = require('../models/charge');
 var PaymentCard = require('../models/payment_card');
 var StripeManager = require('./stripe_manager');
-var Step = require('step');
+var async = require("async");
 
 function getPaymentCardForCharge(charge, reference_id, callback) {
     PaymentCard.findOne({ 'reference_id': reference_id }, function(err, payment_card) {
-      callback(err, charge, payment_card);
+      callback(err, payment_card);
     });
 }
 module.exports = {
@@ -16,28 +16,20 @@ module.exports = {
       callback(err, charge)
     })
   },
-  parse: function(stripe_charges, membership, callback) {
-    var numberOfCharges = stripe_charges.data.length;
-    var charges = [];
+  parse: function(user, stripe_charges, membership, callback) {
+    var all_charges = [];
 
-    if(numberOfCharges == 0) {
-      callback(null, []);
-    }
-    stripe_charges.data.forEach(function(stripe_charge) {
-      //find charge
-      Step(
-        function getCharge() {
-          Charge.findOne({"reference_id": stripe_charge.id}, this);
+    async.eachSeries(stripe_charges.data, function(stripe_charge, callback) {
+      async.waterfall([
+        function getCharge(callback) {
+          Charge.findOne({"reference_id": stripe_charge.id}, callback);
         },
-        function getPaymentCard(err, charge) {
-          if(err) { throw err; }
-
-          getPaymentCardForCharge(charge, stripe_charge.source.id, this);
+        function getPaymentCard(charge, callback) {
+          getPaymentCardForCharge(charge, stripe_charge.source.id, function(err, payment_card) {
+            callback(err, charge, payment_card);
+          });
         },
-        function parseCharge(err, charge, payment_card) {
-          if(err) { console.log(err); }
-
-          //ToDo Handle no Payment Card in DB
+        function parseCharge(charge, payment_card, callback) {
           if(!charge) {
             charge = new Charge();
           }
@@ -64,44 +56,19 @@ module.exports = {
           charge.status = stripe_charge.status;
           charge.membership = membership._id;
           charge.payment_card = payment_card;
-
-          return charge;
-        },
-        function doCallback(err, charge) {
-          if(err) { console.log(err); }
-
-          charges.push(charge)
-
-          numberOfCharges -= 1;
-          if(numberOfCharges == 0) {
-            callback(null, charges)
-          }
-        }
-      )
-    });
-  },
-  saveCharges: function(user, charges, callback) {
-    var numberOfCharges = charges.length;
-
-    if(numberOfCharges == 0) {
-      callback(null, []);
-    }
-    charges.forEach(function(charge) {
-      Step(
-        function saveCharge() {
           charge.user = user;
 
-          charge.save(this);
-        },
-        function doCallback(err, charge) {
-          if(err) { console.log(err); }
-
-          numberOfCharges -= 1;
-          if(numberOfCharges == 0) {
-            callback(err, user)
-          }
+          charge.save(function(err) {
+            callback(err, charge);
+          });
         }
-      )
+      ], function(err, charges) {
+        all_charges.push(charges);
+
+        callback(err, charges);
+      });
+    }, function(err) {
+      callback(err, all_charges);
     });
   }
 }

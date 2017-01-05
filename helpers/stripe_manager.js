@@ -70,7 +70,7 @@ module.exports = {
     stripe.subscriptions.list(
       options,
       function(err, subscriptions) {
-        if(err) { return callback(err, stripe_subscriptions); }
+        if(err) { callback(err, stripe_subscriptions); }
 
         subscriptions.data.forEach(function(subscription) {
           stripe_subscriptions.push(subscription);

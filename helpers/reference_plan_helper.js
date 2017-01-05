@@ -1,71 +1,61 @@
 var Plan = require('../models/plan');
 var StripeManager = require('./stripe_manager');
 var Step = require('step');
+var async = require("async");
 
 function transformRecurringInterval(stripe_plan, callback) {
   switch(stripe_plan.interval) {
     case "day":
-      callback(null, stripe_plan, 0);
+      callback(null, 0);
       break;
     case "week":
-      callback(null, stripe_plan, 1);
+      callback(null, 1);
       break;
     case "month":
-      callback(null, stripe_plan, 2);
+      callback(null, 2);
       break;
     case "year":
-      callback(null, stripe_plan, 3);
+      callback(null, 3);
       break;
     default:
-      callback("Invalid Recurring Interval " + stripe_plan.interval, stripe_plan, null);
+      callback("Invalid Recurring Interval " + stripe_plan.interval, null);
   }
 }
 module.exports = {
   parse: function(user, reference_id, callback) {
-    Step(
-      function getPlan() {
-        console.log("***Getting Plan***");
-
+    async.waterfall([
+      function getPlan(callback) {
         Plan.findOne({ "reference_id": reference_id, "user": user })
-        .exec(this);
+        .exec(function(err, plan) {
+          callback(err, plan);
+        });
       },
-      function parsePlan(err, plan) {
-        if(err) { console.log(err); }
-
-        console.log("***Parse Referencce Plan***");
-
+      function parsePlan(plan, callback) {
         if(!plan) {
-          module.exports.createPlan(user, reference_id, this);
+          module.exports.createPlan(user, reference_id, function(err, plan) {
+            callback(err, plan);
+          });
         } else {
-          return plan
+          callback(null, plan);
         }
-      },
-      function doCallback(err, plan) {
-        if(err) { console.log(err); }
-
-        console.log("***Do Callback for Reference Plan***");
-
-        callback(err, plan)
       }
-    )
+    ], function(err, plan) {
+      callback(err, plan)
+    });
   },
   createPlan: function(user, reference_id, callback) {
     var stripe_api_key = user.account.stripe_connect.access_token;
 
-    Step(
-      function getPlan() {
-        console.log("***Getting Plan from Stripe***");
-
-        StripeManager.getPlan(stripe_api_key, reference_id, this);
+    async.waterfall([
+      function getPlan(callback) {
+        StripeManager.getPlan(stripe_api_key, reference_id, callback);
       },
-      function convertRecurringInterval(err, stripe_plan) {
-        transformRecurringInterval(stripe_plan, this);
+      function convertRecurringInterval(stripe_plan, callback) {
+        transformRecurringInterval(stripe_plan, function(err, recurring_interval) {
+          callback(err, stripe_plan, recurring_interval);
+        });
       },
-      function parsePlan(err, stripe_plan, recurring_interval) {
-        if(err) { throw err; }
-
-        console.log("***Parse Stripe Plan***");
-
+      function parsePlan(stripe_plan, recurring_interval, callback) {
         var plan = new Plan();
 
         plan.user = user._id;
@@ -79,28 +69,12 @@ module.exports = {
         plan.statement_descriptor = stripe_plan.statement_descriptor;
         plan.trial_period_days = stripe_plan.trial_period_days || 0;
 
-        return plan;
-      },
-      function savePlan(err, plan) {
-        if(err) { throw err; }
-
         plan.save(function(err) {
-          if(err) { throw err; }
-
-          user.plans.push(plan);
-
-          console.log("***Saved Plan***");
-
-          user.save(function(err) {
-            if(err) { throw err; }
-
-            console.log("***Saved User***");
-
-            plan.user = user;
-            callback(err, plan);
-          });
+          callback(err, plan);
         });
       }
-    )
+    ], function(err, plan) {
+      callback(err, plan);
+    });
   }
 }

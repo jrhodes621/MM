@@ -1,54 +1,77 @@
+var Membership = require('../models/membership');
 var Plan = require('../models/plan');
 var Subscription = require('../models/subscription');
 var CustomerParser = require('./customer_parser');
+var SourceHelper      = require('./source_helper');
 var StripeManager = require('./stripe_manager');
-var Step = require('step');
+var async = require("async");
 
 module.exports = {
   parse: function(bull, stripe_api_key, subscriptions, plan, callback) {
-    console.log("***Parse Subscriptions***");
-    console.log(subscriptions.length);
+    var addedUsers = [];
 
-    var numberOfSubscriptions = subscriptions.length;
-    var users = [];
-
-    if(numberOfSubscriptions == 0) {
-      callback(null, []);
-    }
-    subscriptions.forEach(function(subscription) {
-      Step(
-        function getStripeCustomer() {
-          console.log("***Get Customer from Stripe***");
-
-          StripeManager.getCustomer(stripe_api_key, subscription.customer, this);
+    async.eachSeries(subscriptions, function(stripe_subscription, callback) {
+      async.waterfall([
+        function getStripeCustomer(callback) {
+          StripeManager.getCustomer(stripe_api_key, stripe_subscription.customer, callback);
         },
-        function parseCustomer(err, customer) {
-          if(err) { console.log(err) }
-
-          console.log("***Parse Customer***");
-
-          CustomerParser.parse(customer, subscription, plan, this)
+        function parseCustomer(customer, callback) {
+          CustomerParser.parse(bull, customer, stripe_subscription, plan, function(err, user) {
+            callback(err, customer, user);
+          });
         },
-        function addMember(err, user) {
-          if(err) { console.log(err) }
+        function addUserMemberships(customer, user, callback) {
+          var membership = new Membership();
 
-          console.log("***Add Member to Users***");
+          membership.reference_id = customer.id;
+          membership.user = user;
+          membership.company_name = bull.account.company_name;
+          membership.account = bull.account;
+          membership.member_since = customer.created;
 
-          users.push(user);
+          var subscription = new Subscription();
 
-          return users;
+          subscription.plan = plan;
+          subscription.reference_id = stripe_subscription.id;
+          subscription.subscription_created_at = stripe_subscription.created_at;
+          subscription.subscription_canceled_at = stripe_subscription.canceled_at;
+          subscription.trial_start = stripe_subscription.trial_start;
+          subscription.trial_end = stripe_subscription.trial_end;
+          subscription.status = stripe_subscription.status;
+          subscription.membership = membership;
+
+          subscription.save(function(err) {
+            if(err) { return callback(err, customer, user); }
+
+            membership.subscriptions.push(subscription);
+            plan.members.push(user);
+
+            membership.save(function(err) {
+              if(err) { return callback(err, customer, user); }
+
+              user.memberships.push(membership);
+
+              callback(err, customer, user);
+            });
+          });
         },
-        function doCallback(err, users) {
-          if(err) { console.log(err) }
-
-          console.log("***Do Callback***");
-
-          numberOfSubscriptions -= 1;
-          if(numberOfSubscriptions == 0) {
-            callback(err, users);
-          }
+        function parsePaymentCards(customer, user, callback) {
+          SourceHelper.parse(user, customer, function(err) {
+            callback(err, user);
+          });
+        },
+        function saveUser(user, callback) {
+          user.save(function(err) {
+            callback(err, user);
+          })
         }
-      );
+      ], function(err, users) {
+        addedUsers.push(users);
+
+        callback(err);
+      });
+    }, function(err) {
+      callback(err, addedUsers);
     });
   },
   subscribeToPlan: function(user, plan, callback) {

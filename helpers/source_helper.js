@@ -1,29 +1,18 @@
 var PaymentCard = require('../models/payment_card');
 var Step = require('step');
+var async = require("async");
 
 module.exports = {
   parse: function(user, customer, callback) {
+    var all_sources = [];
 
-    var numberOfSources = customer.sources.data.length;
-
-    if(numberOfSources == 0) {
-      callback(null, user);
-    }
-    customer.sources.data.forEach(function(source) {
-      Step(
-        function getPaymentCard() {
-          console.log("getting payment card");
-
-          PaymentCard.findOne({"reference_id": source.id}, this);
+    async.eachSeries(customer.sources.data, function(source, callback) {
+      async.waterfall([
+        function getPaymentCard(callback) {
+          PaymentCard.findOne({ "reference_id": source.id }, callback);
         },
-        function parsePaymentCard(err, payment_card) {
-          if(err) { throw err; }
-
-          console.log("Parse Payment Card")
-
+        function parsePaymentCard(payment_card, callback) {
           if(!payment_card) {
-            console.log("Adding Payment Card");
-
             payment_card = new PaymentCard();
 
             payment_card.reference_id = source.id;
@@ -35,43 +24,23 @@ module.exports = {
             payment_card.status = "Active";
 
             payment_card.save(function(err) {
-              if(err) { throw err; }
-
-              console.log("Payment Card Saved");
-
               user.payment_cards.push(payment_card);
 
-              numberOfSources -= 1;
-              if(numberOfSources == 0) {
-                callback(null, user);
-              }
+              callback(err, payment_card);
             });
           } else {
-            numberOfSources -= 1;
-            if(numberOfSources == 0) {
-              callback(null, user);
-            }
+            callback(null, payment_card);
           }
         }
-      )
-    });
-  },
-  saveSources: function(sources, callback) {
-    var numberOfSources = sources.length;
+      ], function(err, payment_cards) {
+        all_sources.push(payment_cards);
 
-    if(numberOfSources == 0) {
-      callback(null, []);
-    }
-    sources.forEach(function(source) {
-      numberOfSources -= 1;
-
-      source.save(function(err) {
-        if(err) { console.log(err); }
-
-        if(numberOfSources == 0) {
-          callback(err, sources)
-        }
+        user.save(function(err) {
+          callback(err, payment_cards);
+        });
       });
+    }, function(err) {
+      callback(err, all_sources);
     });
   }
 }

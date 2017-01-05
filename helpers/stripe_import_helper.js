@@ -8,7 +8,7 @@ var StripeManager = require('./stripe_manager');
 var ChargeHelper = require('./charge_helper');
 var SubscriptionHelper = require('./subscription_helper')
 var User = require('../models/user');
-var Step = require('step');
+var async = require("async");
 
 function getMembershipById(membership_id, callback) {
   Membership.findById(membership_id, function(err, membership) {
@@ -19,137 +19,76 @@ module.exports = {
   importFromStripe: function(user, callback) {
     var stripe_api_key = user.account.stripe_connect.access_token;
 
-    Step(
-      function getStripePlans() {
-        StripeManager.listPlans(stripe_api_key, this)
+    async.waterfall([
+      function getStripePlans(callback) {
+        StripeManager.listPlans(stripe_api_key, function(err, stripePlans) {
+          callback(err, stripePlans.data);
+        });
       },
-      function parsePlans(err, stripePlans) {
-        if(err) { throw err; }
-
+      function parsePlans(stripePlans) {
         var plans = [];
-        stripePlans.data.forEach(function(stripePlan) {
+        async.eachSeries(stripePlans, function(stripePlan, callback) {
           var plan = {
             reference_id: stripePlan.id,
             plan_name: stripePlan.name
           }
-
           plans.push(plan);
-        });
 
-        callback(err, plans);
+          callback(null, plan);
+        }, function() {
+          callback(null, plans);
+        });
       }
-    );
+    ], function(plans) {
+      callback(null, plans)
+    });
   },
   importMembersForPlan: function(bull, plan, callback) {
     var stripe_api_key = bull.account.stripe_connect.access_token;
 
-    Step(
-      function getSubscriptionsFromStripe() {
-        console.log("***Getting Subscriptions from Stripe");
-
-        StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, null, [], this);
+    async.waterfall([
+      function getSubscriptionsFromStripe(callback) {
+        StripeManager.listSubscriptions(stripe_api_key, plan.reference_id, null, [], callback);
       },
-      function parseSubscriptions(err, stripe_subscriptions) {
-        if(err) { throw err; }
-
-        console.log("***Parsing StripeSubscriptions");
-
-        SubscriptionHelper.parse(bull, stripe_api_key, stripe_subscriptions, plan, this);
-      },
-      function addMembersToPlan(err, members) {
-        if(err) { throw err; }
-
-        module.exports.addMembersToPlan(plan, members, this);
-      },
-      function doCallback(err, members) {
-        if(err) { throw err; }
-
-        console.log("***Do importMembersFromStripe callback");
-        console.log("found " + members.length);
-
-        callback(err, plan, members);
+      function parseSubscriptions(stripe_subscriptions, callback) {
+        SubscriptionHelper.parse(bull, stripe_api_key, stripe_subscriptions, plan, function(err, users) {
+          callback(err, users);
+        });
       }
-    );
-  },
-  addMembersToPlan:function(plan, members, callback) {
-    var numberOfMembers = members.length;
-
-    if(numberOfMembers == 0) {
-      callback(null, members);
-    }
-    members.forEach(function(member) {
-      Step(
-        function addMemberToPlan() {
-          plan.members.push(member);
-
-          return member
-        },
-        function doCallback(err, member) {
-          if(err) { throw err; }
-
-          numberOfMembers -= 1;
-          if(numberOfMembers == 0) {
-            callback(err, members);
-          }
-        }
-      )
+    ], function(err, users) {
+      callback(err, users);
     });
   },
-  importChargesForMembers:function(bull, plan, users, callback) {
-    console.log("importing charges");
-
+  importChargesForMembers: function(bull, users, callback) {
     var stripe_api_key = bull.account.stripe_connect.access_token;
-    var numberOfUsers = users.length;
+    var all_charges = [];
 
-    if(numberOfUsers == 0) {
-      callback(null, plan, users);
-    }
-    users.forEach(function(user) {
-      Step(
-        function getMembership() {
-          getMembershipById(user.memberships[0], this);
+    async.eachSeries(users, function(user, callback) {
+      async.waterfall([
+        function getMembership(callback) {
+          getMembershipById(user.memberships[0], callback);
         },
-        function importCharges(err, membership) {
-          if(err) { throw err; }
-
-          module.exports.importChargesForUser(stripe_api_key, user, membership, this)
-        },
-        function doCallback(err, user) {
-          if(err) { throw err; }
-
-          numberOfUsers -= 1;
-          if(numberOfUsers == 0) {
-            callback(err, plan, users);
-          }
+        function importCharges(membership, callback) {
+          module.exports.importChargesForUser(stripe_api_key, user, membership, callback);
         }
-      )
+      ], function(err, results) {
+        all_charges.push(results)
+        callback(err, results);
+      });
+    }, function(err) {
+      callback(err, all_charges);
     });
   },
   importChargesForUser: function(stripe_api_key, user, membership, callback) {
-    Step(
-      function getChargesFromStripe() {
-        console.log("getting charges");
-
-        StripeManager.listCharges(stripe_api_key, membership.reference_id, this);
+    async.waterfall([
+      function getChargesFromStripe(callback) {
+        StripeManager.listCharges(stripe_api_key, membership.reference_id, callback);
       },
-      function parseCharges(err, charges) {
-        if(err) { throw err; }
-
-        console.log("parsing charges");
-
-        ChargeHelper.parse(charges, membership, this)
-      },
-      function saveCharges(err, charges) {
-        if(err) { throw err; }
-        console.log("saving charges");
-
-        ChargeHelper.saveCharges(user, charges, this)
-      },
-      function doCallback(err, user) {
-        if(err) { throw err; }
-
-        callback(err, user);
+      function parseCharges(stripe_charges) {
+        ChargeHelper.parse(user, stripe_charges, membership, callback);
       }
-    )
+    ], function(err, results) {
+      callback(err, results);
+    });
   }
 }

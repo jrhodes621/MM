@@ -170,6 +170,7 @@ router.use(function(req, res, next) {
 
         User.findById(user_id)
         .populate('account')
+        .populate('plans')
         .exec(function(err, user) {
           if (err) {
             return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
