@@ -26,14 +26,14 @@ router.route('')
     console.log("getting plans");
 
     var current_user = req.current_user;
-    var page_size = 100;
+    var page_size = 10;
     var page = req.query.page || 1;
     var offset = (page-1)*page_size;
 
     Plan.paginate({ "user": current_user._id, "archive": false }, { offset: offset, limit: page_size, sort: { name: 'asc'} }, function(err, result) {
       if(err) { return next(err) };
 
-      res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset });
+      res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset, max_pages: Math.ceil(result.total/page_size) });
     });
   })
   .post(upload.single('file'), function(req, res, next) {

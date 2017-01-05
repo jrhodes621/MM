@@ -160,7 +160,7 @@ router.route('/members')
         }] }, function(err, result) {
           if(err) { return next(err) };
 
-          res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset });
+          res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset, max_pages: Math.ceil(result.total/page_size) });
         });
       });
     });
