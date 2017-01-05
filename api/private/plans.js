@@ -30,7 +30,7 @@ router.route('')
     var page = req.query.page || 1;
     var offset = (page-1)*page_size;
 
-    Plan.paginate({ "user": current_user._id, "archive": false }, { offset: offset, limit: page_size }, function(err, result) {
+    Plan.paginate({ "user": current_user._id, "archive": false }, { offset: offset, limit: page_size, sort: { name: 'asc'} }, function(err, result) {
       if(err) { return next(err) };
 
       res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset });

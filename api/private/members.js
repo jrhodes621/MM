@@ -20,10 +20,11 @@ router.route('')
     if(!user.account) { return next(new Error("No Members")); }
     // Map the docs into an array of just the _ids
 
-    Membership.find({'account': user.account}, function(err, memberships) {
+    Membership.find({ 'account': user.account })
+    .exec(function(err, memberships) {
       var ids = memberships.map(function(doc) { return doc._id; });
 
-      User.paginate({ 'memberships': { $in: ids } }, { offset: offset, limit: page_size, populate: [{
+      User.paginate({ 'memberships': { $in: ids } }, { offset: offset, limit: page_size, sort: { last_name: 'asc', first_name: 'asc', email_address: 'asc' }, populate: [{
         path: 'memberships',
         populate: {
           path: 'account'
