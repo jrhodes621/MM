@@ -44,8 +44,6 @@ module.exports = {
             if(err) { return callback(err, customer, user); }
 
             membership.subscriptions.push(subscription);
-            plan.members.push(user);
-
             membership.save(function(err) {
               if(err) { return callback(err, customer, user); }
 
@@ -63,7 +61,7 @@ module.exports = {
         function saveUser(user, callback) {
           user.save(function(err) {
             plan.members.push(user);
-            
+
             callback(err, user);
           })
         }
