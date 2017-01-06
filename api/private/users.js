@@ -94,15 +94,28 @@ router.route('/:user_id/activities')
 
       User.findById(req.params.user_id, function(err, user) {
         if(err) { return next(err); }
-        Activity.find({ "calf": user})
-        .populate('bull')
-        .populate('calf')
-        .populate('plan')
+        Activity.aggregate([
+          { $match: { "calf": user._id } },
+          { $group: {
+               _id: { year: { $year : "$createdAt" }, month: { $month : "$createdAt" },day: { $dayOfMonth : "$createdAt" } },
+               date_group: { $first : '$createdAt' },
+              activities: { $push: '$$ROOT'}
+          } },
+          { $project: {
+              _id: 0,
+              date_group: 1,
+              activities: 1
+            }
+          }
+        ])
+        // .populate('bull')
+        // .populate('calf')
+        // .populate('plan')
         .exec(function(err, activities) {
           if(err) { return next(err) }
 
           res.status(200).send(activities);
-        });
+        })
       });
     });
 

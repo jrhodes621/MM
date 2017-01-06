@@ -171,10 +171,23 @@ router.route('/activities')
       var current_user = req.current_user;
       var plan = req.plan;
 
-      Activity.find({ "plan": plan})
-      .populate('bull')
-      .populate('calf')
-      .populate('plan')
+      Activity.aggregate([
+        { $match: { "plan": plan._id } },
+        { $group: {
+             _id: { year: { $year : "$createdAt" }, month: { $month : "$createdAt" },day: { $dayOfMonth : "$createdAt" } },
+             date_group: { $first : '$createdAt' },
+            activities: { $push: '$$ROOT'}
+        } },
+        { $project: {
+            _id: 0,
+            date_group: 1,
+            activities: 1
+          }
+        }
+      ])
+      // .populate('bull')
+      // .populate('calf')
+      // .populate('plan')
       .exec(function(err, activities) {
         if(err) { return next(err) }
 
