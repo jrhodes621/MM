@@ -52,7 +52,7 @@ module.exports = {
               var payload = {'messageFrom': 'MemberMoose',
                             'type': "payment_succeeded"};
 
-              user.forEach(function(user) {
+              users.forEach(function(user) {
                 user.devices.forEach(function(device) {
                   console.log("sending push to " + device.token);
 
