@@ -9,7 +9,7 @@ var User = require('../../models/user');
 const FormatCurrency = require('format-currency')
 
 module.exports = {
-  processCreated: function(stripe_event, callback) {
+  processCreated: function(stripe_event, bull, callback) {
     var stripe_customer = stripe_event.raw_object.data.object;
     var source = "Stripe";
     var received_at = new Date(stripe_event.raw_object.created*1000);
@@ -17,7 +17,7 @@ module.exports = {
     User.findOne({ "reference_id": stripe_customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
       if(!user) {
-        CustomerHelper.parseCustomerFromStripe(stripe_event.account, stripe_customer, function(err, user) {
+        CustomerHelper.parseCustomerFromStripe(bull, stripe_customer, function(err, user) {
           callback(err, user);
 
           var message_calf = "";

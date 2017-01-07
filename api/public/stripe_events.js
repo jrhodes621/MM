@@ -34,7 +34,7 @@ router.route('')
         stripe_event.save(function(err) {
           if(err) { return next(err); }
 
-          StripeEventProcessor.processEvent(stripe_event, function(activity, callback) {
+          StripeEventProcessor.processEvent(stripe_event, bull, function(activity, callback) {
             if(!err) {
               stripe_event.processed = true;
 
