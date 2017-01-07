@@ -1,8 +1,11 @@
 var ActivityHelper = require('../../helpers/activity_helper');
+var CustomerHelper = require('../../helpers/customer_helper');
 var MembershipHelper = require('../../helpers/membership_helper');
 var PushNotificationHelper = require('../../helpers/push_notification_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeManager = require('../stripe_manager');
+var User = require('../../models/user');
+
 const FormatCurrency = require('format-currency')
 
 module.exports = {
