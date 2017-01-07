@@ -11,6 +11,7 @@ var ChargeRefundedProcessor = require('./stripe_event_processors/charge_refunded
 var ChargeDisputeProcessor = require('./stripe_event_processors/charge_dispute_processor');
 var CustomerSubscriptionCreatedProcessor = require('./stripe_event_processors/customer_subscription_created_processor');
 var CustomerSubscriptionUpdatedProcessor = require('./stripe_event_processors/customer_subscription_updated_processor');
+var InvoiceCreatedProcessor = require('./stripe_event_processors/invoice_created_processor');
 var InvoiceSucceededProcessor = require('./stripe_event_processors/invoice_succeeded_processor');
 
 module.exports = {
