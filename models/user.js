@@ -32,7 +32,6 @@ var UserSchema   = new Schema({
     ref: 'Account'
   },
   avatar: {},
-  roles: [String],
   reference_id: {
     type: String
   },

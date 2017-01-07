@@ -9,6 +9,98 @@ var UserHelper   = require('./user_helper');
 var async = require("async");
 
 module.exports = {
+  parseCustomerFromStripe: function(bull, stripe_customer, callback) {
+    async.waterfall([
+      function createUser(callback) {
+        var user = new User();
+
+        user.email_address = stripe_customer.email
+        user.password = "test123"
+        user.roles.push("Calf")
+        user.reference_id = stripe_customer.id
+        user.status = "Active"
+
+        user.save(function(err) {
+          callback(err, user);
+        })
+      },
+      function addPaymentCards(user, callback) {
+        var stripe_sources = stripe_customer.sources.data;
+
+        async.eachSeries(stripe_sources, function(source, callback) {
+          var payment_card = new PaymentCard();
+
+          payment_card.reference_id = source.id;
+          payment_card.name = source.name;
+          payment_card.brand = source.brand;
+          payment_card.last4 = source.last_four;
+          payment_card.exp_month = source.exp_month;
+          payment_card.exp_year = source.exp_year;
+          payment_card.status = source.status;
+
+          payment_card.save(function(err) {
+            if(err) { callback(err, user); }
+
+            user.payment_cards.push(payment_card);
+          })
+        }, function(err) {
+          callback(err, user);
+        });
+      },
+      function addMembership(user, callback) {
+        var membership = new Membership();
+
+        membership.reference_id = stripe_customer.id;
+        membership.user = user;
+        membership.company_name = bull.account.company_name;
+        membership.account = bull.account;
+        membership.member_since = stripe_customer.created;
+
+        membership.save(function(err) {
+          callback(err, user, membership);
+        });
+      },
+      function addSubscriptions(user, membership) {
+        var stipe_subscriptions = stripe_customer.subscriptions.data;
+
+        async.eachSeries(stripe_subscriptions, function(stripe_subscription) {
+          async.waterfall([
+            function getPlan(callback) {
+              Plan.findOne({reference_id: plan_reference_id }, function(err, plan) {
+                callback(err, plan);
+              });
+            },
+            function addSubscription(plan, callback) {
+              var subscription = new Subscription();
+
+              subscription.plan = plan;
+              subscription.membership = membership;
+              subscription.reference_id = stripe_subscription.id;
+              subscription.subscription_created_at = new Date();
+              subscription.status = "Active";
+
+              subscription.save(function(err) {
+                if(err) { callback(err, user); }
+
+                membership.subscriptions.push(subscription);
+                membership.save(function(err) {
+                  callback(err, user, membership);
+                });
+              });
+            }
+          ], function(err) {
+            callback(err, user);
+          }), function(user) {
+            callback(err, user);
+          };
+        });
+      }
+    ], function(err, user) {
+      console.log(user);
+      
+      callback(err, user)
+    });
+  },
   parse: function(bull, customer, stripe_subscription, plan, callback) {
     async.waterfall([
       function getUser(callback) {

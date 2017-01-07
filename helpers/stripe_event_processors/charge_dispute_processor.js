@@ -39,5 +39,17 @@ module.exports = {
         });
       });
     });
+  },
+  processClosed: function(stripe_event, callback) {
+    callback(new Error("Not Implmented"), null);
+  },
+  processUpdated: function(stripe_event, callback) {
+    callback(new Error("Not Implmented"), null);
+  },
+  processFundsWithdrawn: function(stripe_event, callback) {
+    callback(new Error("Not Implmented"), null);
+  },
+  procuessFundsReinstated: function(stripe_event, callback) {
+    callback(new Error("Not Implmented"), null);
   }
 };

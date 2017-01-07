@@ -16,7 +16,7 @@ var SubscriptionSchema   = new Schema({
     type: String,
     required: true
   },
-  subscription_created_ad: {
+  subscription_created_at: {
     type: Date
   },
   subscription_canceled_at: {
