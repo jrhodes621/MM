@@ -21,7 +21,7 @@ var PlanProcessor = require('./stripe_event_processors/plan_processor');
 var SourceProcessor = require('./stripe_event_processors/source_processor');
 
 module.exports = {
-  processEvent: function(stripe_event, callback) {
+  processEvent: function(stripe_event, bull, callback) {
     console.log("Processing Stripe Event: " + stripe_event.type);
 
     switch(stripe_event.type) {
@@ -86,7 +86,7 @@ module.exports = {
         });
         break;
       case "customer.created":
-        CustomerProcessor.processCreated(stripe_event, function(err, activity) {
+        CustomerProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
