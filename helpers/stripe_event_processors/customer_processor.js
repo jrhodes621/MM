@@ -17,7 +17,7 @@ module.exports = {
     User.findOne({ "reference_id": stripe_customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
       if(!user) {
-        CustomerHelper.parseCustomerFromStripe(bull, stripe_customer, function(err, user) {
+        CustomerHelper.parseCustomerFromStripe(stripe_event.account, stripe_customer, function(err, user) {
           callback(err, user);
 
           var message_calf = "";
