@@ -36,7 +36,8 @@ module.exports = {
           });
         })
       } else {
-        call(new Error("Customer already exists"), null)
+        console.log(user);
+        callback(new Error("Customer already exists"), null)
       }
     })
   },
