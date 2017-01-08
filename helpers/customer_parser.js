@@ -61,7 +61,7 @@ module.exports = {
         });
       },
       function addSubscriptions(user, membership) {
-        var stipe_subscriptions = stripe_customer.subscriptions.data;
+        var stripe_subscriptions = stripe_customer.subscriptions.data;
 
         async.eachSeries(stripe_subscriptions, function(stripe_subscription) {
           async.waterfall([
