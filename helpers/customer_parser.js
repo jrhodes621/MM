@@ -14,6 +14,8 @@ module.exports = {
 
     async.waterfall([
       function createUser(callback) {
+        console.log(user);
+        
         if(!user) {
           user = new User();
 
