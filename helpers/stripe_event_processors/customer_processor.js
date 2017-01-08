@@ -19,20 +19,16 @@ module.exports = {
     User.findOne({ "reference_id": stripe_customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
 
-      if(!user) {
-        CustomerHelper.parseNewCustomerFromStripe(bull, stripe_customer, function(err, user) {
-          if(err) { return callback(err, null); }
+      CustomerHelper.parseNewCustomerFromStripe(user, bull, stripe_customer, function(err, user) {
+        if(err) { return callback(err, null); }
 
-          var message_calf = "Test Message";
-          var message_bull= "You have a new customer " + user.email + " signed up!";
+        var message_calf = "Test Message";
+        var message_bull= "You have a new customer " + user.email + " signed up!";
 
-          StripeEventHelper.notifyUsers("customer_created", bull, user, null, message_bull, message_calf, "Stripe", received_at, function(err, activities) {
-            callback(err, user);
-          })
-        });
-      } else {
-        callback(new Error("Customer already exists"), null)
-      }
+        StripeEventHelper.notifyUsers("customer_created", bull, user, null, message_bull, message_calf, "Stripe", received_at, function(err, activities) {
+          callback(err, user);
+        })
+      });
     })
   },
   processDeleted: function(stripe_event, callback) {
