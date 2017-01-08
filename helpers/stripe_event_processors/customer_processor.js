@@ -25,16 +25,20 @@ module.exports = {
           var payload = {'messageFrom': 'MemberMoose',
                         'type': "customer_created"};
 
-          var devices = subscription.plan.user.devices;
-          devices.forEach(function(device) {
-            PushNotificationHelper.sendPushNotification(device, message_bull, payload);
-          });
+          User.find({ "account": bull}, function(err, users) {
+            user.forEach(function(user) {
+              var devices = user.devices;
+              devices.forEach(function(device) {
+                PushNotificationHelper.sendPushNotification(device, message_bull, payload);
+              });
 
-          ActivityHelper.createActivity(subscription.plan.user, membership.user, subscription.plan, "customer_created", message_calf, message_bull,
-            source, received_at, function(err, activity) {
-              callback(err, activity);
+              ActivityHelper.createActivity(subscription.plan.user, membership.user, subscription.plan, "customer_created", message_calf, message_bull,
+                source, received_at, function(err, activity) {
+                  callback(err, activity);
+              });
+            });
           });
-        })
+        });
       } else {
         console.log(user);
         callback(new Error("Customer already exists"), null)
