@@ -80,10 +80,7 @@ module.exports = {
         });
       },
       function parseMembership(user, membership, callback) {
-        var new_membership = false;
         if(!membership) {
-          new_membership = true;
-
           membership = new Membership();
         }
         membership.reference_id = stripe_customer.id;
@@ -93,8 +90,8 @@ module.exports = {
         membership.member_since = stripe_customer.created;
 
         membership.save(function(err) {
-          if(new_membership) {
-            user.memberships.push(membreship);
+          if (user.memberships.indexOf(membership._id) === -1) {
+              user.memberships.push(membership);
           }
 
           callback(err, user, membership);
