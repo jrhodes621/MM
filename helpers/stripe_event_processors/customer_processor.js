@@ -44,11 +44,17 @@ module.exports = {
       Membership.findOneAndRemove({ "user": user, "account": bull }, function(err, membership) {
         if(err) { return callback(err, null); }
 
-        var message_calf = "Test Message";
-        var message_bull= "Your customer " + user.email + " was deleted!";
+        user.memberships.pull(membership._id);
 
-        StripeEventHelper.notifyUsers("customer_deleted", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
-          callback(err, user);
+        user.save(function(err) {
+          if(err) { return callback(err, null); }
+
+          var message_calf = "Test Message";
+          var message_bull= "Your customer " + user.email + " was deleted!";
+
+          StripeEventHelper.notifyUsers("customer_deleted", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
+            callback(err, user);
+          });
         });
       })
     });
