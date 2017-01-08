@@ -1,9 +1,37 @@
-var multer  = require('multer');
-var Upload = require('s3-uploader');
-var Upload = require('s3-uploader');
-var fs = require('fs');
+var Plan = require('../models/plan');
+var async = require("async");
 
 module.exports = {
+  parsePlanFromStripe: function(plan, bull, stripe_plan, callback) {
+    console.log("parsing plan from stripe " + stripe_plan.id);
+
+    async.waterfall([
+      function getPlan(callback) {
+        Plan.findOne({ "reference_id": stripe_plan.id }, function(err, plan) {
+          callback(err, plan);
+        });
+      },
+      function parsePlan(plan, callback) {
+        if(!plan) {
+          plan = new Plan();
+        }
+        plan.amount = stripe_plan.amount/100;
+        plan.reference_id = stripe_plan.id;
+        //plan.currency = stripe_plan.currency;
+        plan.interval = "month";
+        plan.interval_count = stripe_plan.interval_count;
+        plan.name = stripe_plan.name;
+        plan.statement_descriptor = stripe_plan.statement_descriptor;
+        plan.trial_period_days = stripe_plan.trial_period_days;
+
+        plan.save(function(err) {
+          callback(err, plan);
+        });
+      }
+    ], function(err) {
+      callback(err, plan);
+    });
+  },
   uploadAvatar: function(plan, avatar_path, callback) {
     console.log("uploading images");
 
