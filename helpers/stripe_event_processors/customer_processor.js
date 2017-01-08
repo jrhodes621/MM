@@ -5,6 +5,7 @@ var PushNotificationHelper = require('../../helpers/push_notification_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeManager = require('../stripe_manager');
 var User = require('../../models/user');
+var async = require("async");
 
 const FormatCurrency = require('format-currency')
 
