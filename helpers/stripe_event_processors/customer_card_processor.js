@@ -9,7 +9,7 @@ module.exports = {
     let stripe_card = stripe_event.raw_object.data.object;
     let customer = stripe_card.customer;
     let source = "Stripe";
-    let received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    let received_at = new Date(stripe_event.raw_object.created*1000);
 
     User.findOne({ "reference_id": customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
@@ -35,7 +35,7 @@ module.exports = {
     let stripe_card = stripe_event.raw_object.data.object;
     let customer = stripe_card.customer;
     let source = "Stripe";
-    let received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    let received_at  = new Date(stripe_event.raw_object.created*1000);
 
     User.findOne({ "reference_id": customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
@@ -61,7 +61,7 @@ module.exports = {
     let stripe_card = stripe_event.raw_object.data.object;
     let customer = stripe_card.customer;
     let source = "Stripe";
-    let received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    let received_at = new Date(stripe_event.raw_object.created*1000);
 
     User.findOne({ "reference_id": customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
