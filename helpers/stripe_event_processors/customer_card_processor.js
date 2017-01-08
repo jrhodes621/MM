@@ -15,7 +15,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!user) { return callback(new Error("User not found"), null); }
 
-      PaymentCard.findOne({ "reference_id": card.id }, function(err, payment_card) {
+      PaymentCard.findOne({ "reference_id": stripe_card.id }, function(err, payment_card) {
         if(err) { return callback(err, null) }
 
         PaymentCardHelper.parsePaymentCardFromStripe(user, payment_card, bull, stripe_card, function(err, user, payment_card) {
@@ -41,7 +41,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!user) { return callback(new Error("User not found"), null); }
 
-      PaymentCard.findOne({ "reference_id": card.id }, function(err, payment_card) {
+      PaymentCard.findOne({ "reference_id": stripe_card.id }, function(err, payment_card) {
         if(err) { return callback(err, null) }
 
         PaymentCardHelper.archivePaymentCard(user, payment_card, stripe_card, function(err, user, payment_card) {
@@ -67,7 +67,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!user) { return callback(new Error("User not found"), null); }
 
-      PaymentCard.findOne({ "reference_id": card.id }, function(err, payment_card) {
+      PaymentCard.findOne({ "reference_id": stripe_card.id }, function(err, payment_card) {
         if(err) { return callback(err, null) }
 
         PaymentCardHelper.parsePaymentCardFromStripe(user, payment_card, bull, stripe_card, function(err, user, payment_card) {
