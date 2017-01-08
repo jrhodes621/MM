@@ -22,7 +22,7 @@ var SourceProcessor = require('./stripe_event_processors/source_processor');
 
 module.exports = {
   processEvent: function(stripe_event, bull, callback) {
-    console.log("Processing Stripe Event: " + stripe_event.type);
+    console.log("Processing Stripe Event: " + stripe_event.type + " for " + bull);
 
     switch(stripe_event.type) {
       case "customer.subscription.created":
