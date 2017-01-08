@@ -25,29 +25,50 @@ module.exports = {
         var message_calf = "Test Message";
         var message_bull= "You have a new customer " + user.email + " signed up!";
 
-        StripeEventHelper.notifyUsers("customer_created", bull, user, null, message_bull, message_calf, "Stripe", received_at, function(err, activities) {
+        StripeEventHelper.notifyUsers("customer_created", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
           callback(err, user);
-        })
+        });
       });
-    })
+    });
   },
-  processDeleted: function(stripe_event, callback) {
-    let reference_id = stripe_event.raw_object.data.object.charge;
+  processDeleted: function(stripe_event, bull, callback) {
+    var stripe_customer = stripe_event.raw_object.data.object;
     var source = "Stripe";
-    var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    var received_at = new Date(stripe_event.raw_object.created*1000);
 
-    //find customer with the stripe customer_id
-    //if found update membership to mark deleted
-    callback(new Error("Not Implmented"), null);
+    User.findOne({ "reference_id": stripe_customer.id}, function(err, user) {
+      if(err) { return callback(err, null); }
+
+      Membership.findOneAndRemove({ "user": user, "account": bull }, function(err, membership) {
+        if(err) { return callback(err, null); }
+
+        var message_calf = "Test Message";
+        var message_bull= "Your customer " + user.email + " was deleted!";
+
+        StripeEventHelper.notifyUsers("customer_deleted", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
+          callback(err, user);
+        });
+      })
+    });
   },
-  processUpdated: function(stripe_event, callback) {
-    let reference_id = stripe_event.raw_object.data.object.charge;
+  processUpdated: function(stripe_event, bull, callback) {
+    var stripe_customer = stripe_event.raw_object.data.object;
     var source = "Stripe";
-    var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    var received_at = new Date(stripe_event.raw_object.created*1000);
 
-    //find customer with the stripe customer id
-    //if found update it, create it and log activity
-    //if not found, create it and log activity
-    callback(new Error("Not Implmented"), null);
+    User.findOne({ "reference_id": stripe_customer.id}, function(err, user) {
+      if(err) { return callback(err, null); }
+
+      CustomerHelper.parseCustomerFromStripe(user, bull, stripe_customer, function(err, user) {
+        if(err) { return callback(err, null); }
+
+        var message_calf = "Test Message";
+        var message_bull= "Your customer " + user.email + " was updated!";
+
+        StripeEventHelper.notifyUsers("customer_updated", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
+          callback(err, user);
+        });
+      });
+    });
   }
 };

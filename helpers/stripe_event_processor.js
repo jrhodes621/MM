@@ -91,12 +91,12 @@ module.exports = {
         });
         break;
       case "customer.deleted":
-        CustomerProcessor.processDeleted(stripe_event, function(err, activity) {
+        CustomerProcessor.processDeleted(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.updated":
-        CustomerProcessor.processUpdated(stripe_event, function(err, activity) {
+        CustomerProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
