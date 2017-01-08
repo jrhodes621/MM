@@ -15,7 +15,6 @@ module.exports = {
     var user;
     async.waterfall([
       function createUser(callback) {
-        console.log("creating new user");
         user = new User();
 
         user.email_address = stripe_customer.email
@@ -29,8 +28,6 @@ module.exports = {
         })
       },
       function addPaymentCards(user, callback) {
-        console.log("adding payment cards");
-
         var stripe_sources = stripe_customer.sources.data;
 
         async.eachSeries(stripe_sources, function(source, callback) {
@@ -54,8 +51,6 @@ module.exports = {
         });
       },
       function addMembership(user, callback) {
-        console.log("adding membership");
-
         var membership = new Membership();
 
         membership.reference_id = stripe_customer.id;
@@ -69,8 +64,6 @@ module.exports = {
         });
       },
       function addSubscriptions(user, membership, callback) {
-        console.log("adding supbscriptions");
-
         var stripe_subscriptions = stripe_customer.subscriptions.data;
 
         async.eachSeries(stripe_subscriptions, function(stripe_subscription) {

@@ -39,8 +39,6 @@ router.route('')
               stripe_event.processed = true;
 
               stripe_event.save(function(err) {
-                console.log(err);
-
                 res.send(200);
               });
             } else {
