@@ -24,7 +24,7 @@ module.exports = {
         if(err) { return callback(err, null); }
 
         var message_calf = "Test Message";
-        var message_bull= "You have a new customer " + user.email + " signed up!";
+        var message_bull= "You have a new customer. " + user.email_address + " signed up!";
 
         StripeEventHelper.notifyUsers("customer_created", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
           callback(err, user);
@@ -50,7 +50,7 @@ module.exports = {
           if(err) { return callback(err, null); }
 
           var message_calf = "Test Message";
-          var message_bull= "Your customer " + user.email + " was deleted!";
+          var message_bull= "Your customer " + user.email_address + " was deleted!";
 
           StripeEventHelper.notifyUsers("customer_deleted", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
             callback(err, user);
@@ -71,7 +71,7 @@ module.exports = {
         if(err) { return callback(err, null); }
 
         var message_calf = "Test Message";
-        var message_bull= "Your customer " + user.email + " was updated!";
+        var message_bull= "Your customer " + user.email_address + " was updated!";
 
         StripeEventHelper.notifyUsers("customer_updated", bull, user, null, message_bull, message_calf, source, received_at, function(err, activities) {
           callback(err, user);
