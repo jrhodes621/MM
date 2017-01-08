@@ -26,7 +26,7 @@ module.exports = {
                         'type': "customer_created"};
 
           User.find({ "account": bull}, function(err, bull_users) {
-            bull_users.forEach(function(bull_user) {
+            async.eachSeries(bull_users, function(bull_user, callback) {
               var devices = user.devices;
               devices.forEach(function(device) {
                 PushNotificationHelper.sendPushNotification(device, message_bull, payload);
@@ -36,6 +36,8 @@ module.exports = {
                 source, received_at, function(err, activity) {
                   callback(err, activity);
               });
+            }, function(err) {
+              callback(err, users);
             });
           });
         });
