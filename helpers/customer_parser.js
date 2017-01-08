@@ -99,10 +99,10 @@ module.exports = {
               });
             }
           ], function(err) {
-            callback(err, user);
+            callback(err);
           });
-        }, function(user) {
-          callback(null, user);
+        }, function(err, user) {
+          callback(err);
         });
       }
     ], function(err) {
