@@ -11,10 +11,12 @@ var async = require("async");
 module.exports = {
   parseCustomerFromStripe: function(bull, stripe_customer, callback) {
     console.log("parsing customer from stripe " + stripe_customer.email);
+
+    var user;
     async.waterfall([
       function createUser(callback) {
         console.log("creating new user");
-        var user = new User();
+        user = new User();
 
         user.email_address = stripe_customer.email
         user.password = "test123"
@@ -103,10 +105,7 @@ module.exports = {
           callback(null, user);
         });
       }
-    ], function(err, user) {
-      console.log(err);
-      console.log(user);
-
+    ], function(err) {
       callback(err, user)
     });
   },
