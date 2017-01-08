@@ -28,6 +28,11 @@ var PaymentCardSchema   = new Schema({
   status: {
     type: String,
     required: true
+  },
+  archive: {
+    type: Boolean,
+    required: true,
+    default: false
   }
 },
 {
