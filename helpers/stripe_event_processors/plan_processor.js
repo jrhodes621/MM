@@ -26,7 +26,19 @@ module.exports = {
     let reference_id = stripe_event.raw_object.data.object.charge;
     let received_at  = new Date(stripe_event.raw_object.created*1000);
 
-    callback(new Error("Not Implmented"), null);
+    Plan.findOne({ "reference_id": stripe_plan.id}, function(err, plan) {
+      if(err) { return callback(err, null) }
+
+      PlanHelper.archivePlan(plan, function(err, plan) {
+        if(err) { return callback(err, null) }
+
+        var message_bull= "Your plan, " + plan.name + ", was deleted.";
+
+        StripeEventHelper.notifyUsers("plan_deleted", bull, null, plan, message_bull, null, source, received_at, function(err, plan) {
+          callback(err, plan);
+        });
+      });
+    });
   },
   processUpdated: function(stripe_event, bull, callback) {
     let stripe_plan = stripe_event.raw_object.data.object;

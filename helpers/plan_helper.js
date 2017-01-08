@@ -32,6 +32,12 @@ module.exports = {
       callback(err, plan);
     });
   },
+  deletePlan: function(plan, callback) {
+    plan.archive = true;
+    plan.save(function(err) {
+      callback(err, plan);
+    });
+  },
   uploadAvatar: function(plan, avatar_path, callback) {
     console.log("uploading images");
 
