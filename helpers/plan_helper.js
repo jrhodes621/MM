@@ -32,7 +32,7 @@ module.exports = {
       callback(err, plan);
     });
   },
-  deletePlan: function(plan, callback) {
+  archivePlan: function(plan, callback) {
     plan.archive = true;
     plan.save(function(err) {
       callback(err, plan);
