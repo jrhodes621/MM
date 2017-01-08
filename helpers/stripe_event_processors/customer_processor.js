@@ -32,7 +32,7 @@ module.exports = {
                 PushNotificationHelper.sendPushNotification(device, message_bull, payload);
               });
 
-              ActivityHelper.createActivity(bull_user, membership.user, subscription.plan, "customer_created", message_calf, message_bull,
+              ActivityHelper.createActivity(bull_user, user, subscription.plan, "customer_created", message_calf, message_bull,
                 source, received_at, function(err, activity) {
                   callback(err, activity);
               });
