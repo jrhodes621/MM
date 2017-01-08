@@ -68,7 +68,7 @@ module.exports = {
           callback(err, user, membership);
         });
       },
-      function addSubscriptions(user, membership) {
+      function addSubscriptions(user, membership, callback) {
         console.log("adding supbscriptions");
 
         var stripe_subscriptions = stripe_customer.subscriptions.data;
