@@ -1,5 +1,6 @@
 var PlanHelper = require('../../helpers/plan_helper');
 var StripeEventHelper = require('../../helpers/stripe_event_helper');
+var Plan = require('../../models/plan');
 const source = "Stripe";
 
 module.exports = {
