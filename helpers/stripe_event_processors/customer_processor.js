@@ -25,14 +25,14 @@ module.exports = {
           var payload = {'messageFrom': 'MemberMoose',
                         'type': "customer_created"};
 
-          User.find({ "account": bull}, function(err, users) {
-            users.forEach(function(user) {
+          User.find({ "account": bull}, function(err, bull_users) {
+            bull_users.forEach(function(bull_user) {
               var devices = user.devices;
               devices.forEach(function(device) {
                 PushNotificationHelper.sendPushNotification(device, message_bull, payload);
               });
 
-              ActivityHelper.createActivity(subscription.plan.user, membership.user, subscription.plan, "customer_created", message_calf, message_bull,
+              ActivityHelper.createActivity(bull_user, membership.user, subscription.plan, "customer_created", message_calf, message_bull,
                 source, received_at, function(err, activity) {
                   callback(err, activity);
               });
