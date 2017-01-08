@@ -25,10 +25,12 @@ module.exports = {
         plan.trial_period_days = stripe_plan.trial_period_days || 0;
 
         plan.save(function(err) {
-          callback(err, plan);
+          callback(err);
         });
       }
     ], function(err) {
+      console.log(plan);
+      
       callback(err, plan);
     });
   },
