@@ -52,8 +52,8 @@ module.exports = {
 
         membership.reference_id = stripe_customer.id;
         membership.user = user;
-        membership.company_name = bull.account.company_name;
-        membership.account = bull.account;
+        membership.company_name = bull.company_name;
+        membership.account = bull;
         membership.member_since = stripe_customer.created;
 
         membership.save(function(err) {
@@ -97,7 +97,7 @@ module.exports = {
       }
     ], function(err, user) {
       console.log(user);
-      
+
       callback(err, user)
     });
   },
