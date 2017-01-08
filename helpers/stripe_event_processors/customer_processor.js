@@ -26,7 +26,7 @@ module.exports = {
                         'type': "customer_created"};
 
           User.find({ "account": bull}, function(err, users) {
-            user.forEach(function(user) {
+            users.forEach(function(user) {
               var devices = user.devices;
               devices.forEach(function(device) {
                 PushNotificationHelper.sendPushNotification(device, message_bull, payload);
