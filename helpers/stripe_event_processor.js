@@ -5,18 +5,14 @@ var router = express.Router();              // get an instance of the express Ro
 var mongoose   = require('mongoose');
 var StripeEvent = require('../models/stripe_event');
 var AccountHelper = require('./account_helper');
-var ChargeSucceededProcessor = require('./stripe_event_processors/charge_succeeded_processor');
-var ChargeFailedProcessor = require('./stripe_event_processors/charge_failed_processor');
-var ChargeRefundedProcessor = require('./stripe_event_processors/charge_refunded_processor');
+var ChargeProcessor = require('./stripe_event_processors/charge_processor');
 var ChargeDisputeProcessor = require('./stripe_event_processors/charge_dispute_processor');
 var CouponProcessor = require('./stripe_event_processors/coupon_processor');
 var CustomerProcessor = require('./stripe_event_processors/customer_processor');
 var CustomerDiscountProcessor = require('./stripe_event_processors/customer_discount_processor');
 var CustomerSourceProcessor = require('./stripe_event_processors/customer_source_processor');
-var CustomerSubscriptionCreatedProcessor = require('./stripe_event_processors/customer_subscription_created_processor');
-var CustomerSubscriptionUpdatedProcessor = require('./stripe_event_processors/customer_subscription_updated_processor');
-var InvoiceCreatedProcessor = require('./stripe_event_processors/invoice_created_processor');
-var InvoiceSucceededProcessor = require('./stripe_event_processors/invoice_succeeded_processor');
+var CustomerSubscriptionProcessor = require('./stripe_event_processors/customer_subscription_processor');
+var InvoiceProcessor = require('./stripe_event_processors/invoice_processor');
 var PlanProcessor = require('./stripe_event_processors/plan_processor');
 var SourceProcessor = require('./stripe_event_processors/source_processor');
 
@@ -26,62 +22,62 @@ module.exports = {
 
     switch(stripe_event.type) {
       case "customer.subscription.created":
-        CustomerSubscriptionCreatedProcessor.process(stripe_event, function(err, activity) {
+        CustomerSubscriptionProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.subscription.updated":
-        CustomerSubscriptionUpdatedProcessor.process(stripe_event, function(err, activity) {
+        CustomerSubscriptionProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.subscription.deleted":
-        CustomerSubscriptionUpdatedProcessor.process(stripe_event, function(err, activity) {
+        CustomerSubscriptionProcessor.processDeleted(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.subscription.trial_will_end":
-        CustomerSubscriptionUpdatedProcessor.process(stripe_event, function(err, activity) {
+        CustomerSubscriptionProcessor.processTrialWillend(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "charge.dispute.created":
-        CustomerDisputeProcessor.processCreated(stripe_event, function(err, activity) {
+        CustomerDisputeProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "charge.dispute.closed":
-        CustomerDisputeProcessor.processClosed(stripe_event, function(err, activity) {
+        CustomerDisputeProcessor.processClosed(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "charge.dispute.updated":
-      CustomerDisputeProcessor.processUpdated(stripe_event, function(err, activity) {
+      CustomerDisputeProcessor.processUpdated(stripe_event, bull, function(err, activity) {
         callback(err, activity);
       });
         break;
       case "charge.dispute.funds_withdrawn":
-        CustomerDisputeProcessor.processFundsWithdrawn(stripe_event, function(err, activity) {
+        CustomerDisputeProcessor.processFundsWithdrawn(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "charge.dispute.funds_reinstated":
-        CustomerDisputeProcessor.processFundsReinstated(stripe_event, function(err, activity) {
+        CustomerDisputeProcessor.processFundsReinstated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "coupon.created":
-        CouponProcessor.processCreated(stripe_event, function(err, activity) {
+        CouponProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "coupon.deleted":
-        CouponProcessor.processDeleted(stripe_event, function(err, activity) {
+        CouponProcessor.processDeleted(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "coupon.updated":
-        CouponProcessor.processUpdated(stripe_event, function(err, activity) {
+        CouponProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
@@ -101,74 +97,74 @@ module.exports = {
         });
         break;
       case "customer.discount.created":
-        CustomerDiscountProcessor.processCreated(stripe_event, function(err, activity) {
+        CustomerDiscountProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.discount.deleted":
-        CustomerDiscountProcessor.processDeleted(stripe_event, function(err, activity) {
+        CustomerDiscountProcessor.processDeleted(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.discount.updated":
-        CustomerDiscountProcessor.processUpdated(stripe_event, function(err, activity) {
+        CustomerDiscountProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.source.created":
-        CustomerSourceProcessor.processCreated(stripe_event, function(err, activity) {
+        CustomerSourceProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.source.deleted":
-        CustomerSourceProcessor.processDeleted(stripe_event, function(err, activity) {
+        CustomerSourceProcessor.processDeleted(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.source.updated":
-        CustomerSourceProcessor.processUpdated(stripe_event, function(err, activity) {
+        CustomerSourceProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "plan.created":
-        PlanProcessor.processCreated(stripe_event, function(err, activity) {
+        PlanProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "plan.deleted":
-        PlanProcessor.processDeleted(stripe_event, function(err, activity) {
+        PlanProcessor.processDeleted(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "plan.updated":
-        PlanProcessor.processUpdated(stripe_event, function(err, activity) {
+        PlanProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "source.canceled":
-        SourceProcessor.processCanceled(stripe_event, function(err, activity) {
+        SourceProcessor.processCanceled(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "source.chargeable":
-        SourceProcessor.processChargeable(stripe_event, function(err, activity) {
+        SourceProcessor.processChargeable(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "source.failed":
-        SourceProcessor.processFailed(stripe_event, function(err, activity) {
+        SourceProcessor.processFailed(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       //case "source.transaction.created":
       //break;
       case "invoice.created":
-        InvoiceCreatedProcessor.process(stripe_event, function(err, activity) {
+        InvoiceProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "invoice.payment_succeeded":
-        InvoiceSucceededProcessor.process(stripe_event, function(err, activity) {
+        InvoiceProcessor.processSucceeded(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
@@ -182,22 +178,17 @@ module.exports = {
         // case "customer.invoice_item.updated":
         //   break;
       case "charge.succeeded":
-        ChargeSucceededProcessor.process(stripe_event, function(err, activity) {
+        ChargeProcessor.processSucceeded(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "charge.failed":
-        ChargeFailedProcessor.process(stripe_event, function(err, activity) {
+        Chargerocessor.processFailedP(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "charge.refunded":
-        ChargeRefundedProcessor.process(stripe_event, function(err, activity) {
-          callback(err, activity);
-        });
-        break;
-      case "invoice.created":
-        InvoiceCreatedProcessor.process(stripe_event, function(err, activity) {
+        ChargeProcessor.processRefunded(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;

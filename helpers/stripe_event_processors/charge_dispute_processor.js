@@ -3,10 +3,11 @@ var MembershipHelper = require('../../helpers/membership_helper');
 var PushNotificationHelper = require('../../helpers/push_notification_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeManager = require('../stripe_manager');
+var StripeEventHelper = require('../../helpers/stripe_event_helper');
 const FormatCurrency = require('format-currency')
 
 module.exports = {
-  processCreated: function(stripe_event, callback) {
+  processCreated: function(stripe_event, bull, callback) {
     // Do something with event_json
     //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
     let reference_id = stripe_event.raw_object.data.object.charge;
@@ -22,34 +23,21 @@ module.exports = {
       var message_calf = "A dispute for a payment in the amount of " + amount_formatted + " was created.";
       var message_bull= charge.membership.user.email_address + " create a dispute for a payment in the amount of " + amount_formatted + ".";
 
-      var payload = {'messageFrom': 'MemberMoose',
-                    'type': "customer_dispute_created"};
-
-      User.find({"account": stripe_event.account }, function(err, users) {
-        user.forEach(function(user) {
-          var devices = user.devices;
-          devices.forEach(function(device) {
-            PushNotificationHelper.sendPushNotification(device, message_bull, payload);
-          });
-
-          ActivityHelper.createActivity(subscription.plan.user, membership.user, subscription.plan, "customer_subscription_deleted", message_calf, message_bull,
-            source, received_at, function(err, activity) {
-              callback(err, activity);
-          });
-        });
+      StripeEventHelper.notifyUsers("charge_dispute_created", bull, charge.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
+        callback(err, user);
       });
     });
   },
-  processClosed: function(stripe_event, callback) {
+  processClosed: function(stripe_event, bull, callback) {
     callback(new Error("Not Implmented"), null);
   },
-  processUpdated: function(stripe_event, callback) {
+  processUpdated: function(stripe_event, bull, callback) {
     callback(new Error("Not Implmented"), null);
   },
-  processFundsWithdrawn: function(stripe_event, callback) {
+  processFundsWithdrawn: function(stripe_event, bull, callback) {
     callback(new Error("Not Implmented"), null);
   },
-  procuessFundsReinstated: function(stripe_event, callback) {
+  procuessFundsReinstated: function(stripe_event, bull, callback) {
     callback(new Error("Not Implmented"), null);
   }
 };

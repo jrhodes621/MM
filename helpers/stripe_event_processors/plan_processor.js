@@ -6,25 +6,25 @@ var StripeManager = require('../stripe_manager');
 const FormatCurrency = require('format-currency')
 
 module.exports = {
-  processCreated: function(stripe_event, callback) {
+  processCreated: function(stripe_event, bull, callback) {
     let reference_id = stripe_event.raw_object.data.object.charge;
     var source = "Stripe";
     var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
 
     callback(new Error("Not Implmented"), null);
   },
-  processDeleted: function(stripe_event, callback) {
+  processDeleted: function(stripe_event, bull, callback) {
     let reference_id = stripe_event.raw_object.data.object.charge;
     var source = "Stripe";
     var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
 
     callback(new Error("Not Implmented"), null);
   },
-  processUpdated: function(stripe_event, callback) {
+  processUpdated: function(stripe_event, bull, callback) {
     let reference_id = stripe_event.raw_object.data.object.charge;
     var source = "Stripe";
     var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
-    
+
     callback(new Error("Not Implmented"), null);
   }
 };
