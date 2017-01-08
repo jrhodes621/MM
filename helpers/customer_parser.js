@@ -56,7 +56,7 @@ module.exports = {
               payment_card.save(function(err) {
                 if(err) { callback(err, user); }
 
-                if(user.payment_cards.indexOf(payment_card._id) === -1)
+                if(user.payment_cards.indexOf(payment_card._id) === -1) {
                   user.payment_cards.push(payment_card);
                 }
 
