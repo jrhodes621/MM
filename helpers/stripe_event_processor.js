@@ -163,20 +163,26 @@ module.exports = {
           callback(err, activity);
         });
         break;
-      case "invoice.payment_succeeded":
-        InvoiceProcessor.processSucceeded(stripe_event, bull, function(err, activity) {
+      case "invoice.payment_failed":
+        InvoiceProcessor.processPaymentFailed(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
-        //invoice.payment_failed
-        //invoice.sent
-        //invoice.updated
-        // case "customer.invoice_item.created":
-        //   break;
-        // case "customer.invoice_item.deleted":
-        //   break;
-        // case "customer.invoice_item.updated":
-        //   break;
+      case "invoice.payment_succeeded":
+        InvoiceProcessor.processPaymentSucceeded(stripe_event, bull, function(err, activity) {
+          callback(err, activity);
+        });
+        break;
+      case "invoice.sent":
+        InvoiceProcessor.processSent(stripe_event, bull, function(err, activity) {
+          callback(err, activity);
+        });
+        break;
+      case "invoice.updated":
+        InvoiceProcessor.processUpdated(stripe_event, bull, function(err, activity) {
+          callback(err, activity);
+        });
+        break;
       case "charge.succeeded":
         ChargeProcessor.processSucceeded(stripe_event, bull, function(err, activity) {
           callback(err, activity);
