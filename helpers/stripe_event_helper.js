@@ -10,13 +10,13 @@ module.exports = {
 
     var activities = [];
     User.find({ "account": bull }, function(err, users) {
-      async.eachSeries(users, function(users, callback) {
-        var devices = bull_user.devices;
+      async.eachSeries(users, function(user, callback) {
+        var devices = user.devices;
         devices.forEach(function(device) {
           PushNotificationHelper.sendPushNotification(device, message_bull, payload);
         });
 
-        ActivityHelper.createActivity(bull_user, user, plan, notification_type, message_calf, message_bull,
+        ActivityHelper.createActivity(bull, calf, plan, notification_type, message_calf, message_bull,
           source, received_at, function(err, activity) {
             activities.push(activity);
 
