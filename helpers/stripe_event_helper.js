@@ -1,6 +1,6 @@
 var async = require("async");
-var ActivityHelper = require('./helpers/activity_helper');
-var PushNotificationHelper = require('./helpers/push_notification_helper');
+var ActivityHelper = require('../helpers/activity_helper');
+var PushNotificationHelper = require('../helpers/push_notification_helper');
 var User = require('../models/user');
 
 module.exports = {
