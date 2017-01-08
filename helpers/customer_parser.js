@@ -14,8 +14,6 @@ module.exports = {
 
     async.waterfall([
       function createUser(callback) {
-        console.log(user);
-
         if(!user) {
           user = new User();
 
@@ -23,7 +21,9 @@ module.exports = {
         }
 
         user.email_address = stripe_customer.email
-        user.roles.push("Calf")
+        if(user.roles.indexOf("Calf") === - 1) {
+          user.roles.push("Calf")
+        }
         user.reference_id = stripe_customer.id
         user.status = "Active"
 
@@ -42,11 +42,7 @@ module.exports = {
               });
             },
             function parsePaymentCard(payment_card, callback) {
-              var new_payment_card = false;
-
               if(!payment_card) {
-                new_payment_card = true;
-
                 payment_card = new PaymentCard();
               }
               payment_card.reference_id = source.id;
@@ -60,7 +56,7 @@ module.exports = {
               payment_card.save(function(err) {
                 if(err) { callback(err, user); }
 
-                if(new_payment_card) {
+                if(user.payment_cards.indexOf(payment_card._id) === -1)
                   user.payment_cards.push(payment_card);
                 }
 
@@ -115,10 +111,7 @@ module.exports = {
               });
             },
             function parseSubscription(plan, subscription, callback) {
-              var new_subscription = false;
               if(!subscription) {
-                new_subscription = true;
-
                 subscription = new Subscription();
                 subscription.subscription_created_at = new Date();
               }
@@ -131,7 +124,7 @@ module.exports = {
               subscription.save(function(err) {
                 if(err) { callback(err, user); }
 
-                if(new_subscription) {
+                if(membership.subscriptions.indexOf(subscription) === -1) {
                   membership.subscriptions.push(subscription);
                 }
                 membership.save(function(err) {
