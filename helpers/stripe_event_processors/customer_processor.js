@@ -39,6 +39,7 @@ module.exports = {
 
     User.findOne({ "reference_id": stripe_customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
+      if(!user) { return callback(null, null); }
 
       Membership.findOneAndRemove({ "user": user, "account": bull }, function(err, membership) {
         if(err) { return callback(err, null); }
