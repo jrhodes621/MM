@@ -15,8 +15,6 @@ module.exports = {
     var stripe_customer = stripe_event.raw_object.data.object;
     var source = "Stripe";
     var received_at = new Date(stripe_event.raw_object.created*1000);
-    var message_calf = "Test Message";
-    var message_bull= "You have a new customer " + user.email + " signed up!";
 
     User.findOne({ "reference_id": stripe_customer.id}, function(err, user) {
       if(err) { return callback(err, null); }
@@ -24,6 +22,9 @@ module.exports = {
       if(!user) {
         CustomerHelper.parseCustomerFromStripe(bull, stripe_customer, function(err, user) {
           if(err) { return callback(err, null); }
+
+          var message_calf = "Test Message";
+          var message_bull= "You have a new customer " + user.email + " signed up!";
 
           StripeEventHelper.notifyUsers("customer_created", bull, user, null, message_bull, message_calf, "Stripe", received_at, function(err, activities) {
             callback(err, user);
