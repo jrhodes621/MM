@@ -7,13 +7,17 @@ module.exports = {
     let stripe_plan = stripe_event.raw_object.data.object;
     let received_at = new Date(stripe_event.raw_object.created*1000);
 
-    PlanHelper.parsePlanFromStripe(plan, bull, stripe_plan, function(err, callback) {
+    Plan.findOne({ "reference_id": stripe_plan.id}, function(err, plan) {
       if(err) { return callback(err, null) }
 
-      var message_bull= "A new plan, " + plan.name + ", was created!";
+      PlanHelper.parsePlanFromStripe(plan, bull, stripe_plan, function(err, callback) {
+        if(err) { return callback(err, null) }
 
-      StripeEventHelper.notifyUsers("plan_created", bull, null, plan, message_bull, null, source, received_at, function(err, plan) {
-        callback(err, plan);
+        var message_bull= "A new plan, " + plan.name + ", was created!";
+
+        StripeEventHelper.notifyUsers("plan_created", bull, null, plan, message_bull, null, source, received_at, function(err, plan) {
+          callback(err, plan);
+        });
       });
     });
   },
@@ -27,13 +31,17 @@ module.exports = {
     let stripe_plan = stripe_event.raw_object.data.object;
     let received_at = new Date(stripe_event.raw_object.created*1000);
 
-    PlanHelper.parsePlanFromStripe(plan, bull, stripe_plan, function(err, callback) {
+    Plan.findOne({ "reference_id": stripe_plan.id}, function(err, plan) {
       if(err) { return callback(err, null) }
 
-      var message_bull= "Your plan, " + plan.name + ", was updated.";
+      PlanHelper.parsePlanFromStripe(plan, bull, stripe_plan, function(err, callback) {
+        if(err) { return callback(err, null) }
 
-      StripeEventHelper.notifyUsers("plan_updated", bull, null, plan, message_bull, null, source, received_at, function(err, plan) {
-        callback(err, plan);
+        var message_bull= "Your plan, " + plan.name + ", was updated.";
+
+        StripeEventHelper.notifyUsers("plan_updated", bull, null, plan, message_bull, null, source, received_at, function(err, plan) {
+          callback(err, plan);
+        });
       });
     });
   }
