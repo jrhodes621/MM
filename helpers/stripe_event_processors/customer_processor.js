@@ -19,8 +19,8 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!user) {
         CustomerHelper.parseCustomerFromStripe(bull, stripe_customer, function(err, user) {
-          var message_calf = "";
-          var message_bull= "You have a new customer. " + user.email + " signed up!";
+          var message_calf = "Test Message";
+          var message_bull= "You have a new customer " + user.email + " signed up!";
           var payload = {'messageFrom': 'MemberMoose',
                         'type': "customer_created"};
 
