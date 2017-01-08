@@ -100,10 +100,11 @@ module.exports = {
             callback(err, user);
           });
         }, function(user) {
-          callback(err, user);
+          callback(null, user);
         });
       }
     ], function(err, user) {
+      console.log(err);
       console.log(user);
 
       callback(err, user)
