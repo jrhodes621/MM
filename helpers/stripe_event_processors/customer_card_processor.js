@@ -1,8 +1,8 @@
-var ActivityHelper = require('../../helpers/activity_helper');
-var MembershipHelper = require('../../helpers/membership_helper');
-var SubscriptionHelper = require('../../helpers/subscription_helper');
+var PaymentCardHelper = require('../../helpers/payment_card_helper');
 var StripeEventHelper = require('../../helpers/stripe_event_helper');
 var StripeManager = require('../stripe_manager');
+var PaymentCard = require('../../models/payment_card');
+var User = require('../../models/user');
 
 module.exports = {
   processCreated: function(stripe_event, bull, callback) {
