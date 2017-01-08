@@ -22,12 +22,10 @@ var ActivitySchema   = new Schema({
     required: true
   },
   message_calf: {
-    type: String,
-    required: true
+    type: String
   },
   message_bull: {
-    type: String,
-    required: true
+    type: String
   },
   received_at: {
     type: Date
