@@ -18,11 +18,11 @@ module.exports = {
         plan.amount = stripe_plan.amount/100;
         plan.reference_id = stripe_plan.id;
         //plan.currency = stripe_plan.currency;
-        plan.interval = "month";
+        plan.interval = 0; //"month";
         plan.interval_count = stripe_plan.interval_count;
         plan.name = stripe_plan.name;
         plan.statement_descriptor = stripe_plan.statement_descriptor;
-        plan.trial_period_days = stripe_plan.trial_period_days;
+        plan.trial_period_days = stripe_plan.trial_period_days || 0;
 
         plan.save(function(err) {
           callback(err, plan);
