@@ -20,7 +20,7 @@ module.exports = {
       if(err) { return callback(err, null); }
 
       if(!user) {
-        CustomerHelper.parseCustomerFromStripe(bull, stripe_customer, function(err, user) {
+        CustomerHelper.parseNewCustomerFromStripe(bull, stripe_customer, function(err, user) {
           if(err) { return callback(err, null); }
 
           var message_calf = "Test Message";
