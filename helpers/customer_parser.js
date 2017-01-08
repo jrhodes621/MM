@@ -15,7 +15,7 @@ module.exports = {
     async.waterfall([
       function createUser(callback) {
         console.log(user);
-        
+
         if(!user) {
           user = new User();
 
@@ -80,7 +80,10 @@ module.exports = {
         });
       },
       function parseMembership(user, membership, callback) {
+        var new_membership = false;
         if(!membership) {
+          new_membership = true;
+
           membership = new Membership();
         }
         membership.reference_id = stripe_customer.id;
@@ -90,6 +93,10 @@ module.exports = {
         membership.member_since = stripe_customer.created;
 
         membership.save(function(err) {
+          if(new_membership) {
+            user.memberships.push(membreship);
+          }
+
           callback(err, user, membership);
         });
       },
@@ -141,7 +148,9 @@ module.exports = {
         });
       }
     ], function(err) {
-      callback(err, user)
+      user.save(function(err) {
+        callback(err, user);
+      })
     });
   },
   parse: function(bull, customer, stripe_subscription, plan, callback) {
