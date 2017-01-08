@@ -19,8 +19,6 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!user) {
         CustomerHelper.parseCustomerFromStripe(bull, stripe_customer, function(err, user) {
-          callback(err, user);
-
           var message_calf = "";
           var message_bull= "You have a new customer. " + user.email + " signed up!";
           var payload = {'messageFrom': 'MemberMoose',
@@ -28,7 +26,7 @@ module.exports = {
 
           User.find({ "account": bull}, function(err, bull_users) {
             async.eachSeries(bull_users, function(bull_user, callback) {
-              var devices = user.devices;
+              var devices = bull_user.devices;
               devices.forEach(function(device) {
                 PushNotificationHelper.sendPushNotification(device, message_bull, payload);
               });
@@ -38,7 +36,7 @@ module.exports = {
                   callback(err, activity);
               });
             }, function(err) {
-              callback(err, users);
+              callback(err, user);
             });
           });
         });
