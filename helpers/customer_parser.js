@@ -90,6 +90,8 @@ module.exports = {
         membership.member_since = stripe_customer.created;
 
         membership.save(function(err) {
+          console.log(user.memberships.indexOf(membership._id));
+
           if (user.memberships.indexOf(membership._id) === -1) {
               user.memberships.push(membership);
           }
