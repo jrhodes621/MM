@@ -11,7 +11,7 @@ module.exports = {
     Plan.findOne({ "reference_id": stripe_plan.id}, function(err, plan) {
       if(err) { return callback(err, null) }
 
-      PlanHelper.parsePlanFromStripe(plan, bull, stripe_plan, function(err, callback) {
+      PlanHelper.parsePlanFromStripe(plan, bull, stripe_plan, function(err, plan) {
         if(err) { return callback(err, null) }
 
         var message_bull= "A new plan, " + plan.name + ", was created!";
