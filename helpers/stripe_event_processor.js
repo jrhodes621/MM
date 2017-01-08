@@ -10,7 +10,7 @@ var ChargeDisputeProcessor = require('./stripe_event_processors/charge_dispute_p
 var CouponProcessor = require('./stripe_event_processors/coupon_processor');
 var CustomerProcessor = require('./stripe_event_processors/customer_processor');
 var CustomerDiscountProcessor = require('./stripe_event_processors/customer_discount_processor');
-var CustomerSourceProcessor = require('./stripe_event_processors/customer_source_processor');
+var CustomerCardProcessor = require('./stripe_event_processors/customer_card_processor');
 var CustomerSubscriptionProcessor = require('./stripe_event_processors/customer_subscription_processor');
 var InvoiceProcessor = require('./stripe_event_processors/invoice_processor');
 var PlanProcessor = require('./stripe_event_processors/plan_processor');
@@ -112,17 +112,17 @@ module.exports = {
         });
         break;
       case "customer.source.created":
-        CustomerSourceProcessor.processCreated(stripe_event, bull, function(err, activity) {
+        CustomerCardProcessor.processCreated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.source.deleted":
-        CustomerSourceProcessor.processDeleted(stripe_event, bull, function(err, activity) {
+        CustomerCardProcessor.processDeleted(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "customer.source.updated":
-        CustomerSourceProcessor.processUpdated(stripe_event, bull, function(err, activity) {
+        CustomerCardProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
