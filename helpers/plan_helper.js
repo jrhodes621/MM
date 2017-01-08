@@ -29,8 +29,6 @@ module.exports = {
         });
       }
     ], function(err) {
-      console.log(plan);
-      
       callback(err, plan);
     });
   },
