@@ -2,7 +2,7 @@ var PaymentCard = require('../models/payment_card');
 
 module.exports = {
   archivePaymentCard: function(user, payment_card, stripe_card, callback) {
-    payment_card.archived = true;
+    payment_card.archive = true;
     payment_card.save(function(err) {
       if(user.payment_cards.indexOf(payment_card) != -1) {
         user.payment_cards.pull(payment_card._id);
