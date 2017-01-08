@@ -23,7 +23,7 @@ module.exports = {
     });
   },
   processDeleted: function(stripe_event, bull, callback) {
-    let reference_id = stripe_event.raw_object.data.object.charge;
+    let stripe_plan = stripe_event.raw_object.data.object;
     let received_at  = new Date(stripe_event.raw_object.created*1000);
 
     Plan.findOne({ "reference_id": stripe_plan.id}, function(err, plan) {
