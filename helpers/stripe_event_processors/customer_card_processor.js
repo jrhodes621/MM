@@ -18,7 +18,7 @@ module.exports = {
       PaymentCard.findOne({ "reference_id": stripe_card.id }, function(err, payment_card) {
         if(err) { return callback(err, null) }
 
-        PaymentCardHelper.parsePaymentCardFromStripe(user, payment_card, bull, stripe_card, function(err, user, payment_card) {
+        PaymentCardHelper.parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
           if(err) { return callback(err, null) }
 
           var message_calf = "A new payment card was added to your account.";
@@ -70,7 +70,7 @@ module.exports = {
       PaymentCard.findOne({ "reference_id": stripe_card.id }, function(err, payment_card) {
         if(err) { return callback(err, null) }
 
-        PaymentCardHelper.parsePaymentCardFromStripe(user, payment_card, bull, stripe_card, function(err, user, payment_card) {
+        PaymentCardHelper.parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
           if(err) { return callback(err, null) }
 
           var message_calf = "Your payment card was updated.";
