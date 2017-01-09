@@ -38,7 +38,11 @@ module.exports = {
       });
     });
   },
-  parsePaymentCardFromStripe: parsePaymentCardFromStripe,
+  parsePaymentCardFromStripe: function(user, payment_card, stripe_card, callback) {
+    parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
+      callback(err, user, payment_card);
+    });
+  }),
   parseSources: function(customer, user, callback) {
     var numberOfSources = customer.sources.data.length;
     customer.sources.data.forEach(function(source) {
