@@ -3,6 +3,7 @@ var MembershipHelper = require('../../helpers/membership_helper');
 var StripeEventHelper = require('../../helpers/stripe_event_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
 var StripeManager = require('../stripe_manager');
+const FormatCurrency = require('format-currency')
 
 module.exports = {
   processCaptured: function(stripe_event, bull, callback) {
@@ -123,6 +124,37 @@ module.exports = {
           var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " was refunded.";
 
           StripeEventHelper.notifyUsers("charge_refunded", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
+            callback(err, user);
+          });
+        })
+      });
+    });
+  },
+  processSucceeded: function(stripe_event, bull, callback) {
+    let stripe_charge = stripe_event.raw_object.data.object;
+    let charge_id = stripe_charge.id;
+    let customer_id = stripe_charge.customer;
+    let source = "Stripe";
+    let received_at = new Date(stripe_event.raw_object.created*1000);
+    let payment_total = stripe_charge.amount;
+
+    let opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
+    let payment_total_formatted = FormatCurrency(payment_total, opts)
+
+    MembershipHelper.getMembershipByReference(customer_id, function(err, membership) {
+      if(err) { return callback(err, null); }
+      if(!membership) { return callback(new Error("Calf not found"), null) }
+
+      ChargeHelper.getCharge(charge_id, function(err, charge) {
+        if(err) { return callback(err, null); }
+
+        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
+          if(err) { return callback(err, charge); }
+
+          var message_calf = "Your charge of " + payment_total_formatted + " was processed.";
+          var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " was processed.";
+
+          StripeEventHelper.notifyUsers("charge_succeeded", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
             callback(err, user);
           });
         })
