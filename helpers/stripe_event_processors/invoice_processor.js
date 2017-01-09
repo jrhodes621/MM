@@ -120,7 +120,7 @@ module.exports = {
       });
     });
   },
-  processUpdated(stripe_event, bull callback) {
+  processUpdated(stripe_event, bull, callback) {
     var reference_id = stripe_event.raw_object.data.object.customer;
     var invoice_id = stripe_event.raw_object.data.object.id;
     var subscription_id = stripe_event.raw_object.data.object.subscription;
