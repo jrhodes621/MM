@@ -183,18 +183,33 @@ module.exports = {
           callback(err, activity);
         });
         break;
+      case "charge.captured":
+        ChargeProcessor.processCaptured(stripe_event, bull, function(err, activity) {
+          callback(err, activity);
+        });
+        break;
       case "charge.succeeded":
         ChargeProcessor.processSucceeded(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
       case "charge.failed":
-        Chargerocessor.processFailedP(stripe_event, bull, function(err, activity) {
+        ChargeProcessor.processFailed(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
+        case "charge.pending":
+          ChargeProcessor.processPendiing(stripe_event, bull, function(err, activity) {
+            callback(err, activity);
+          });
+          break;
       case "charge.refunded":
         ChargeProcessor.processRefunded(stripe_event, bull, function(err, activity) {
+          callback(err, activity);
+        });
+        break;
+      case "charge.updated":
+        ChargeProcessor.processUpdated(stripe_event, bull, function(err, activity) {
           callback(err, activity);
         });
         break;
