@@ -9,7 +9,7 @@ function getPaymentCardForCharge(charge, reference_id, callback) {
     });
 }
 module.exports = {
-  getCharge: function(charge_id, membership, cal  lback) {
+  getCharge: function(charge_id, membership, callback) {
     Charge.findOne({ "reference_id": charge_id, "membership": membership })
     .populate('membership')
     .populate('payment_card')

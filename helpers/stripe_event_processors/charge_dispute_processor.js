@@ -16,7 +16,7 @@ module.exports = {
     var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
     let amount_formatted = FormatCurrency(amount, opts)
 
-    ChargeHelper.getCharge(reference_id, function(err, charge) {
+    ChargeHelper.getCharge(reference_id, membership, function(err, charge) {
       if(err) { return callback(err, null); }
       if(!charge) { return callback(new Error("Charge not found"), null) }
 
