@@ -32,7 +32,7 @@ module.exports = {
           var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " was captured.";
 
           StripeEventHelper.notifyUsers("charge_captured", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
-            callback(err, user);
+            callback(err, activities);
           });
         })
       });
@@ -63,7 +63,7 @@ module.exports = {
           var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " failed.";
 
           StripeEventHelper.notifyUsers("charge_failed", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
-            callback(err, user);
+            callback(err, activities);
           });
         })
       });
@@ -94,7 +94,7 @@ module.exports = {
           var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " is pending.";
 
           StripeEventHelper.notifyUsers("charge_pending", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
-            callback(err, user);
+            callback(err, activities);
           });
         })
       });
@@ -125,7 +125,7 @@ module.exports = {
           var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " was refunded.";
 
           StripeEventHelper.notifyUsers("charge_refunded", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
-            callback(err, user);
+            callback(err, activities);
           });
         })
       });
@@ -156,7 +156,7 @@ module.exports = {
           var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " was processed.";
 
           StripeEventHelper.notifyUsers("charge_succeeded", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
-            callback(err, user);
+            callback(err, activities);
           });
         })
       });
@@ -187,7 +187,7 @@ module.exports = {
           var message_bull= "A charge of " + payment_total_formatted + " from " + membership.user.email_address + " was updated.";
 
           StripeEventHelper.notifyUsers("charge_updated", bull, membership.user, null, message_bull, message_calf, source, received_at, function(err, activities) {
-            callback(err, user);
+            callback(err, activities);
           });
         })
       });
