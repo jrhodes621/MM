@@ -22,7 +22,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      ChargeHelper.getCharge(charge_id, function(err, charge) {
+      ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
         ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
@@ -53,7 +53,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      ChargeHelper.getCharge(charge_id, function(err, charge) {
+      ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
         ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
@@ -84,7 +84,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      ChargeHelper.getCharge(charge_id, function(err, charge) {
+      ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
         ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
@@ -115,7 +115,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      ChargeHelper.getCharge(charge_id, function(err, charge) {
+      ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
         ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
@@ -146,7 +146,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      ChargeHelper.getCharge(charge_id, function(err, charge) {
+      ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
         ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
@@ -177,7 +177,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      ChargeHelper.getCharge(charge_id, function(err, charge) {
+      ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
         ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
