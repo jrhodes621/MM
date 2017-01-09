@@ -18,7 +18,7 @@ module.exports = {
     })
   },
   parseChargeFromStripe: function(charge, membership, bull, stripe_charge, callback) {
-    async.waterfall(
+    async.waterfall([
       function getPaymentCard(callback) {
         PaymentCard.findOne({"reference_id": stripe_charge.source.id}, function(err, payment_card) {
           if(!payment_card) { return callback(new Error("Payment Card not found"), null); }
