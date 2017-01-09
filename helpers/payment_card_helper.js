@@ -2,15 +2,16 @@ var PaymentCard = require('../models/payment_card');
 
 module.exports = {
   archivePaymentCard: function(user, payment_card, stripe_card, callback) {
-    payment_card.archive = true;
-    payment_card.save(function(err) {
-      if(user.payment_cards.indexOf(payment_card) != -1) {
-        user.payment_cards.pull(payment_card._id);
-      }
-      callback(err, user, payment_card);
+    parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
+      if(!payment_card) { return callback(new Error("Can't create payment card"), user, payment_card); }
+
+      payment_card.archive = true;
+      payment_card.save(function(err) {
+        callback(err, user, payment_card);
+      });
     });
   },
-  parsePaymentCardFromStripe: function(user, payment_card, bull, stripe_card, callback) {
+  parsePaymentCardFromStripe: function(user, payment_card, stripe_card, callback) {
     if(!payment_card) {
       payment_card = new PaymentCard();
     }
