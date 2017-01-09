@@ -1,4 +1,5 @@
 var ActivityHelper = require('../../helpers/activity_helper');
+var ChargeHelper = require('../../helpers/charge_helper');
 var MembershipHelper = require('../../helpers/membership_helper');
 var StripeEventHelper = require('../../helpers/stripe_event_helper');
 var SubscriptionHelper = require('../../helpers/subscription_helper');
