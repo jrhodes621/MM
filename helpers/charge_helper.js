@@ -9,7 +9,7 @@ function getPaymentCardForCharge(charge, reference_id, callback) {
     });
 }
 module.exports = {
-  getCharge: function(charge_id, membership, callback) {
+  getCharge: function(charge_id, membership, cal  lback) {
     Charge.findOne({ "reference_id": charge_id, "membership": membership })
     .populate('membership')
     .populate('payment_card')
@@ -17,7 +17,7 @@ module.exports = {
       callback(err, charge)
     })
   },
-  parseChargeFromStripe: function(charge, membership, bull, stripe_charge, callback) {
+  parseChargeFromStripe: function(charge, membership, bull, stripe_charge, status, callback) {
     async.waterfall([
       function getPaymentCard(callback) {
         PaymentCard.findOne({"reference_id": stripe_charge.source.id}, function(err, payment_card) {
@@ -50,7 +50,7 @@ module.exports = {
         charge.shipping = stripe_charge.shipping;
         charge.source_transfer = stripe_charge.source_transfer;
         charge.statement_descriptor = stripe_charge.statement_descriptor;
-        charge.status = stripe_charge.status;
+        charge.status = status;
         charge.membership = membership._id;
         charge.payment_card = payment_card;
 

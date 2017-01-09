@@ -25,7 +25,7 @@ module.exports = {
       ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
-        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
+        ChargeHelper.parseChargeFromStripe(charge,  membership, bull, stripe_charge, "captured", function(err, charge) {
           if(err) { return callback(err, charge); }
 
           var message_calf = "Your charge of " + payment_total_formatted + " was captured.";
@@ -56,7 +56,7 @@ module.exports = {
       ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
-        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
+        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, "failied", function(err, charge) {
           if(err) { return callback(err, charge); }
 
           var message_calf = "Your charge of " + payment_total_formatted + " failed.";
@@ -87,7 +87,7 @@ module.exports = {
       ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
-        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
+        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, "pending", function(err, charge) {
           if(err) { return callback(err, charge); }
 
           var message_calf = "Your charge of " + payment_total_formatted + " is pending.";
@@ -118,7 +118,7 @@ module.exports = {
       ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
-        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
+        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, "refunded", function(err, charge) {
           if(err) { return callback(err, charge); }
 
           var message_calf = "Your charge of " + payment_total_formatted + " was refunded.";
@@ -149,7 +149,7 @@ module.exports = {
       ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
-        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
+        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, "succeeded", function(err, charge) {
           if(err) { return callback(err, charge); }
 
           var message_calf = "Your charge of " + payment_total_formatted + " was processed.";
@@ -180,7 +180,7 @@ module.exports = {
       ChargeHelper.getCharge(charge_id, membership, function(err, charge) {
         if(err) { return callback(err, null); }
 
-        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, function(err, charge) {
+        ChargeHelper.parseChargeFromStripe(charge, membership, bull, stripe_charge, charge.status, function(err, charge) {
           if(err) { return callback(err, charge); }
 
           var message_calf = "Your charge of " + payment_total_formatted + " was updated.";
