@@ -1,5 +1,32 @@
 var PaymentCard = require('../models/payment_card');
 
+function parseChargeFromStripe(user, payment_card, stripe_card, callback) {
+  if(!payment_card) {
+    payment_card = new PaymentCard();
+  }
+
+  payment_card.reference_id = stripe_card.id;
+  payment_card.name = stripe_card.name;
+  payment_card.brand = stripe_card.brand;
+  payment_card.last4 = stripe_card.last4;
+  payment_card.exp_month = stripe_card.exp_month;
+  payment_card.exp_year = stripe_card.exp_year;
+  payment_card.status = "Active";
+
+  payment_card.save(function(err) {
+    if(err) { callback(err, user, null); }
+
+    if(user.payment_cards.indexOf(payment_card._id) === -1) {
+      user.payment_cards.push(payment_card);
+
+      user.save(function(err) {
+        callback(err, user, payment_card)
+      })
+    } else {
+      callback(err, user, payment_card);
+    }
+  });
+}
 module.exports = {
   archivePaymentCard: function(user, payment_card, stripe_card, callback) {
     parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
@@ -12,30 +39,8 @@ module.exports = {
     });
   },
   parsePaymentCardFromStripe: function(user, payment_card, stripe_card, callback) {
-    if(!payment_card) {
-      payment_card = new PaymentCard();
-    }
-
-    payment_card.reference_id = stripe_card.id;
-    payment_card.name = stripe_card.name;
-    payment_card.brand = stripe_card.brand;
-    payment_card.last4 = stripe_card.last4;
-    payment_card.exp_month = stripe_card.exp_month;
-    payment_card.exp_year = stripe_card.exp_year;
-    payment_card.status = "Active";
-
-    payment_card.save(function(err) {
-      if(err) { callback(err, user, null); }
-
-      if(user.payment_cards.indexOf(payment_card._id) === -1) {
-        user.payment_cards.push(payment_card);
-
-        user.save(function(err) {
-          callback(err, user, payment_card)
-        })
-      } else {
-        callback(err, user, payment_card);
-      }
+    parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
+      callback(err, user, payment_card);
     });
   },
   parseSources: function(customer, user, callback) {
