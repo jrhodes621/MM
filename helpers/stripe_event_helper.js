@@ -1,7 +1,6 @@
-var async = require("async");
-var ActivityHelper = require('../helpers/activity_helper');
-var PushNotificationHelper = require('../helpers/push_notification_helper');
-var User = require('../models/user');
+var async                        = require("async");
+var PushNotificationServices     = require('../services/push_notification.services');
+var User                         = require('../models/user');
 
 module.exports = {
   notifyUsers: function(notification_type, bull, calf, plan, message_bull, message_calf, source, received_at, callback) {
@@ -13,10 +12,10 @@ module.exports = {
       async.eachSeries(users, function(user, callback) {
         var devices = user.devices;
         devices.forEach(function(device) {
-          PushNotificationHelper.sendPushNotification(device, message_bull, payload);
+          PushNotificationServices.SendPushNotification(device, message_bull, payload);
         });
 
-        ActivityHelper.createActivity(bull, calf, plan, notification_type, message_calf, message_bull,
+        Activity.CreateActivity(bull, calf, plan, notification_type, message_calf, message_bull,
           source, received_at, function(err, activity) {
             activities.push(activity);
 

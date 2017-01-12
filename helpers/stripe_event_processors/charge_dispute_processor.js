@@ -1,22 +1,21 @@
-var ActivityHelper = require('../../helpers/activity_helper');
-var MembershipHelper = require('../../helpers/membership_helper');
-var PushNotificationHelper = require('../../helpers/push_notification_helper');
-var SubscriptionHelper = require('../../helpers/subscription_helper');
-var StripeManager = require('../stripe_manager');
-var StripeEventHelper = require('../../helpers/stripe_event_helper');
-const FormatCurrency = require('format-currency')
+var StripeEventHelper           = require('../../helpers/stripe_event_helper');
+var StripeServices              = require('../../services/stripe.services');
+const FormatCurrency            = require('format-currency')
 
 module.exports = {
   processCreated: function(stripe_event, bull, callback) {
     // Do something with event_json
     //var event_types = ['charge.failed', 'charge.refunded', 'charge.succeeded']
-    let reference_id = stripe_event.raw_object.data.object.charge;
+    var reference_id = stripe_event.raw_object.data.object.charge;
     var amount = stripe_event.raw_object.data.object.total;
     var source = "Stripe";
     var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
-    let amount_formatted = FormatCurrency(amount, opts)
+    var amount_formatted = FormatCurrency(amount, opts)
 
-    ChargeHelper.getCharge(reference_id, membership, function(err, charge) {
+    var params = {
+      charge_id: reference_id
+    }
+    Charge.GetCharge(params, function(err, charge) {
       if(err) { return callback(err, null); }
       if(!charge) { return callback(new Error("Charge not found"), null) }
 

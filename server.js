@@ -14,6 +14,7 @@ var errorHandler = require('api-error-handler');
 var mongoose = require("mongoose");
 var jwt    = require('jsonwebtoken');
 var cors = require('cors');
+var params = require('./params');
 
 var dashboard = require('./routes/dashboard');
 var routes = require('./routes/index');
@@ -26,6 +27,28 @@ var PaymentCard = require('./models/payment_card');
 var User = require('./models/user');
 
 var app = express();
+
+var AccountsController = require('./controllers/accounts.controller');
+var ActivitiesController = require('./controllers/activities.controller');
+var MembersController = require('./controllers/members.controller');
+var MessagesController = require('./controllers/messages.controller');
+var MeController = require('./controllers/me.controller');
+var OAuthController = require('./controllers/oauth.controller');
+var FunnelController = require('./controllers/funnel.controller');
+var PlansController = require('./controllers/plans.controller');
+var PlanActivitiesController = require('./controllers/plan_activities.controller');
+var PlanMembersController = require('./controllers/plan_members.controller');
+var SessionsController = require('./controllers/sessions.controller');
+var StripeEventsController = require('./controllers/stripe_events.controller');
+var SubscribeController = require('./controllers/subscribe.controller');
+var SubscriptionsController = require('./controllers/subscriptions.controller');
+var UsersController = require('./controllers/users.controller');
+var UserActivitiesController = require('./controllers/user_activities.controller');
+var UserChargesController = require('./controllers/user_charges.controller');
+var UserDevicesController = require('./controllers/user_devices.controller');
+var UserMessagesController = require('./controllers/user_messages.controller');
+var UserPaymentCardsController = require('./controllers/user_payment_cards.controller');
+var UserMessagesController = require('./controllers/user_messages.controller');
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
@@ -90,8 +113,8 @@ app.use('/partials/:name', function(req, res) {
   res.render('partials/' + name);
 });
 app.use('/accounts/:subdomain/partials/public/:name', function(req, res) {
-
   var name = req.params.name;
+
   res.render('partials/public/' + name);
 });
 app.use('/users', users);
@@ -132,23 +155,8 @@ function errorNotification(err, str, req) {
   //   if (err) throw err;
   // });
 }
-//app.use(handleError);
 
-var PublicFunnelRoutes = require('./api/public/funnel');
-var PublicUserRoutes = require('./api/public/users');
-var PublicFunnelRoutes = require('./api/public/funnel');
-var SessionsRoutes = require('./api/public/sessions');
-var OauthCallbackRoutes = require('./api/public/oauth');
-var SubscribeRoutes = require('./api/public/subscribe');
-var StripeEventRoutes = require('./api/public/stripe_events')
-
-router.use('/funnel/step1', PublicFunnelRoutes);
-router.use('/users/auth', OauthCallbackRoutes);
-router.use('/sessions', SessionsRoutes);
-router.use('/users', PublicUserRoutes);
-router.use('/stripe_events', StripeEventRoutes);
-
-router.use(function(req, res, next) {
+function GetToken(req, res, next) {
   console.log("looking for token");
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -193,71 +201,72 @@ router.use(function(req, res, next) {
     });
 
   }
-});
+}
+//app.use(handleError);
 
-var AccountRoutes = require('./api/private/account.js');
-var ActivityRoutes = require('./api/private/activities.js');
-var ChargesRoutes = require('./api/private/charge.js');
-var MeRoutes = require('./api/private/me.js');
-var MembersRoutes = require('./api/private/members.js');
-var MessagesRoutes = require('./api/private/messages.js');
-var MessageRoutes = require('./api/private/message.js');
-var PlansRoutes = require('./api/private/plans.js');
-var PlanRoutes = require('./api/private/plan.js');
-var PaymentCardRoutes = require('./api/private/payment_cards.js');
-var PrivateFunnelRoutes = require('./api/private/funnel');
-var PrivateSubscriptionRoutes = require('./api/private/subscriptions')
-var PrivateUserRoutes = require('./api/private/users.js')
+//Public endpoints
+router.post('/accounts/:subdomain/api/subscribe', SubscribeController.CreateSubscription);
+router.post('/funnel/step1', FunnelController.Step1);
+router.post('/sessions', SessionsController.CreateSession);
+router.post('/sessions/verify', SessionsController.RefreshSession);
+router.post('/stripe_events', StripeEventsController.CreateStripeEvent);
+router.post('/users', UsersController.CreateUser);
+router.get('/users/auth/stripe_connect/callback', OAuthController.StripeConnectCallback);
 
-router.use('/accounts', AccountRoutes);
-router.use('/activities', ActivityRoutes);
-router.use('/funnel', PrivateFunnelRoutes);
-router.use('/me', MeRoutes);
-router.use('/members', MembersRoutes);
-router.use('/messages', MessagesRoutes);
-router.use('/messages/:user_id', MessageRoutes);
-router.use('/plans', PlansRoutes);
-router.use('/plans/:plan_id', PlanRoutes);
-router.use('/users/:user_id/subscriptions', PrivateSubscriptionRoutes);
-router.use('/users', PrivateUserRoutes);
-router.use('/users/:user_id', PrivateUserRoutes);
-router.use('/users/:user_id/devices', PrivateUserRoutes);
-router.use('/users/:user_id/charges', ChargesRoutes);
-router.use('/users/:user_id/payment_cards', PaymentCardRoutes)
+router.use(GetToken);
 
-router.param(':plan_id', function (req, res, next, plan_id) {
-  console.log("Getting Plan for " + plan_id);
+//Private Endpoints
+//Accounts
+router.put('/accounts', AccountsController.UpdateAccount);
 
-  Plan.findById(plan_id)
-  .exec(function(err, plan) {
-    if(err) { return next(err); }
+//Activities
+router.get('/activities', ActivitiesController.GetActivities);
 
-    if(!plan) {
-      return handleError(res, "Plan Not Found", "Plan Not Found.", 404);
-    }
-    req.plan = plan;
+//Funnel
+router.post('/funnel/step2', FunnelController.Step2);
+router.post('/funnel/step3', FunnelController.Step3);
 
-    return next();
-  });
-});
-router.param('user_id', function (req, res, next, user_id) {
-  console.log("Getting User for " + user_id);
+//Me
+router.get('/me', MeController.GetUser);
 
-  User.findById(user_id)
-  .exec(function(err, user) {
-    if(err) { return next(err); }
+//Members
+router.get('/members', MembersController.GetMembers);
+router.get('/members/:user_id', MembersController.GetMember);
+router.post('/members', MembersController.CreateMember);
 
-    if(!user) {
-      return handleError(res, "User Not Found", "Use Not Found.", 404);
-    }
-    req.user = user;
+//Messages
+router.get('/messages', MessagesController.GetMessages);
+router.get('/messages/:user_id', UserMessagesController.GetMessages);
+router.post('/messages/:user_id', UserMessagesController.CreateMessage);
 
-    return next();
-  });
-});
+//Plans
+router.get('/plans', PlansController.GetPlans);
+router.get('/plans/:plan_id', PlansController.GetPlan);
+router.post('/plans', PlansController.CreatePlan);
+router.put('/plans/:plan_id', PlansController.UpdatePlan);
+router.delete('/plans/:plan_id', PlansController.DeletePlan);
+router.get('/plans/:plan_id/members', PlanMembersController.GetMembers);
+router.get('/plans/:plan_id/activities', PlanActivitiesController.GetActivities);
+
+//Subscriptions
+router.post('/users/:user_id/subscriptions', SubscriptionsController.CreateSubscription);
+router.delete('/users/:user_id/subscriptions/:subscription_id', SubscriptionsController.DeleteSubscription);
+router.post('/users/:user_id/subscriptions/:subscription_id/upgrade', SubscriptionsController.UpgradeSubscription);
+
+//Users
+router.put('/users/:user_id', UsersController.UpdateUser);
+router.get('/users/:user_id/activities', UserActivitiesController.GetActivities)
+router.get('/users/:user_id/charges', UserChargesController.GetCharges);
+router.post('/users/:user_id/charges', UserChargesController.CreateCharge);
+router.post('/users/:user_id/devices', UserDevicesController.CreateDevice);
+router.get('/users/:user_id/messages', UserMessagesController.GetMessages);
+router.post('/users/:user_id/payment_cards', UserPaymentCardsController.CreatePaymentCard)
+
+router.param('plan_id', params.GetPlan);
+router.param('user_id', params.GetUser);
+
 router.use(errorHandler());
 // apply the routes to our application with the prefix /api
 app.use('/api', router);
-app.use('/accounts/:subdomain/api/subscribe', SubscribeRoutes);
 
 module.exports = app;

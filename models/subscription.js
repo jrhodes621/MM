@@ -1,11 +1,11 @@
-var mongoose = require('mongoose');
-var Schema       = mongoose.Schema;
-var Plan = require('../models/plan');
+var mongoose    = require('mongoose');
+var Schema      = mongoose.Schema;
 
 var SubscriptionSchema   = new Schema({
   plan: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan'
+    ref: 'Plan',
+    required: true
   },
   membership: {
     type: mongoose.Schema.Types.ObjectId,
@@ -17,7 +17,8 @@ var SubscriptionSchema   = new Schema({
     required: true
   },
   subscription_created_at: {
-    type: Date
+    type: Date,
+    required: true
   },
   subscription_canceled_at: {
     type: Date

@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 var Plan     = require('../models/plan');
+var AccountServices = require('../models/account.services')
 
 var AccountSchema   = new Schema({
   reference_id: {
@@ -17,11 +18,16 @@ var AccountSchema   = new Schema({
   avatar: {},
   subscription: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan'
+    ref: 'Subscription'
   },
   plans: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Plan',
+    default: []
+  }],
+  members: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     default: []
   }],
   reference_plans: [{
@@ -48,5 +54,9 @@ var AccountSchema   = new Schema({
 {
     timestamps: true
 });
+
+AccountSchema.statics.GetAccountById = AccountServices.GetAccountById
+AccountSchema.statics.SaveAccount = AccountServices.SaveAccount
+AccountSchema.statics.UploadAvatar = AccountServices.UploadAvatar
 
 module.exports = mongoose.model('Account', AccountSchema);

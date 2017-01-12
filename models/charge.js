@@ -1,6 +1,7 @@
-var mongoose = require('mongoose');
-var Schema       = mongoose.Schema;
-var Plan     = require('../models/membership');
+var mongoose         = require('mongoose');
+var Schema           = mongoose.Schema;
+var Membership       = require('../models/membership');
+var ChargeServices   = require('../models/charge.services')
 
 var ChargeSchema   = new Schema({
   membership: {
@@ -92,5 +93,8 @@ var ChargeSchema   = new Schema({
 {
     timestamps: true
 });
+
+ChargeSchema.statics.GetChargeById = ChargeServices.GetChargeById
+ChargeSchema.statics.GetChargeByReferenceId = ChargeServices.GetChargeByReferenceId
 
 module.exports = mongoose.model('Charge', ChargeSchema);

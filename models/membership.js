@@ -19,7 +19,8 @@ var MembershipSchema   = new Schema({
     type: String
   },
   member_since: {
-    type: Date
+    type: Date,
+    required: true
   },
   subscriptions: [{
     type: mongoose.Schema.Types.ObjectId,

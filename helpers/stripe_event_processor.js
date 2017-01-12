@@ -4,7 +4,6 @@ var express    = require('express');        // call express
 var router = express.Router();              // get an instance of the express Router
 var mongoose   = require('mongoose');
 var StripeEvent = require('../models/stripe_event');
-var AccountHelper = require('./account_helper');
 var ChargeProcessor = require('./stripe_event_processors/charge_processor');
 var ChargeDisputeProcessor = require('./stripe_event_processors/charge_dispute_processor');
 var CouponProcessor = require('./stripe_event_processors/coupon_processor');

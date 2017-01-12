@@ -1,10 +1,12 @@
-var mongoose = require('mongoose');
-var Schema       = mongoose.Schema;
+var mongoose      = require('mongoose');
+var Schema        = mongoose.Schema;
+var Account       = require('../models/account');
 
 var StripeEventSchema   = new Schema({
   account: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Account'
+    ref: 'Account',
+    required: true
   },
   event_id: {
     type: String,
@@ -20,7 +22,7 @@ var StripeEventSchema   = new Schema({
   },
   raw_object: {
     type: Schema.Types.Mixed,
-    require: true
+    required: true
   },
   processed: {
     type: Boolean,

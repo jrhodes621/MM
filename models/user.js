@@ -87,7 +87,6 @@ var UserSchema   = new Schema({
 {
     timestamps: true
 });
-
 UserSchema.pre('save', function (next) {
     var user = this;
     if (this.isModified('password') || this.isNew) {
@@ -116,6 +115,11 @@ UserSchema.methods.comparePassword = function (passw, cb) {
         cb(null, isMatch);
     });
 };
+UserSchema.methods.UpdateUser = function(callback) {
+  this.save(function(err) {
+    callback(err)
+  });
+}
 UserSchema.set('toJSON', {
     getters: true,
     virtuals: true,
@@ -132,4 +136,6 @@ UserSchema.virtual('gravatar_url').get(function() {
 });
 UserSchema.plugin(mongoosePaginate);
 
-module.exports = mongoose.model('User', UserSchema);
+var User = mongoose.model('User', UserSchema)
+
+module.exports = User;

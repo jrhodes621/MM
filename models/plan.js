@@ -1,12 +1,14 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
-var User = require('../models/user');
+var Account = require('../models/account');
 var mongoosePaginate = require('mongoose-paginate');
+var PlanServices = require('../models/plan.services')
 
 var PlanSchema   = new Schema({
-  user: {
+  account: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'Account',
+    required: true
   },
   name: {
     type: String,
@@ -67,6 +69,11 @@ var PlanSchema   = new Schema({
 {
     timestamps: true
 });
+
+PlanSchema.statics.GetPlans = PlanServices.GetPlans
+PlanSchema.statics.GetPlan = PlanServices.GetPlan
+PlanSchema.statics.SavePlan = PlanServices.SavePlan
+
 PlanSchema.set('toJSON', {
     getters: true,
     virtuals: true,
@@ -81,4 +88,6 @@ PlanSchema.virtual('member_count').get(function () {
   return this.members.length;
 });
 
-module.exports = mongoose.model('Plan', PlanSchema);
+var Plan = mongoose.model('Plan', PlanSchema);
+
+module.exports = Plan;

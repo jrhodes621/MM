@@ -1,0 +1,47 @@
+var mongoose          = require('mongoose');
+var Schema            = mongoose.Schema;
+var Charge            = require('../models/charge');
+var mongoosePaginate  = require('mongoose-paginate');
+
+var RefundSchema   = new Schema({
+  charge: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Charge',
+    required: true
+  },
+  reference_id: {
+    type: String,
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true
+  },
+  currency: {
+    type: String,
+    required: true,
+    default: 'usd'
+  },
+  refund_created: {
+    type: Date,
+    required: true
+  },
+  description: {
+    type: String
+  },
+  reason: {
+    type: String
+  },
+  receipt_number: {
+    type: String
+  },
+  status: {
+    type: String,
+    required: true
+  }
+},
+{
+    timestamps: true
+});
+
+module.exports = mongoose.model('Refund', RefundSchema);

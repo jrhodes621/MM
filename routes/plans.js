@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
-var StripeManager = require("../helpers/stripe_manager");
+var StripeServices = require('../services/stripe.services');
 
 router.get('/', function(req, res, next) {
     User.findOne({ 'subdomain': req.subdomain}, function(err, user) {
@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
       }
       var stripe_api_key = user.account.stripe_connect.access_token;
 
-      StripeManager.listPlans(stripe_api_key, function(err, plans) {
+      StripeServices.listPlans(stripe_api_key, function(err, plans) {
         if(err) {
           console.log(err);
 
@@ -38,7 +38,7 @@ router.get('/subscribe/:plan_id', function(req, res) {
       }
       var stripe_api_key = user.account.stripe_connect.access_token;
 
-      StripeManager.getPlan(stripe_api_key, plan_id, function(err, plan) {
+      StripeServices.getPlan(stripe_api_key, plan_id, function(err, plan) {
         if(err) {
           console.log(err);
 
