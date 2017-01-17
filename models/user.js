@@ -1,14 +1,9 @@
 var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
-var Account = require('../models/account');
-var Charge = require('../models/charge');
-var Membership = require('../models/membership');
-var PaymentCard = require('../models/payment_card');
-var Plan = require('../models/plan');
-var Subscription = require('../models/subscription');
 var mongoosePaginate = require('mongoose-paginate');
 var bcrypt = require('bcrypt');
-var gravatar = require('gravatar');
+
+var UserServices = require('../models/user.services')
 
 var UserSchema   = new Schema({
   email_address: {
@@ -32,19 +27,6 @@ var UserSchema   = new Schema({
     ref: 'Account'
   },
   avatar: {},
-  reference_id: {
-    type: String
-  },
-  plans: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan',
-    default: []
-  }],
-  members: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: []
-  }],
   memberships: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Membership',
@@ -60,7 +42,10 @@ var UserSchema   = new Schema({
     ref: 'Charge',
     default: []
   }],
-  roles: [String],
+  roles: [{
+    type: String,
+    unique: true
+  }],
   status: {
     type: String,
     required: true
@@ -131,10 +116,16 @@ UserSchema.set('toJSON', {
 UserSchema.virtual('member_count').get(function () {
   return this.members.length;
 });
-UserSchema.virtual('gravatar_url').get(function() {
-  return gravatar.url(this.email_address, {s: '100', r: 'x', d: 'retro'}, true);
-});
+// UserSchema.virtual('gravatar_url').get(function() {
+//   return gravatar.url(this.email_address, {s: '100', r: 'x', d: 'retro'}, true);
+// });
 UserSchema.plugin(mongoosePaginate);
+
+UserSchema.statics.GetUserById = UserServices.GetUserById
+UserSchema.statics.GetUserByEmailAddress = UserServices.GetUserByEmailAddress
+UserSchema.statics.SaveUser = UserServices.SaveUser
+UserSchema.statics.UploadAvatar = UserServices.UploadAvatar
+UserSchema.statics.ParseReferencePlans = UserServices.ParseReferencePlans
 
 var User = mongoose.model('User', UserSchema)
 

@@ -1,6 +1,8 @@
 var mongoose   = require('mongoose');
 var Schema     = mongoose.Schema;
 
+var CouponServices   = require('../models/coupon.services')
+
 var CouponSchema   = new Schema({
   account: {
     type: mongoose.Schema.Types.ObjectId,
@@ -55,5 +57,9 @@ var CouponSchema   = new Schema({
 {
     timestamps: true
 });
+
+CouponSchema.statics.GetChargeById = CouponServices.GetCouponById
+CouponSchema.statics.GetChargeByReferenceId = CouponServices.GetCouponByReferenceId
+CouponSchema.statics.SaveCharge = CouponServices.SaveCoupon
 
 module.exports = mongoose.model('Coupon', CouponSchema);

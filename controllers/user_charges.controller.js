@@ -12,9 +12,7 @@ var UserChargesController = {
       if(err) { return next(err); }
       if(!membership) { return next(new Error("No membership for user")) }
 
-      Charge.find({'membership': membership})
-      .populate('payment_card')
-      .exec(function(err, charges) {
+      Charge.GetChargesForUser(membership, function(err, charges) {
         if(err) { return next(err); }
 
         res.status(200).send(charges);
@@ -24,11 +22,17 @@ var UserChargesController = {
   CreateCharge: function(req, res, next) {
     var current_user = req.current_user;
     var user = req.user;
+    var amount = req.body.amount;
+    var currency = "usd";
+    var customer_id = user.memberships[0].reference_id;
+    var description = req.body.description;
+
     var stripe_api_key = current_user.account.stripe_connect.access_token;
 
     //verify user has a reference_id
-    StripeServices.createCharge(stripe_api_key, user.memberships[0].reference_id, req.body.amount, "usd", req.body.description, function(err, stripe_charge) {
+    StripeServices.createCharge(stripe_api_key, customer_id, amount, currency, description, function(err, stripe_charge) {
       if(err) { return next(err); }
+      if(!stripe_charge) { return next(new Error("Unable able to create Stripe Charge")); }
 
       var charge = new Charge();
       charge.reference_id = stripe_charge.id;
@@ -54,11 +58,11 @@ var UserChargesController = {
       charge.status = stripe_charge.status;
       charge.card_info = stripe_charge.source.brand + " ending in " + stripe_charge.source.last4;
 
-      charge.save(function(err) {
+      Charge.SaveCharge(function(err) {
         if(err) { return next(err) }
 
-        //user.charges.push(charge);
-        user.save(function(err) {
+        user.charges.push(charge);
+        User.SaveUser(function(err) {
           if(err) { return next(err) }
 
           res.status(201).send(charge);

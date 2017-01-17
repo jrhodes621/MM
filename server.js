@@ -15,6 +15,7 @@ var mongoose = require("mongoose");
 var jwt    = require('jsonwebtoken');
 var cors = require('cors');
 var params = require('./params');
+var security = require('./security');
 
 var dashboard = require('./routes/dashboard');
 var routes = require('./routes/index');
@@ -52,7 +53,7 @@ var UserMessagesController = require('./controllers/user_messages.controller');
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
-mongoose.connect(process.env.MONGODB_URI); // connect to our database
+//mongoose.connect(process.env.MONGODB_URI); // connect to our database
 
 app.options('*', cors());
 
@@ -157,55 +158,35 @@ function errorNotification(err, str, req) {
 }
 
 function GetToken(req, res, next) {
-  console.log("looking for token");
-  // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-  // decode token
-  if (token) {
-    // verifies secret and checks exp
-    jwt.verify(token, process.env.SECRET, { header: 'JWT' }, function(err, decoded) {
-      if (err) {
-        if(err.name == 'TokenExpiredError') {
-          return res.status(401).send({ success: false, message: 'Token expired.' });
-        } else {
-          return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
-        }
-      } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;
-        var user_id = decoded._id;
-
-        User.findById(user_id)
-        .populate('account')
-        .populate('plans')
-        .exec(function(err, user) {
-          if (err) {
-            return res.status(403).send({ success: false, message: 'Failed to authenticate token.' });
-          } else {
-            req.current_user = user;
-
-            next();
-          }
-        });
-      }
-    });
-
-  } else {
-
-    // if there is no token
-    // return an error
+  if(!token) {
     return res.status(403).send({
         success: false,
         message: 'No token provided.'
     });
-
   }
+
+  security.validate_token(token, process.env.SECRET, function(err, status_code, minor_code, user) {
+    if(err) {
+      console.log(err);
+
+      return res.status(status_code).send({
+        success: false,
+        minor_code: minor_code,
+        message: err
+      });
+    }
+
+    req.current_user = user;
+
+    next();
+  });
 }
 //app.use(handleError);
 
 //Public endpoints
-router.post('/accounts/:subdomain/api/subscribe', SubscribeController.CreateSubscription);
+router.post('/accounts/:subdomain/subscribe', SubscribeController.CreateSubscription);
 router.post('/funnel/step1', FunnelController.Step1);
 router.post('/sessions', SessionsController.CreateSession);
 router.post('/sessions/verify', SessionsController.RefreshSession);
@@ -214,7 +195,7 @@ router.post('/users', UsersController.CreateUser);
 router.get('/users/auth/stripe_connect/callback', OAuthController.StripeConnectCallback);
 
 router.use(GetToken);
-
+console.log('here');
 //Private Endpoints
 //Accounts
 router.put('/accounts', AccountsController.UpdateAccount);

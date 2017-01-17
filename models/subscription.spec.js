@@ -20,15 +20,6 @@ describe('Subscription', function(done) {
       done();
     });
   });
-  it('should be invalid if reference_id is empty', function(done) {
-    var subscription = new Subscription();
-
-    subscription.validate(function(err) {
-      expect(err.errors.reference_id).to.exist;
-
-      done();
-    });
-  });
   it('should be invalid if subscription created at is empty', function(done) {
     var subscription = new Subscription();
 

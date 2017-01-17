@@ -12,6 +12,7 @@ function parse(bull, stripe_plan, callback) {
       if(!plan) {
         plan = new Plan();
       }
+      plan.account = bull;
       plan.amount = stripe_plan.amount/100;
       plan.reference_id = stripe_plan.id;
       //plan.currency = stripe_plan.currency;

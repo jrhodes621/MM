@@ -11,7 +11,7 @@ var PlansController = {
     var offset = (page-1)*page_size;
 
     var params = {
-      query: { "user": current_user._id, "archive": false },
+      query: { "account": current_user.account, "archive": false },
       paging: { offset: offset, limit: page_size, sort: { name: 'asc'} }
     }
     Plan.GetPlans(params, function(err, result) {
@@ -36,7 +36,7 @@ var PlansController = {
 
     var plan = new Plan();
 
-    plan.user = user._id;
+    plan.account = user.account._id;
     plan.name = req.body.name;
     plan.description = req.body.description;
     plan.features = req.body.features;

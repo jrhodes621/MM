@@ -7,7 +7,7 @@ var async                 = require("async");
 function parse(bull, stripe_customer, callback) {
   var result = null;
   var user = null;
-
+  
   async.waterfall([
     function getUser(callback) {
       User.findOne({ "email_address": stripe_customer.email }, function(err, user) {

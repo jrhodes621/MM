@@ -8,50 +8,50 @@ var PlanParser         = require('../../parsers/stripe/plan_parser');
 
 function parse(bull, stripe_subscription, callback) {
   var result = null;
-  //var stripe_api_key = bull.stripe_connect.access_token;
+  var stripe_api_key = bull.stripe_connect.access_token;
 
   async.waterfall([
     function getStripeCustomer(callback) {
-      var stripe_customer = {
-        "id": "cus_7Vaek4PEyYBvsJ",
-        "object": "customer",
-        "account_balance": 0,
-        "created": 1483908144,
-        "currency": "usd",
-        "default_source": null,
-        "delinquent": false,
-        "description": null,
-        "discount": null,
-        "email": "james+200@somehero.com",
-        "livemode": false,
-        "metadata": {
-        },
-        "shipping": null,
-        "sources": {
-          "object": "list",
-          "data": [
-
-          ],
-          "has_more": false,
-          "total_count": 0,
-          "url": "/v1/customers/cus_9tagyvZXCzFCj9/sources"
-        },
-        "subscriptions": {
-          "object": "list",
-          "data": [
-
-          ],
-          "has_more": false,
-          "total_count": 0,
-          "url": "/v1/customers/cus_9tagyvZXCzFCj9/subscriptions"
-        }
-      }
-      // StripeServices.getCustomer(stripe_api_key, stripe_subscription.customer, function(err, customer) {
-      //   if(!customer) { return callback(new Error("Can't get customer from Stripe"), null); }
+      // var stripe_customer = {
+      //   "id": "cus_7Vaek4PEyYBvsJ",
+      //   "object": "customer",
+      //   "account_balance": 0,
+      //   "created": 1483908144,
+      //   "currency": "usd",
+      //   "default_source": null,
+      //   "delinquent": false,
+      //   "description": null,
+      //   "discount": null,
+      //   "email": "james+200@somehero.com",
+      //   "livemode": false,
+      //   "metadata": {
+      //   },
+      //   "shipping": null,
+      //   "sources": {
+      //     "object": "list",
+      //     "data": [
       //
-      //   callback(err, stripe_customer);
-      // });
-      callback(null, stripe_customer);
+      //     ],
+      //     "has_more": false,
+      //     "total_count": 0,
+      //     "url": "/v1/customers/cus_9tagyvZXCzFCj9/sources"
+      //   },
+      //   "subscriptions": {
+      //     "object": "list",
+      //     "data": [
+      //
+      //     ],
+      //     "has_more": false,
+      //     "total_count": 0,
+      //     "url": "/v1/customers/cus_9tagyvZXCzFCj9/subscriptions"
+      //   }
+      // }
+      StripeServices.getCustomer(stripe_api_key, stripe_subscription.customer, function(err, stripe_customer) {
+        if(!stripe_customer) { return callback(new Error("Can't get customer from Stripe"), null); }
+
+        callback(err, stripe_customer);
+      });
+      //callback(null, stripe_customer);
     },
     function getUser(stripe_customer, callback) {
       User.findOne({"email_address": stripe_customer.email}, function(err, user) {

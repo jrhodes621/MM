@@ -1,6 +1,8 @@
 var mongoose    = require('mongoose');
 var Schema      = mongoose.Schema;
 
+var SubscriptionServices = require('../models/subscription.services')
+
 var SubscriptionSchema   = new Schema({
   plan: {
     type: mongoose.Schema.Types.ObjectId,
@@ -13,8 +15,7 @@ var SubscriptionSchema   = new Schema({
     required: true
   },
   reference_id: {
-    type: String,
-    required: true
+    type: String
   },
   subscription_created_at: {
     type: Date,
@@ -32,10 +33,20 @@ var SubscriptionSchema   = new Schema({
   status: {
     type: String,
     required: true
+  },
+  synced: {
+    type: Boolean,
+    required: true,
+    default: false
   }
 },
 {
     timestamps: true
 });
+
+SubscriptionSchema.statics.SubscribeToPlan = SubscriptionServices.SubscribeToPlan
+SubscriptionSchema.statics.GetSubscriptionByReferenceId = SubscriptionServices.GetSubscriptionByReferenceId
+SubscriptionSchema.statics.GetMemberMooseFreePlan = SubscriptionServices.GetMemberMooseFreePlan
+SubscriptionSchema.statics.GetMemberMoosePrimePlan = SubscriptionServices.GetMemberMoosePrimePlan
 
 module.exports = mongoose.model('Subscription', SubscriptionSchema);

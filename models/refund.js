@@ -3,6 +3,8 @@ var Schema            = mongoose.Schema;
 var Charge            = require('../models/charge');
 var mongoosePaginate  = require('mongoose-paginate');
 
+var RefundServices = require('../models/refund.services')
+
 var RefundSchema   = new Schema({
   charge: {
     type: mongoose.Schema.Types.ObjectId,
@@ -43,5 +45,9 @@ var RefundSchema   = new Schema({
 {
     timestamps: true
 });
+
+RefundSchema.statics.GetStripeEventById = RefundServices.GetRefundById
+RefundSchema.statics.GetRefundByReferenceId = RefundServices.GetRefundByReferenceId
+RefundSchema.statics.SaveRefund = RefundServices.SaveRefund
 
 module.exports = mongoose.model('Refund', RefundSchema);

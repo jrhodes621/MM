@@ -1,5 +1,115 @@
 var request = require('request');
 
+function getPlans(stripe_api_key, options, callback) {
+  var stripe = require('stripe')(stripe_api_key);
+
+  stripe.plans.list(options, callback);
+}
+function getCharges(stripe_api_key, options, callback) {
+  var stripe = require('stripe')(stripe_api_key);
+
+  stripe.charges.list(options, callback);
+}
+function getCoupons(stripe_api_key, options, callback) {
+  var stripe = require('stripe')(stripe_api_key);
+
+  stripe.coupons.list(options, callback);
+}
+function getInvoices(stripe_api_key, options, callback) {
+  var stripe = require('stripe')(stripe_api_key);
+
+  stripe.invoices.list(options, callback);
+}
+function getSubscriptions(stripe_api_key, options, callback) {
+  var stripe = require('stripe')(stripe_api_key);
+
+  stripe.subscriptions.list(options, callback);
+}
+function getPlanCount(stripe_api_key, options, total_count, callback) {
+  getPlans(stripe_api_key, options, function(err, plans) {
+    if(err) { callback(err, total_count); }
+
+    total_count += plans.data.length;
+
+    if(!plans.has_more) {
+      callback(err, total_count);
+    } else {
+      var options = {
+        limit: 100,
+        starting_after: plans.data[plans.data.length -1].id
+      }
+      getPlanCount(stripe_api_key, options, total_count, callback);
+    }
+  });
+}
+function getSubscriptionCount(stripe_api_key, options, total_count, callback) {
+  getSubscriptions(stripe_api_key, options, function(err, subscriptions) {
+    if(err) { callback(err, total_count); }
+
+    total_count += subscriptions.data.length;
+
+    if(!subscriptions.has_more) {
+      callback(err, total_count);
+    } else {
+      var options = {
+        limit: 100,
+        starting_after: subscriptions.data[subscriptions.data.length -1].id
+      }
+      getSubscriptionCount(stripe_api_key, options, total_count, callback);
+    }
+  });
+}
+function getChargeCount(stripe_api_key, options, total_count, callback) {
+  getCharges(stripe_api_key, options, function(err, charges) {
+    if(err) { return callback(err, total_count); }
+
+    total_count += charges.data.length;
+
+    if(!charges.has_more) {
+      return callback(err, total_count);
+    } else {
+      var options = {
+        limit: 100,
+        starting_after: charges.data[charges.data.length -1].id
+      }
+      getChargeCount(stripe_api_key, options, total_count, callback);
+    }
+  });
+}
+function getCouponCount(stripe_api_key, options, total_count, callback) {
+  getCoupons(stripe_api_key, options, function(err, coupons) {
+    if(err) { callback(err, total_count); }
+
+    total_count += coupons.data.length;
+
+    if(!coupons.has_more) {
+      callback(err, total_count);
+    } else {
+      var options = {
+        limit: 100,
+        starting_after: coupons.data[coupons.data.length -1].id
+      }
+      getCouponCount(stripe_api_key, options, total_count, callback);
+    }
+  });
+}
+function getInvoiceCount(stripe_api_key, options, total_count, callback) {
+  getInvoices(stripe_api_key, options, function(err, invoices) {
+    if(err) { callback(err, total_count); }
+
+    total_count += invoices.data.length;
+
+    if(!invoices.has_more) {
+      callback(err, total_count);
+    } else {
+      var options = {
+        limit: 100,
+        starting_after: invoices.data[invoices.data.length -1].id
+      }
+      getInvoiceCount(stripe_api_key, options, total_count, callback);
+    }
+  });
+}
 module.exports = {
   createCustomer: function(stripe_api_key, user, plan, callback) {
     var stripe = require('stripe')(stripe_api_key);
@@ -94,6 +204,56 @@ module.exports = {
         callback(err, subscription);
       }
     );
+  },
+  getNumberOfPlans: function(stripe_api_key, callback) {
+    var total_count = 0;
+    var options = {
+      limit: 100
+    }
+
+    getPlanCount(stripe_api_key, options, total_count, function(err, total_count) {
+      callback(err, total_count)
+    });
+  },
+  getNumberOfSubscriptions: function(stripe_api_key, callback) {
+    var total_count = 0;
+    var options = {
+      limit: 100
+    }
+
+    getSubscriptionCount(stripe_api_key, options, total_count, function(err, total_count) {
+      callback(err, total_count)
+    });
+  },
+  getNumberOfCharges: function(stripe_api_key, callback) {
+    var total_count = 0;
+    var options = {
+      limit: 100
+    }
+
+    getChargeCount(stripe_api_key, options, total_count, function(err, total_count) {
+      callback(err, total_count)
+    });
+  },
+  getNumberOfCoupons: function(stripe_api_key, callback) {
+    var total_count = 0;
+    var options = {
+      limit: 100
+    }
+
+    getCouponCount(stripe_api_key, options, total_count, function(err, total_count) {
+      callback(err, total_count)
+    });
+  },
+  getNumberOfInvoices: function(stripe_api_key, callback) {
+    var total_count = 0;
+    var options = {
+      limit: 100
+    }
+
+    getInvoiceCount(stripe_api_key, options, total_count, function(err, total_count) {
+      callback(err, total_count)
+    });
   },
   listPlans: function(stripe_api_key, callback) {
     var stripe = require('stripe')(stripe_api_key);
@@ -202,6 +362,16 @@ module.exports = {
       }
     );
   },
+  getCharge: function(stripe_api_key, charge_id, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.charges.retrieve(
+      charge_id,
+      function(err, charge) {
+        callback(err, charge);
+      }
+    );
+  },
   createCoupon: function(stripe_api_key, coupon, callback) {
     var stripe = require('stripe')(stripe_api_key);
 
@@ -222,11 +392,23 @@ module.exports = {
     var stripe = require('stripe')(stripe_api_key);
 
     stripe.coupons.list(
-      { limit: 12 },
+      { limit: 100 },
       function(err, coupons) {
         callback(err, coupons);
       }
     );
+  },
+  listInvoices: function(stripe_api_key, customer_id, callback) {
+    var stripe = require('stripe')(stripe_api_key);
+
+    stripe.invoices.list(
+      {
+        limit: 100,
+        customer: customer_id
+      },
+      function(err, invoices) {
+        callback(err, invoices);
+      });
   },
   getInvoice: function(stripe_api_key, invoice_id, callback) {
     var stripe = require('stripe')(stripe_api_key);

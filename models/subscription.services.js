@@ -1,16 +1,20 @@
+var Plan = require('../models/plan');
+
 var SubscriptionServices = {
-  SubscribeToPlan: function(user, plan, callback) {
-    var subscription = new Subscription();
+  SubscribeToPlan: function(membership, plan, reference_id, callback) {
+    var subscription = new this();
 
-    this.plan = plan;
-    this.save(function(err) {
-      if(err) { return callback(err, null); }
+    subscription.plan = plan;
+    subscription.membership = membership;
+    subscription.reference_id = reference_id;
+    subscription.subscription_created_at = new Date();
+    subscription.status = "active";
+    subscription.synced = false;
 
-      callback(null, subscription);
-    });
+    subscription.save(callback);
   },
-  GetSubscriptionByReferenceId: function(subscription_id, callback) {
-    Subscription.findOne({ "reference_id": subscription_id })
+  GetSubscriptionByReferenceId: function(reference_id, callback) {
+    Subscription.findOne(reference_id )
     .populate('plan')
     .populate({
       path: 'plan',

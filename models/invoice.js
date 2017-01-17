@@ -3,6 +3,8 @@ var Schema       = mongoose.Schema;
 var Membership = require('../models/membership');
 var mongoosePaginate = require('mongoose-paginate');
 
+var InvoiceServices   = require('../models/invoice.services')
+
 var InvoiceSchema   = new Schema({
   membership: {
     type: mongoose.Schema.Types.ObjectId,
@@ -110,5 +112,9 @@ var InvoiceSchema   = new Schema({
 {
     timestamps: true
 });
+
+InvoiceSchema.statics.GetChargeById = InvoiceServices.GetInvoiceById
+InvoiceSchema.statics.GetChargeByReferenceId = InvoiceServices.GetInvoiceByReferenceId
+InvoiceSchema.statics.SaveCharge = InvoiceServices.SaveInvoice
 
 module.exports = mongoose.model('Invoice', InvoiceSchema);

@@ -16,7 +16,7 @@ function parse(bull, stripe_coupon, callback) {
       coupon.reference_id = stripe_coupon.id;
       coupon.amount_off = stripe_coupon.amount_off;
       coupon.coupon_created = stripe_coupon.created;
-      coupon.currency = stripe_coupon.currency;
+      coupon.currency = stripe_coupon.currency || 'usd';
       coupon.duration = stripe_coupon.duration;
       coupon.duration_in_months = stripe_coupon.duration_in_months;
       coupon.max_redemptions = stripe_coupon.max_redemptions;

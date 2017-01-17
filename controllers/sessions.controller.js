@@ -6,14 +6,10 @@ var User = require('../models/user');
 
 var SessionsController = {
   CreateSession: function(req, res, next) {
-    console.log("authenicating user");
-
     var email_address = req.body.email_address;
     var password = req.body.password;
 
-    User.findOne({ email_address: req.body.email_address })
-    .populate('subscriptions')
-    .exec(function(err, user) {
+    User.GetUserByEmailAddress(email_address, function(err, user) {
       if (err) { return next(err); }
 
       if (!user) {
@@ -41,9 +37,9 @@ var SessionsController = {
   RefreshSession: function(req, res, next) {
     var refresh_token = req.body.refresh_token;
 
-    User.findOne({"refresh_token": refresh_token}, function(err, user) {
+    User.findOne({ "refresh_token": refresh_token }, function(err, user) {
       if(err) { return next(err); }
-      if(!user) { return next(new Error("User Not Found")) }
+      if(!user) { return res.status(403).send({ success: false, minor_code: 1006, message: 'Invalid Refresh Token.' }); }
 
       var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
       var refresh_token = randtoken.uid(256)

@@ -1,200 +1,231 @@
-var chai = require('chai');
-var expect = chai.expect;
+var expect        = require('chai').expect;
+var async         = require("async");
+var factory       = require('factory-girl');
+var request       = require('supertest');
+var app           = require('../server');
+var security      = require('../security');
 
-var http_mocks = require('node-mocks-http');
-var mockery = require('mockery');
-var mongoose = require('mongoose');
+var Account   = require("../models/account.js");
 
-var Account = require('../models/account');
-var User = require('../models/user');
-
-var PlanFixtures = require('../fixtures/plan.fixtures')
-var PlanServicesMock = require('../models/plan.services.mock');
-
-function buildResponse() {
-  return http_mocks.createResponse({eventEmitter: require('events').EventEmitter})
-}
-function next(err) {
-  console.log(err);
-}
-
-var user = {
-  "status": "Active",
-  "email_address": "james@membermoose.com",
-  "password": "mm1234",
-}
-var account = {
-  company_name: "Membermoose",
-  subdomain: "membermoose",
-  status: "active"
-}
-
-var current_user = new User(user)
-current_user.account = new Account(account);
+var UserFactory   = require("../test/factories/user.factory.js");
+var PlanFactory   = require("../test/factories/plan.factory.js");
+var BeforeHooks   = require("../test/hooks/before.hooks.js");
+var AfterHooks    = require("../test/hooks/after.hooks.js");
 
 describe("Plans API Endpoint", function() {
+  var bull = null;
+  var bull_user = null;
+  var json_web_token = null;
+
   beforeEach(function(done) {
-    mockery.enable({
-      warnOnReplace: true,
-      warnOnUnregistered: false,
-      useCleanCache: true
+    async.waterfall([
+      function openConnection(callback) {
+        BeforeHooks.SetupDatabase(callback)
+      },
+      function createAccount(callback) {
+        factory.create('account', function(err, account) {
+          bull = account;
+
+          callback();
+        });
+      },
+      function createUser(callback) {
+        factory.create('bull', function(err, user) {
+          user.account = bull
+          user.save(function(err) {
+            if(err) { console.log(err); }
+
+            bull_user = user;
+
+            security.generate_token(bull_user, process.env.SECRET, function(err, token) {
+              if(err) { console.log(err); }
+
+              json_web_token = token;
+
+              callback(err)
+            });
+          });
+        });
+      }
+    ], function(err) {
+      done(err);
     });
-
-    mockery.registerMock('../models/plan.services', PlanServicesMock);
-
-    this.controller = require('../controllers/plans.controller');
-
-    done();
   });
   afterEach(function(done) {
-    mockery.disable();
-
-    done();
+    AfterHooks.CleanUpDatabase(function(err) {
+      done(err);
+    });
   });
   describe("Get Plans", function() {
     it('returns all plans', function(done) {
-      var response = buildResponse()
-      var request  = http_mocks.createRequest({
-        method: 'GET',
-        url: '/plans',
-        current_user: current_user
-      })
+      factory.createMany('plan', {}, 35, { "account": bull },  function(err, plans) {
+        request(app)
+        .get('/api/plans')
+        .set('x-access-token', json_web_token)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.results).to.be.an('array')
+          expect(res.body.results).to.have.length(10);
+          expect(res.body.total).to.equal(35);
+          expect(res.body.limit).to.equal(10);
+          expect(res.body.max_pages).to.equal(4);
 
-      response.on('end', function() {
-        var data = JSON.parse(response._getData());
-
-        expect(data.results).to.have.lengthOf(PlanFixtures.paginated_results.plans.length);
-        expect(data.total).to.equal(PlanFixtures.paginated_results.total);
-        expect(data.limit).to.equal(PlanFixtures.paginated_results.limit);
-        expect(data.offset).to.equal(PlanFixtures.paginated_results.offset);
-        expect(data.max_pages).to.equal(PlanFixtures.paginated_results.max_pages);
-
-        done();
+          done();
+        });
       });
+    });
+    it('paginates second page of results when passing page=2 in querystring', function(done) {
+      factory.createMany('plan', {}, 35, { "account": bull },  function(err, plans) {
+        request(app)
+        .get('/api/plans?page=2')
+        .set('x-access-token', json_web_token)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.results).to.be.an('array')
+          expect(res.body.results).to.have.length(10);
+          expect(res.body.offset).to.equal(10);
 
-      this.controller.GetPlans(request, response, next);
+          done();
+        });
+      });
+    });
+    it('paginates third page of results when passing page=3 in querystring', function(done) {
+      factory.createMany('plan', {}, 35, { "account": bull },  function(err, plans) {
+        request(app)
+        .get('/api/plans?page=3')
+        .set('x-access-token', json_web_token)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.results).to.be.an('array')
+          expect(res.body.results).to.have.length(10);
+          expect(res.body.offset).to.equal(20);
+
+          done();
+        });
+      });
+    });
+    it('paginates forth page of results when passing page=4 in querystring', function(done) {
+      factory.createMany('plan', {}, 35, { "account": bull },  function(err, plans) {
+        request(app)
+        .get('/api/plans?page=4')
+        .set('x-access-token', json_web_token)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.results).to.be.an('array')
+          expect(res.body.results).to.have.length(5);
+          expect(res.body.offset).to.equal(30);
+
+          done();
+        });
+      });
     });
   });
   describe("Get Plan", function() {
     it('returns a plan', function(done) {
-      var response = buildResponse()
-      var request  = http_mocks.createRequest({
-        method: 'GET',
-        url: '/plans/586da9eb4cec8e8176f190ce',
-        current_user: current_user
+      factory.createMany('plan', {}, 35, { "account": bull },  function(err, plans) {
+        var plan = plans[2];
+
+        request(app)
+        .get('/api/plans/' + plan._id)
+        .set('x-access-token', json_web_token)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.name).to.equal(plan.name);
+
+          done();
+        });
       });
+    });
+    it('returns a 404 if plan is not found', function(done) {
+      factory.createMany('plan', {}, 35, { "account": bull },  function(err, plans) {
+        request(app)
+        .get('/api/plans/587d092b6b16cf17b630205b')
+        .set('x-access-token', json_web_token)
+        .expect(404)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
 
-      response.on('end', function() {
-        var plan = response._getData();
-
-        expect(plan._id).to.equal(PlanFixtures.plan._id);
-        expect(plan.name).to.equal(PlanFixtures.plan.name);
-        expect(plan.member_count).to.equal(PlanFixtures.plan.member_count);
-        //expect(plan.features)
-        expect(plan.archive).to.equal(PlanFixtures.plan.archive);
-        expect(plan.reference_id).to.equal(PlanFixtures.plan.reference_id);
-        //expect(plans.user)
-        expect(plan.amount).to.equal(PlanFixtures.plan.amount);
-        expect(plan.interval).to.equal(PlanFixtures.plan.interval);
-        expect(plan.interval_count).to.equal(PlanFixtures.plan.interval_count);
-        expect(plan.statement_descriptor).to.equal(PlanFixtures.plan.statement_descriptor);
-        expect(plan.created_at).to.equal(PlanFixtures.plan.created_at);
-        expect(plan.updated_at).to.equal(PlanFixtures.plan.updated_at);
-
-        done();
+          done();
+        });
       });
-
-      this.controller.GetPlan(request, response, next);
     });
   });
   describe("Create Plan", function() {
-    it('returns a plan', function(done) {
-      var response = buildResponse()
-      var request  = http_mocks.createRequest({
-        method: 'POST',
-        url: '/plans',
-        current_user: current_user,
-        body: {
-          "name": PlanFixtures.new_plan.name,
-          "description": PlanFixtures.new_plan.descriptions,
-          "features": PlanFixtures.new_plan.features,
-          "amount": PlanFixtures.new_plan.amount,
-          "interval": PlanFixtures.new_plan.interval,
-          "interval_count": PlanFixtures.new_plan.interval_count,
-          "statement_descriptor": PlanFixtures.new_plan.statement_descriptor,
-          "trial_period_days": PlanFixtures.new_plan.trial_period_days,
-          "statement_description": PlanFixtures.new_plan.statement_description,
-          "terms_of_service": PlanFixtures.new_plan.terms_of_service
-        }
-      });
-
-      response.on('end', function() {
-        var plan = response._getData();
-
-        expect(plan.name).to.equal(PlanFixtures.new_plan.name);
-        expect(plan.member_count).to.equal(PlanFixtures.new_plan.member_count);
-        //expect(plan.features)
-        expect(plan.archive).to.equal(PlanFixtures.new_plan.archive);
-        //expect(plans.user)
-        expect(plan.amount).to.equal(PlanFixtures.new_plan.amount);
-        expect(plan.interval).to.equal(PlanFixtures.new_plan.interval);
-        expect(plan.interval_count).to.equal(PlanFixtures.new_plan.interval_count);
-        expect(plan.statement_descriptor).to.equal(PlanFixtures.new_plan.statement_descriptor);
-        expect(plan.created_at).to.equal(PlanFixtures.new_plan.created_at);
-        expect(plan.updated_at).to.equal(PlanFixtures.new_plan.updated_at);
+    it('returns a new plan', function(done) {
+      var new_plan = {
+        "name": "Test Plan ABC",
+        "description": "Best test plan for all",
+        "features": ["Feature 1", "Feature 2"],
+        "amount": 100,
+        "currency": "usd",
+        "interval": 1,
+        "interval_count": 3,
+        "statement_descriptor": "Best Test Plan",
+        "trial_period_days": 0,
+        "statement_description": "This is the statement descriptor",
+        "terms_of_service": "Terms of Service"
+      }
+      request(app)
+      .post('/api/plans/')
+      .set('x-access-token', json_web_token)
+      .send(new_plan)
+      .expect(201)
+      .then((res) => {
+        var plan = res.body;
+        expect(res.body).to.be.an('object');
+        expect(res.body.name).to.equal(new_plan.name);
+        expect(res.body.description).to.equal(new_plan.description);
+        expect(res.body.description).to.equal(new_plan.description);
+        expect(res.body.one_time_amount).to.equal(new_plan.one_time_amount);
+        expect(res.body.statement_descriptor).to.equal(new_plan.statement_descriptor);
+        expect(res.body.trial_period_days).to.equal(new_plan.trial_period_days);
+        expect(res.body.statement_description).to.equal(new_plan.statement_description);
+        expect(res.body.terms_of_service).to.equal(new_plan.terms_of_service);
 
         done();
       });
-
-      this.controller.CreatePlan(request, response, next);
     });
   });
   describe("Update Plan", function() {
     it('returns a plan', function(done) {
-      var response = buildResponse()
-      var request  = http_mocks.createRequest({
-        method: 'PUT',
-        url: '/plans/586da9eb4cec8e8176f190ce',
-        current_user: current_user,
-        plan: PlanFixtures.paginated_results.plans[2],
-        params: {
-          plan_id: "586da9eb4cec8e8176f190ce"
-        },
-        body: {
-          "name": PlanFixtures.updated_plan.name,
-          "description": PlanFixtures.updated_plan.description,
-          "features": PlanFixtures.updated_plan.features,
-          "amount": PlanFixtures.updated_plan.amount,
-          "interval": PlanFixtures.updated_plan.interval,
-          "interval_count": PlanFixtures.updated_plan.interval_count,
-          "statement_descriptor": PlanFixtures.updated_plan.statement_descriptor,
-          "trial_period_days": PlanFixtures.updated_plan.trial_period_days,
-          "statement_description": PlanFixtures.updated_plan.statement_description,
-          "terms_of_service": PlanFixtures.updated_plan.terms_of_service
+      factory.createMany('plan', {}, 35, { "account": bull },  function(err, plans) {
+        var plan = plans[2];
+        var plan_updates = {
+          "name": plan.name + " updated",
+          "description": plan.description + " updated",
+          "features": ['Feature 1', 'Feature 2'],
+          "one_time_amount": 101,
+          //"statement_descriptor": plan.statement_descriptor + " updated",
+          "trial_period_days": 6,
+          //"statement_description": plan.statement_description + " updated",
+          "terms_of_service": plan.terms_of_service + " updated"
         }
+        request(app)
+        .put('/api/plans/' + plan._id)
+        .set('x-access-token', json_web_token)
+        .send(plan_updates)
+        .expect(200)
+        .then((res) => {
+          console.log(res.body);
+
+          expect(res.body).to.be.an('object');
+          expect(res.body.name).to.equal(plan_updates.name);
+          expect(res.body.description).to.equal(plan_updates.description);
+          expect(res.body.features).to.be.an('array');
+          expect(res.body.one_time_amount).to.equal(plan_updates.one_time_amount);
+          expect(res.body.statement_descriptor).to.equal(plan_updates.statement_descriptor);
+          expect(res.body.trial_period_days).to.equal(plan_updates.trial_period_days);
+          expect(res.body.statement_description).to.equal(plan_updates.statement_description);
+          expect(res.body.terms_of_service).to.equal(plan_updates.terms_of_service);
+
+          done();
+        });
       });
-
-      response.on('end', function() {
-        var plan = response._getData();
-
-        expect(plan._id).to.equal(PlanFixtures.paginated_results.plans[2]._id);
-        expect(plan.name).to.equal(PlanFixtures.updated_plan.name);
-        expect(plan.member_count).to.equal(PlanFixtures.paginated_results.plans[2].member_count);
-        //expect(plan.features)
-        expect(plan.archive).to.equal(PlanFixtures.paginated_results.plans[2].archive);
-        expect(plan.reference_id).to.equal(PlanFixtures.paginated_results.plans[2].reference_id);
-        //expect(plans.user)
-        expect(plan.amount).to.equal(PlanFixtures.paginated_results.plans[2].amount);
-        expect(plan.interval).to.equal(PlanFixtures.updated_plan.interval);
-        expect(plan.interval_count).to.equal(PlanFixtures.updated_plan.interval_count);
-        expect(plan.statement_descriptor).to.equal(PlanFixtures.updated_plan.statement_descriptor);
-        expect(plan.created_at).to.equal(PlanFixtures.paginated_results.plans[2].created_at);
-        expect(plan.updated_at).to.equal(PlanFixtures.paginated_results.plans[2].updated_at);
-
-        done();
-      });
-
-      this.controller.UpdatePlan(request, response, next);
     });
   });
 });

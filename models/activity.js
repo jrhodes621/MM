@@ -1,7 +1,10 @@
-var mongoose = require('mongoose');
+var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
-var Plan = require('../models/plan');
-var User = require('../models/user');
+
+var Plan         = require('../models/plan');
+var User         = require('../models/user');
+
+var ActivityServices = require('../models/activity.services')
 
 var ActivitySchema   = new Schema({
   bull: {
@@ -37,5 +40,10 @@ var ActivitySchema   = new Schema({
 {
     timestamps: true
 });
+
+ActivitySchema.statics.GetAccountById = ActivityServices.GetActivities
+ActivitySchema.statics.SaveAccount = ActivityServices.GetActivity
+ActivitySchema.statics.UploadAvatar = ActivityServices.SaveActivity
+ActivitySchema.statics.CreateActivity = ActivityServices.CreateActivity
 
 module.exports = mongoose.model('Activity', ActivitySchema);

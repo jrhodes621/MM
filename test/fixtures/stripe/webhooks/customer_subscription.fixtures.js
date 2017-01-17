@@ -1,0 +1,213 @@
+var Fixtures = {
+  Created: {
+    "created": 1326853478,
+    "livemode": false,
+    "id": "evt_00000000000000",
+    "type": "customer.subscription.created",
+    "object": "event",
+    "request": null,
+    "pending_webhooks": 1,
+    "api_version": "2014-08-20",
+    "data": {
+      "object": {
+        "id": "sub_00000000000000",
+        "object": "subscription",
+        "application_fee_percent": null,
+        "cancel_at_period_end": false,
+        "canceled_at": null,
+        "created": 1449773303,
+        "current_period_end": 1486752503,
+        "current_period_start": 1484074103,
+        "customer": "cus_00000000000000",
+        "discount": null,
+        "ended_at": null,
+        "livemode": false,
+        "metadata": {},
+        "plan": {
+          "id": "Test ABCEFC_00000000000000",
+          "object": "plan",
+          "amount": 10000,
+          "created": 1449549532,
+          "currency": "usd",
+          "interval": "month",
+          "interval_count": 1,
+          "livemode": false,
+          "metadata": {},
+          "name": "Test ABCEFC",
+          "statement_descriptor": null,
+          "trial_period_days": null,
+          "statement_description": null
+        },
+        "quantity": 1,
+        "start": 1481090207,
+        "status": "past_due",
+        "tax_percent": null,
+        "trial_end": null,
+        "trial_start": null
+      }
+    }
+  },
+  Deleted: {
+    "created": 1326853478,
+    "livemode": false,
+    "id": "evt_00000000000000",
+    "type": "customer.subscription.deleted",
+    "object": "event",
+    "request": null,
+    "pending_webhooks": 1,
+    "api_version": "2014-08-20",
+    "data": {
+      "object": {
+        "id": "sub_00000000000000",
+        "object": "subscription",
+        "application_fee_percent": null,
+        "cancel_at_period_end": false,
+        "canceled_at": null,
+        "created": 1449773303,
+        "current_period_end": 1486752503,
+        "current_period_start": 1484074103,
+        "customer": "cus_00000000000000",
+        "discount": null,
+        "ended_at": 1484364089,
+        "livemode": false,
+        "metadata": {},
+        "plan": {
+          "id": "Test ABCEFC_00000000000000",
+          "object": "plan",
+          "amount": 10000,
+          "created": 1449549532,
+          "currency": "usd",
+          "interval": "month",
+          "interval_count": 1,
+          "livemode": false,
+          "metadata": {},
+          "name": "Test ABCEFC",
+          "statement_descriptor": null,
+          "trial_period_days": null,
+          "statement_description": null
+        },
+        "quantity": 1,
+        "start": 1481090207,
+        "status": "canceled",
+        "tax_percent": null,
+        "trial_end": null,
+        "trial_start": null
+      }
+    }
+  },
+  TrialWillEnd: {
+    "created": 1326853478,
+    "livemode": false,
+    "id": "evt_00000000000000",
+    "type": "customer.subscription.trial_will_end",
+    "object": "event",
+    "request": null,
+    "pending_webhooks": 1,
+    "api_version": "2014-08-20",
+    "data": {
+      "object": {
+        "id": "sub_00000000000000",
+        "object": "subscription",
+        "application_fee_percent": null,
+        "cancel_at_period_end": false,
+        "canceled_at": null,
+        "created": 1449773303,
+        "current_period_end": 1486752503,
+        "current_period_start": 1484074103,
+        "customer": "cus_00000000000000",
+        "discount": null,
+        "ended_at": null,
+        "livemode": false,
+        "metadata": {},
+        "plan": {
+          "id": "Test ABCEFC_00000000000000",
+          "object": "plan",
+          "amount": 10000,
+          "created": 1449549532,
+          "currency": "usd",
+          "interval": "month",
+          "interval_count": 1,
+          "livemode": false,
+          "metadata": {},
+          "name": "Test ABCEFC",
+          "statement_descriptor": null,
+          "trial_period_days": null,
+          "statement_description": null
+        },
+        "quantity": 1,
+        "start": 1481090207,
+        "status": "trialing",
+        "tax_percent": null,
+        "trial_end": 1484623105,
+        "trial_start": 1484363905
+      }
+    }
+  },
+  Updated: {
+    "created": 1326853478,
+    "livemode": false,
+    "id": "evt_00000000000000",
+    "type": "customer.subscription.updated",
+    "object": "event",
+    "request": null,
+    "pending_webhooks": 1,
+    "api_version": "2014-08-20",
+    "data": {
+      "object": {
+        "id": "sub_00000000000000",
+        "object": "subscription",
+        "application_fee_percent": null,
+        "cancel_at_period_end": false,
+        "canceled_at": null,
+        "created": 1449773303,
+        "current_period_end": 1486752503,
+        "current_period_start": 1484074103,
+        "customer": "cus_00000000000000",
+        "discount": null,
+        "ended_at": null,
+        "livemode": false,
+        "metadata": {},
+        "plan": {
+          "id": "Test ABCEFC_00000000000000",
+          "object": "plan",
+          "amount": 10000,
+          "created": 1449549532,
+          "currency": "usd",
+          "interval": "month",
+          "interval_count": 1,
+          "livemode": false,
+          "metadata": {},
+          "name": "Test ABCEFC",
+          "statement_descriptor": null,
+          "trial_period_days": null,
+          "statement_description": null
+        },
+        "quantity": 1,
+        "start": 1481090207,
+        "status": "past_due",
+        "tax_percent": null,
+        "trial_end": null,
+        "trial_start": null
+      },
+      "previous_attributes": {
+        "plan": {
+          "id": "OLD_PLAN_ID",
+          "object": "plan",
+          "amount": 10000,
+          "created": 1481060635,
+          "currency": "usd",
+          "interval": "month",
+          "interval_count": 1,
+          "livemode": false,
+          "metadata": {},
+          "name": "Old plan",
+          "statement_descriptor": null,
+          "trial_period_days": null,
+          "statement_description": null
+        }
+      }
+    }
+  }
+}
+
+module.exports = Fixtures

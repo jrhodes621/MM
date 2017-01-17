@@ -10,11 +10,23 @@ var UserDevicesController = {
       token: req.body.device_token
     }
 
-    User.AddDevice(current_user, device, function(err) {
-      if(err) { return next(err); }
+    var device_found = false;
+    current_user.devices.forEach(function(device) {
+      if(device.device_identifier == device.device_identifier) {
+        device.token = device.token;
 
-      res.status(201).send(current_user);
+        device_found = true;
+      }
     });
+
+    if(!device_found) {
+      current_user.devices.push(device);
+      User.SaveUser(current_user, function(err) {
+        res.status(201).send(device);
+      });
+    } else {
+      res.status(200).send(device);
+    }
   }
 }
 

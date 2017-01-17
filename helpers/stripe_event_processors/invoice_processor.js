@@ -1,3 +1,4 @@
+var Membership              = require('../../models/membership');
 var Subscription            = require('../../models/subscription');
 var StripeServices          = require('../../services/stripe.services');
 var StripeEventHelper       = require('../../helpers/stripe_event_helper');
@@ -6,22 +7,22 @@ const FormatCurrency        = require('format-currency')
 
 module.exports = {
   processCreated: function(stripe_event, bull, callback) {
-    var reference_id = stripe_event.raw_object.data.object.customer;
-    var invoice_id = stripe_event.raw_object.data.object.id;
-    var subscription_id = stripe_event.raw_object.data.object.subscription;
-    var payment_total = stripe_event.raw_object.data.object.total;
+    var reference_id = stripe_event.data.object.customer;
+    var invoice_id = stripe_event.data.object.id;
+    var subscription_id = stripe_event.data.object.subscription;
+    var payment_total = stripe_event.data.object.total;
 
     var opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
     var payment_total_formatted = FormatCurrency(payment_total, opts)
 
     var source = "Stripe";
-    var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    var received_at = received_at = new Date(stripe_event.created*1000);
 
-    Membership.findOne({ "reference_id": reference_id }, function(err, membership) {
+    Membership.GetMembershipByReferenceId(reference_id, function(err, membership) {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      Subscription.GetSubscriptionByReferenceId({ "reference_id": stripe_invoice.subscription }, function(err, subscription) {
+      Subscription.GetSubscriptionByReferenceId(stripe_invoice.subscription, function(err, subscription) {
         if(err) { return callback(err, null); }
         if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
@@ -35,19 +36,20 @@ module.exports = {
     });
   },
   processPaymentFailed: function(stripe_event, bull, callback) {
-    var customer_id = stripe_event.raw_object.data.object.customer;
-    var invoice_id = stripe_event.raw_object.data.object.id;
-    var subscription_id = stripe_event.raw_object.data.object.subscription;
-    var payment_id = stripe_event.raw_object.data.object.payment;
+    var customer_id = stripe_event.data.object.customer;
+    var invoice_id = stripe_event.data.object.id;
+    var subscription_id = stripe_event.data.object.subscription;
+    var payment_id = stripe_event.data.object.payment;
+    var payment_total = stripe_event.data.object.total;
 
     var opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
     var payment_total_formatted = FormatCurrency(payment_total, opts)
 
-    Membership.findOne({ "reference_id": customer_id }, function(err, membership) {
+    Membership.GetMembershipByReferenceId(customer_id, function(err, membership) {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      Subscription.GetSubscriptionByReferenceId({ "reference_id": stripe_invoice.subscription }, function(err, subscription) {
+      Subscription.GetSubscriptionByReferenceId(stripe_invoice.subscription, function(err, subscription) {
         if(err) { return callback(err, null); }
         if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
@@ -61,22 +63,23 @@ module.exports = {
     });
   },
   processPaymentSucceeded: function(stripe_event, bull, callback) {
-    var customer_id = stripe_event.raw_object.data.object.customer;
-    var invoice_id = stripe_event.raw_object.data.object.id;
-    var subscription_id = stripe_event.raw_object.data.object.subscription;
-    var payment_id = stripe_event.raw_object.data.object.payment;
+    var customer_id = stripe_event.data.object.customer;
+    var invoice_id = stripe_event.data.object.id;
+    var subscription_id = stripe_event.data.object.subscription;
+    var payment_id = stripe_event.data.object.payment;
+    var payment_total = stripe_event.data.object.total;
 
     var opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
     var payment_total_formatted = FormatCurrency(payment_total, opts)
 
     var source = "Stripe";
-    var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    var received_at = received_at = new Date(stripe_event.created*1000);
 
-    Membership.findOne({ "reference_id": reference_id }, function(err, membership) {
+    Membership.GetMembershipByReferenceId(customer_id, function(err, membership) {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      Subscription.GetSubscriptionByReferenceId({ "reference_id": stripe_invoice.subscription }, function(err, subscription) {
+      Subscription.GetSubscriptionByReferenceId(stripe_invoice.subscription, function(err, subscription) {
         if(err) { return callback(err, null); }
         if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
@@ -90,22 +93,23 @@ module.exports = {
     });
   },
   processSent(stripe_event, bull, callback) {
-    var customer_id = stripe_event.raw_object.data.object.customer;
-    var invoice_id = stripe_event.raw_object.data.object.id;
-    var subscription_id = stripe_event.raw_object.data.object.subscription;
-    var payment_id = stripe_event.raw_object.data.object.payment;
+    var customer_id = stripe_event.data.object.customer;
+    var invoice_id = stripe_event.data.object.id;
+    var subscription_id = stripe_event.data.object.subscription;
+    var payment_id = stripe_event.data.object.payment;
+    var payment_total = stripe_event.data.object.total;
 
     var opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
     var payment_total_formatted = FormatCurrency(payment_total, opts)
 
     var source = "Stripe";
-    var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    var received_at = received_at = new Date(stripe_event.created*1000);
 
-    Membership.findOne({ "reference_id": reference_id }, function(err, membership) {
+    Membership.GetMembershipByReferenceId(customer_id, function(err, membership) {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      Subscription.GetSubscriptionByReferenceId({ "reference_id": stripe_invoice.subscription }, function(err, subscription) {
+      Subscription.GetSubscriptionByReferenceId(stripe_invoice.subscription, function(err, subscription) {
         if(err) { return callback(err, null); }
         if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
@@ -119,22 +123,22 @@ module.exports = {
     });
   },
   processUpdated(stripe_event, bull, callback) {
-    var reference_id = stripe_event.raw_object.data.object.customer;
-    var invoice_id = stripe_event.raw_object.data.object.id;
-    var subscription_id = stripe_event.raw_object.data.object.subscription;
-    var payment_total = stripe_event.raw_object.data.object.total;
+    var reference_id = stripe_event.data.object.customer;
+    var invoice_id = stripe_event.data.object.id;
+    var subscription_id = stripe_event.data.object.subscription;
+    var payment_total = stripe_event.data.object.total;
 
     var opts = { format: '%s%v %c', code: 'USD', symbol: '$' }
     var payment_total_formatted = FormatCurrency(payment_total, opts)
 
     var source = "Stripe";
-    var received_at = received_at = new Date(stripe_event.raw_object.created*1000);
+    var received_at = received_at = new Date(stripe_event.created*1000);
 
-    Membership.findOne({ "reference_id": reference_id }, function(err, membership) {
+    Membership.GetMembershipByReferenceId(reference_id, function(err, membership) {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      Subscription.GetSubscriptionByReferenceId({ "reference_id": stripe_invoice.subscription }, function(err, subscription) {
+      Subscription.GetSubscriptionByReferenceId(stripe_invoice.subscription, function(err, subscription) {
         if(err) { return callback(err, null); }
         if(!subscription) { return callback(new Error("Subscription not found"), null) }
 

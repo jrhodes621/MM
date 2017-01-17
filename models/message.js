@@ -3,6 +3,8 @@ var Schema       = mongoose.Schema;
 var User = require('../models/user');
 var mongoosePaginate = require('mongoose-paginate');
 
+var MessageServices    = require('../models/message.services')
+
 var MessageSchema = new Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
@@ -48,5 +50,8 @@ var MessageSchema = new Schema({
 });
 
 MessageSchema.plugin(mongoosePaginate);
+
+MessageSchema.statics.GetPlans = MessageServices.GetMessageById
+MessageSchema.statics.GetPlan = MessageServices.SaveMessage
 
 module.exports = mongoose.model('Message', MessageSchema);

@@ -1,13 +1,19 @@
 var PaymentCard      = require('../../models/payment_card');
-var User             = require('../../models/user');
+var Membership       = require('../../models/membership');
 var async            = require("async");
 
 function parse(stripe_card, callback) {
   var result = null;
 
   async.waterfall([
-    function getUser(callback) {
-      User.findOne({ "reference_id": stripe_card.customer }, callback)
+    function getMembership(callback) {
+      Membership.findOne({ "reference_id": stripe_card.customer })
+      .populate('user')
+      .exec(function(err, membership) {
+        if(!membership) { callback(new Error("Membership not found"), null); }
+
+        callback(err, membership.user);
+      })
     },
     function getPaymentCard(user, callback) {
       PaymentCard.findOne({"reference_id": stripe_card.id}, function(err, payment_card) {

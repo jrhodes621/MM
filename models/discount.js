@@ -4,6 +4,8 @@ var Membership    = require('../models/membership');
 var Coupon    = require('../models/coupon');
 var Subscription    = require('../models/subscription');
 
+var DiscountServices   = require('../models/discount.services')
+
 var DiscountSchema   = new Schema({
   membership: {
     type: mongoose.Schema.Types.ObjectId,
@@ -31,5 +33,8 @@ var DiscountSchema   = new Schema({
 {
     timestamps: true
 });
+
+DiscountSchema.statics.GetChargeById = DiscountServices.GetDiscountById
+DiscountSchema.statics.SaveCharge = DiscountServices.SaveDiscount
 
 module.exports = mongoose.model('Discount', DiscountSchema);

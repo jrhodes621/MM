@@ -42,5 +42,6 @@ var ChargeDisputeSchema   = new Schema({
 });
 
 ChargeDisputeSchema.statics.GetChargeDisputeByReferenceId = ChargeDisputeServices.GetChargeDisputeByReferenceId
+ChargeDisputeSchema.statics.SaveChargeDispute = ChargeDisputeServices.SaveChargeDispute
 
 module.exports = mongoose.model('ChargeDispute', ChargeDisputeSchema);

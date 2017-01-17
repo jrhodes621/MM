@@ -1,6 +1,21 @@
 var PaymentCard = require('../models/payment_card');
 
 var PaymentCardServices = {
+  GetPaymentCardById: function(payment_card_id, callback) {
+    this.findById(coupon_id)
+    .exec(callback);
+  },
+  GetPaymentCardByReferenceId: function(reference_id, callback) {
+    this.findOne({ "reference_id": reference_id })
+    .exec(callback);
+  },
+  SavePaymentCard: function(payment_card, callback) {
+    payment_card.save(function(err) {
+      if(err) { console.log(err); }
+
+      callback(err);
+    });
+  },
   ArchivePaymentCard: function(user, payment_card, stripe_card, callback) {
     parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
       if(!payment_card) { return callback(new Error("Can't create payment card"), user, payment_card); }
@@ -27,3 +42,5 @@ var PaymentCardServices = {
     });
   }
 }
+
+module.exports = PaymentCardServices

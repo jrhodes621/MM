@@ -1,39 +1,19 @@
-var expect                    = require("chai").expect;
-var CustomerDiscountParser    = require("../../parsers/stripe/customer_discount_parser");
-var Account                   = require("../../models/account");
-var Coupon                    = require("../../models/coupon");
-var Discount                  = require("../../models/discount");
-var Membership                = require("../../models/membership");
-var Plan                      = require("../../models/plan");
-var Subscription              = require("../../models/subscription");
-var User                      = require("../../models/user");
-var mongoose                  = require("mongoose");
-var async                     = require("async");
+var expect                = require("chai").expect;
+var mongoose              = require("mongoose");
+var async                 = require("async");
 
-var stripe_discount = {
-  "object": "discount",
-  "coupon": {
-    "id": "32xuSh5g",
-    "object": "coupon",
-    "amount_off": null,
-    "created": 1449549430,
-    "currency": "usd",
-    "duration": "once",
-    "duration_in_months": null,
-    "livemode": false,
-    "max_redemptions": null,
-    "metadata": {
-    },
-    "percent_off": 1,
-    "redeem_by": null,
-    "times_redeemed": 0,
-    "valid": true
-  },
-  "customer": "cus_9tagyvZXCzFCj9",
-  "end": null,
-  "start": 1449543999,
-  "subscription": "sub_7Ub0lcBP8An6jC"
-}
+var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
+var ChargeFixtures            = require("../../test/fixtures/charge.fixtures.js");
+var DiscountFixtures          = require("../../test/fixtures/discount.fixtures.js");
+var PaymentCardFixtures       = require("../../test/fixtures/payment_card.fixtures.js");
+var MembershipFixtures        = require("../../test/fixtures/membership.fixtures.js");
+var PlanFixtures              = require("../../test/fixtures/plan.fixtures.js");
+var SubscriptionFixtures      = require("../../test/fixtures/subscription.fixtures.js");
+var UserFixtures              = require("../../test/fixtures/user.fixtures.js");
+var BeforeHooks               = require("../../test/hooks/before.hooks.js");
+var AfterHooks                = require("../../test/hooks/after.hooks.js");
+
+var CustomerDiscountParser    = require("../../parsers/stripe/customer_discount_parser");
 
 describe("Customer Discount Parser", function() {
   var bull = null;
@@ -43,127 +23,79 @@ describe("Customer Discount Parser", function() {
   var subscription = null;
 
   beforeEach(function(done){
+    //add some test data
     async.waterfall([
       function openConnection(callback) {
-        mongoose.connect('mongodb://localhost/membermoose_test', callback);
+
+        BeforeHooks.SetupDatabase(callback)
       },
       function addBull(callback) {
-        bull = new Account();
+        BeforeHooks.SetupBull(AccountFixtures.bull, function(err, account) {
+          bull = account;
 
-        bull.reference_id = "1";
-        bull.company_name = "MemberMoose";
-        bull.subdomain = "membermoose";
-        bull.status = "Active";
-
-        bull.save(function(err) {
           callback(err);
         });
       },
       function addUser(callback) {
-        user = new User();
+        BeforeHooks.SetupUser(UserFixtures.User, function(err, new_user) {
+          user = new_user;
 
-        user.email_address = "james@somehero.com";
-        user.password = "test123";
-        user.status = "active";
-
-        user.save(function(err) {
           callback(err);
         });
       },
       function addMembership(callback) {
-        membership = new Membership();
+        BeforeHooks.SetupMembership(MembershipFixtures.Membership, user, bull, function(err, new_membership) {
+          membership = new_membership;
 
-        membership.reference_id = "cus_9tagyvZXCzFCj9";
-        membership.user = user;
-        membership.account = bull;
-        membership.member_since = new Date();
+          callback(err);
+        })
+      },
+      function addPaymentCard(callback) {
+        BeforeHooks.SetupPaymentCard(PaymentCardFixtures.PaymentCard, user, function(err, new_payment_card) {
+          payment_card = new_payment_card;
 
-        membership.save(function(err) {
+          callback(err);
+        })
+      },
+      function addCharge(callback) {
+        BeforeHooks.SetupCharge(ChargeFixtures.Charge, user, membership, payment_card, function(err, new_charge) {
+          charge = new_charge;
+
           callback(err);
         });
       },
       function addPlan(callback) {
-        plan = new Plan();
+        BeforeHooks.SetupPlan(PlanFixtures.Plan, bull, function(err, new_plan) {
+          plan = new_plan;
 
-        plan.account = bull;
-        plan.name = "Fake Plan";
-        plan.amount = 100;
-        plan.interval = 0;
-        plan.interval_count = 1;
-
-        plan.save(function(err) {
           callback(err);
         });
       },
       function addSubscription(callback) {
-        subscription = new Subscription();
+        BeforeHooks.SetupSubscription(SubscriptionFixtures.Subscription, plan, membership, function(err, new_subscription) {
+          subscription = new_subscription;
 
-        subscription.plan = plan;
-        subscription.membership = membership;
-        subscription.reference_id = "sub_7Ub0lcBP8An6jC";
-        subscription.status = "active"
-        subscription.subscription_created_at = new Date(); //ToDo: Implment
-
-        subscription.save(function(err) {
           callback(err);
-        })
+        });
       }
     ], function(err) {
       done(err);
     });
   });
-  afterEach(function(done) {
-    async.waterfall([
-      function removeAccounts(callback) {
-        Account.remove({}, function() {
-          callback();
-        })
-      },
-      function removeUsers(callback) {
-        User.remove({}, function() {
-          callback();
-        });
-      },
-      function removeMemberships(callback) {
-        Membership.remove({}, function() {
-          callback();
-        });
-      },
-      function removePlans(callback) {
-        Plan.remove({}, function() {
-          callback();
-        });
-      },
-      function removeSubscriptions(callback) {
-        Subscription.remove({}, function() {
-          callback();
-        });
-      },
-      function removeDiscounts(callback) {
-        Discount.remove({}, function() {
-          callback();
-        });
-      },
-      function removeCoupons(callback) {
-        Coupon.remove({}, function() {
-          callback();
-        });
-      }
-    ], function(err) {
-      mongoose.connection.close();
-
+  afterEach(function(done){
+    AfterHooks.CleanUpDatabase(function(err) {
       done(err);
     });
   });
   describe("Parse Stripe Discount", function() {
     it("parses a Stripe Discount JSON object into a discount object", function(done) {
-      CustomerDiscountParser.parse(bull, stripe_discount, function(err, discount, coupon) {
+      CustomerDiscountParser.parse(bull, DiscountFixtures.StripeDiscount, function(err, discount, coupon) {
         if(err) { console.log(err); }
 
         expect(mongoose.Schema.Types.ObjectId(discount.membership._id)).to.equal(mongoose.Schema.Types.ObjectId(membership._id));
         expect(mongoose.Schema.Types.ObjectId(discount.subscription._id)).to.equal(mongoose.Schema.Types.ObjectId(subscription._id));
-        //expect(discount.start).to.equal(stripe_discount.start);
-        expect(discount.end).to.equal(stripe_discount.end);
+        //expect(discount.start).to.equal(DiscountFixtures.StripeDiscount.start);
+        expect(discount.end).to.equal(DiscountFixtures.StripeDiscount.end);
         expect(mongoose.Schema.Types.ObjectId(discount.coupon._id)).to.equal(mongoose.Schema.Types.ObjectId(coupon._id));
 
         done(err);

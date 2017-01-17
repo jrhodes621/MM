@@ -1,4 +1,9 @@
+var Account = require('../models/account');
+var Plan = require('../models/plan');
+var Subscription = require('../models/subscription');
 var User = require('../models/user');
+
+var security      = require('../security');
 
 var UsersController = {
   CreateUser: function(req, res, next) {
@@ -25,7 +30,7 @@ var UsersController = {
       account.subdomain = subdomain;
       account.status = "Pending"
 
-      SubscriptionHelper.getFreePlan(function(err, plan) {
+      Subscription.GetMemberMooseFreePlan(function(err, plan) {
         if(err) {
           console.log(err);
           return res.status(400).send(err);
@@ -45,9 +50,11 @@ var UsersController = {
                 user.save(function(err) {
                   if(err) { return next(err); }
 
-                  var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+                  security.generate_token(user, process.env.SECRET, function(err, token) {
+                    if(err) { return next(err); }
 
-                  res.status(200).json({success: true, token: token, user_id: user._id});
+                    res.status(201).json({success: true, token: token, user_id: user._id});
+                  });
                 });
               });
             });
@@ -59,9 +66,11 @@ var UsersController = {
               user.save(function(err) {
                 if(err) { return next(err); }
 
-                var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+                security.generate_token(user, process.env.SECRET, function(err, token) {
+                  if(err) { return next(err); }
 
-                res.status(200).json({success: true, token: token, user_id: user._id});
+                  res.status(201).json({success: true, token: token, user_id: user._id});
+                });
               });
             });
           }
@@ -110,9 +119,11 @@ var UsersController = {
                         plan.user.save(function(err) {
                           if(err) { return next(err); }
 
-                          var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+                          security.generate_token(user, process.env.SECRET, function(err, token) {
+                            if(err) { return next(err); }
 
-                          res.status(200).json({success: true, token: token, user_id: user._id});
+                            res.status(201).json({success: true, token: token, user_id: user._id});
+                          });
                         })
                       });
                     });
@@ -130,7 +141,7 @@ var UsersController = {
 
                         var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
-                        res.status(200).json({success: true, token: token, user_id: user._id});
+                        res.status(201).json({success: true, token: token, user_id: user._id});
                       })
                     });
                   });
@@ -166,13 +177,7 @@ var UsersController = {
           });
         });
       } else {
-        Usser.UploadInitialsAvatar(user, function(err, user) {
-          user.save(function(err) {
-            if(err) { return next(err); }
-
-            res.status(200).json(user);
-          });
-        });
+        res.status(200).json(user);
       }
     });
   }

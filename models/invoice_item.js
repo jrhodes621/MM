@@ -3,6 +3,8 @@ var Schema       = mongoose.Schema;
 var User = require('../models/user');
 var mongoosePaginate = require('mongoose-paginate');
 
+var InvoiceItemServices   = require('../models/invoice_item.services')
+
 var InvoiceItemSchema   = new Schema({
   amount: {
     type: Number,
@@ -51,5 +53,8 @@ var InvoiceItemSchema   = new Schema({
 {
     timestamps: true
 });
+
+InvoiceItemSchema.statics.GetChargeById = InvoiceItemServices.GetInvoiceById
+InvoiceItemSchema.statics.SaveCharge = InvoiceItemServices.SaveInvoiceItem
 
 module.exports = mongoose.model('InvoiceItem', InvoiceItemSchema);

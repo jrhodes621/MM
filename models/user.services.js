@@ -5,6 +5,22 @@ var fs = require('fs');
 var async = require("async");
 
 var UserServices = {
+  GetUserById: function(user_id, callback) {
+    this.findById(user_id)
+    .exec(callback);
+  },
+  GetUserByEmailAddress: function(email_address, callback) {
+    User.findOne({ email_address: req.body.email_address })
+    .populate('subscriptions')
+    .exec(callback)
+  },
+  SaveUser: function(user, callback) {
+    user.save(function(err) {
+      if(err) { console.log(err); }
+
+      callback(err);
+    });
+  },
   UploadAvatar: function(user, avatar_path, callback) {
     var s3BucketName = process.env.S3_BUCKET_NAME;
 
@@ -67,21 +83,6 @@ var UserServices = {
       callback(avatar_images);
     });
   },
-  AddDevice: function(user, new_device, callback) {
-    var device_found = false;
-    this.devices.forEach(function(device) {
-      if(device.device_identifier == new_device.device_identifier) {
-        device.token = new_device.token;
-
-        device_found = true;
-      }
-    });
-
-    this.devices.push(new_device);
-    this.save(function(err) {
-      callback(err)
-    });
-  },
   ParseReferencePlans: function(user, reference_id, callback) {
     async.waterfall([
       function getPlan(callback) {
@@ -101,40 +102,6 @@ var UserServices = {
       }
     ], function(err, plan) {
       callback(err, plan)
-    });
-  },
-  CreatePlan: function(user, reference_id, callback) {
-    var stripe_api_key = user.account.stripe_connect.access_token;
-
-    async.waterfall([
-      function getPlan(callback) {
-        StripeServices.getPlan(stripe_api_key, reference_id, callback);
-      },
-      function convertRecurringInterval(stripe_plan, callback) {
-        transformRecurringInterval(stripe_plan, function(err, recurring_interval) {
-          callback(err, stripe_plan, recurring_interval);
-        });
-      },
-      function parsePlan(stripe_plan, recurring_interval, callback) {
-        var plan = new Plan();
-
-        plan.user = user._id;
-        plan.name = stripe_plan.name;
-        plan.reference_id = stripe_plan.id;
-        plan.amount = stripe_plan.amount/100;
-        plan.created = stripe_plan.created;
-        plan.currency = stripe_plan.currency;
-        plan.interval = recurring_interval;
-        plan.interval_count = stripe_plan.interval_count;
-        plan.statement_descriptor = stripe_plan.statement_descriptor;
-        plan.trial_period_days = stripe_plan.trial_period_days || 0;
-
-        plan.save(function(err) {
-          callback(err, plan);
-        });
-      }
-    ], function(err, plan) {
-      callback(err, plan);
     });
   }
 }

@@ -2,6 +2,7 @@ var Coupon        = require('../../models/coupon');
 var Discount      = require('../../models/discount');
 var Membership    = require('../../models/membership');
 var Subscription  = require('../../models/subscription');
+
 var async         = require("async");
 
 function parse(bull, stripe_discount, callback) {

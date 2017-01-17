@@ -1,6 +1,8 @@
-var Charge      = require('../../models/charge');
-var PaymentCard = require('../../models/payment_card');
-var async       = require("async");
+var Charge                    = require('../../models/charge');
+var PaymentCard               = require('../../models/payment_card');
+var async                     = require("async");
+var StripeCustomerCardParser  = require('../../parsers/stripe/customer_card_parser');
+
 
 function parse(membership, stripe_charge, status, callback) {
   var result = null;
@@ -10,13 +12,19 @@ function parse(membership, stripe_charge, status, callback) {
     },
     function getPaymentCard(charge, callback) {
       PaymentCard.findOne({"reference_id": stripe_charge.source.id}, function(err, payment_card) {
-        if(!payment_card) { return callback(new Error("Payment Card not found"), null); }
-
-        callback(err, charge, payment_card);
+        callback(err, payment_card, charge);
       });
     },
-    //if there is no payment_card -> add it
-    function parseCharge(charge, payment_card, callback) {
+    function parsePaymentCard(payment_card, charge, callback) {
+      if(!payment_card) {
+        StripeCustomerCardParser.parse(stripe_charge.source, function(err, payment_card) {
+          callback(err, payment_card, charge);
+        });
+      } else {
+        callback(null, payment_card, charge);
+      }
+    },
+    function parseCharge(payment_card, charge, callback) {
       if(!charge) {
         charge = new Charge();
       }

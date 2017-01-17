@@ -2,6 +2,8 @@ var mongoose      = require('mongoose');
 var Schema        = mongoose.Schema;
 var Account       = require('../models/account');
 
+var StripeEventServices = require('../models/stripe_event.services')
+
 var StripeEventSchema   = new Schema({
   account: {
     type: mongoose.Schema.Types.ObjectId,
@@ -34,4 +36,7 @@ var StripeEventSchema   = new Schema({
     timestamps: true
 });
 
-  module.exports = mongoose.model('StripeEvent', StripeEventSchema);
+StripeEventSchema.statics.GetStripeEventById = StripeEventServices.GetStripeEventById
+StripeEventSchema.statics.SaveStripeEvent = StripeEventServices.SaveStripeEvent
+
+module.exports = mongoose.model('StripeEvent', StripeEventSchema);
