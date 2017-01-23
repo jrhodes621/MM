@@ -10,7 +10,7 @@ var UserServices = {
     .exec(callback);
   },
   GetUserByEmailAddress: function(email_address, callback) {
-    User.findOne({ email_address: req.body.email_address })
+    this.findOne({ email_address: email_address })
     .populate('subscriptions')
     .exec(callback)
   },

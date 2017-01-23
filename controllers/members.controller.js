@@ -5,19 +5,20 @@ var User            = require('../models/user');
 
 var MembersController = {
   GetMembers: function(req, res, next) {
-    var user = req.current_user;
+    var current_user = req.current_user;
     var page_size = 10;
     var page = req.query.page || 1;
     var offset = (page-1)*page_size;
 
-    if(!user.account) { return next(new Error("No Members")); }
+    console.log(current_user.account);
+    if(!current_user.account) { return next(new Error("No Members")); }
     // Map the docs into an array of just the _ids
 
-    Membership.find({ 'account': user.account })
+    Membership.find({ 'account': current_user.account })
     .exec(function(err, memberships) {
-      var ids = memberships.map(function(doc) { return doc._id; });
+      var ids = memberships.map(function(doc) { return doc.user; });
 
-      User.paginate({ 'memberships': { $in: ids } }, { offset: offset, limit: page_size, sort: { last_name: 'asc', first_name: 'asc', email_address: 'asc' }, populate: [{
+      User.paginate({ '_id': { $in: ids } }, { offset: offset, limit: page_size, sort: { last_name: 'asc', first_name: 'asc', email_address: 'asc' }, populate: [{
         path: 'memberships',
         populate: {
           path: 'account'

@@ -14,7 +14,7 @@ var errorHandler = require('api-error-handler');
 var mongoose = require("mongoose");
 var jwt    = require('jsonwebtoken');
 var cors = require('cors');
-var params = require('./params');
+//var params = require('./params');
 var security = require('./security');
 
 var dashboard = require('./routes/dashboard');
@@ -243,8 +243,8 @@ router.post('/users/:user_id/devices', UserDevicesController.CreateDevice);
 router.get('/users/:user_id/messages', UserMessagesController.GetMessages);
 router.post('/users/:user_id/payment_cards', UserPaymentCardsController.CreatePaymentCard)
 
-router.param('plan_id', params.GetPlan);
-router.param('user_id', params.GetUser);
+//router.param('plan_id', params.GetPlan);
+//router.param('user_id', params.GetUser);
 
 router.use(errorHandler());
 // apply the routes to our application with the prefix /api

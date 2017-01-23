@@ -8,20 +8,24 @@ var security      = require('../security');
 var UsersController = {
   CreateUser: function(req, res, next) {
     var email_address = req.body.email_address;
+    var password = req.body.password;
+    var role = req.body.role;
+    var company_name = req.body.company_name;
+    var subdomain = company_name.replace(/\W/g, '').toLowerCase();
+    var first_name = req.body.first_name;
+    var last_name = req.body.last_name;
 
     User.findOne({email_address : email_address}, function (err, user) {
       if(err) { return next(err) }
       if(user) { return next(new Error("Email Address is already in user")) }
 
       var user = new User();
-      var role = req.body.role;
-      var company_name = req.body.company_name;
-      var subdomain = company_name.replace(/\W/g, '').toLowerCase();
 
+      console.log(req.body);
       user.email_address = email_address;
-      user.password = req.body.password;
-      user.first_name = req.body.first_name;
-      user.last_name = req.body.last_name;
+      user.password = password;
+      user.first_name = first_name;
+      user.last_name = last_name;
       user.roles.push(role);
       user.status = "Pending";
 

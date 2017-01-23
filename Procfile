@@ -1,1 +1,2 @@
-web: node --use_strict ./server.js
+web: node lib/server.js
+worker: node lib/worker.js

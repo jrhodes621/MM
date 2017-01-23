@@ -18,6 +18,23 @@ describe("Plan Activities API Endpoint", function() {
     done();
   });
   describe("Get Activities", function() {
-    
+    it('should return 200 when successful', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should return activities grouped by dates desc', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should return activities in each grouped sorted by time desc', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should only return activities for the specified plan', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should return an 403 error if the current user does not own the specified plan', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should return an error if the token is not valid', function(done) {
+      done(new Error("Not Implemented"));
+    });
   });
 });

@@ -8,8 +8,10 @@ var SessionsController = {
   CreateSession: function(req, res, next) {
     var email_address = req.body.email_address;
     var password = req.body.password;
+    console.log("creating a session for " + email_address);
 
-    User.GetUserByEmailAddress(email_address, function(err, user) {
+    User.findOne({ "email_address": email_address }, function(err, user) {
+      console.log(user);
       if (err) { return next(err); }
 
       if (!user) {

@@ -23,7 +23,6 @@ Security = {
           if (err) {
             return callback(new Error('Unable to Find User'), 403, 1003, null);
           }
-
           return callback(null, null, null, user);
         });
       }

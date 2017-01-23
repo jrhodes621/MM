@@ -3,9 +3,9 @@ var Activity = require('../models/activity');
 var ActivitiesController = {
   GetActivities: function(req, res, next) {
     var current_user = req.current_user;
-
+    
     Activity.aggregate([
-      { $match: { bull: current_user._id } },
+      { $match: { bull: current_user.account._id } },
       { $group: {
            _id: { year: { $year : "$createdAt" }, month: { $month : "$createdAt" },day: { $dayOfMonth : "$createdAt" } },
            date_group: { $first : '$createdAt' },

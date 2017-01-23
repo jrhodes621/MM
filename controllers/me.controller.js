@@ -1,4 +1,5 @@
 var User = require('../models/user');
+var jackrabbit = require('jackrabbit');
 
 var MeController = {
   GetUser: function(req, res, next) {

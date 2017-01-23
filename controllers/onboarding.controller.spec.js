@@ -18,9 +18,20 @@ describe("On Boarding API Endpoint", function() {
     done();
   });
   describe("Connect Stripe", function() {
-    
-  });
-  describe("Import Plans/Sync", function() {
-
+    it('should return a 200 when successful', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should return the sign in user', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should save the Stripe connect information to the user', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should save the account_id returned by Stripe in the reference_id of the user', function(done) {
+      done(new Error("Not Implemented"));
+    });
+    it('should return an error if the json web token is invalid', function(done) {
+      done(new Error("Not Implemented"));
+    });
   });
 });

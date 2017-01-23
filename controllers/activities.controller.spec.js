@@ -6,6 +6,7 @@ var app           = require('../server');
 var security      = require('../security');
 var faker         = require('faker');
 
+var ActivityFactory   = require("../test/factories/activity.factory.js");
 var UserFactory   = require("../test/factories/user.factory.js");
 var BeforeHooks   = require("../test/hooks/before.hooks.js");
 var AfterHooks    = require("../test/hooks/after.hooks.js");
@@ -25,13 +26,6 @@ describe("Activities API Endpoint", function() {
       function createBull(callback) {
         factory.create('account', function(err, account) {
           bull = account;
-
-          callback();
-        });
-      },
-      function createOther(callback) {
-        factory.create('account', function(err, account) {
-          other_bull = account;
 
           callback();
         });
@@ -62,17 +56,42 @@ describe("Activities API Endpoint", function() {
     });
   });
   describe("Get Activities", function() {
+    it('should return a 200 when succeeds', function(done) {
+      let user = factory.buildSync('user');
+
+      user.save(function(err) {
+        if(err) { done(err); }
+
+        factory.createMany('activity', {}, 35,
+          { "bull": bull,
+            "calf": user,
+            "type": "test activity",
+            "message_calf": "Message Calf",
+            "message_bull": "Message Bull"
+          }, function(err, activities) {
+          request(app)
+          .get('/api/activities')
+          .set('x-access-token', json_web_token)
+          .expect(200)
+          .then((res) => {
+            console.log(res.body);
+            expect(res.body).to.be.an('array');
+            //expect(res.body[0].date_group).to.be.a('date');
+            expect(res.body[0].activities).to.be.an('array');
+
+            done();
+          });
+        });
+      });
+    });
     it('should return array of activities grouped by date', function(done) {
       done(new Error("Not Implemented"));
     });
     it('should only return activities for the current bull', function(done) {
       done(new Error("Not Implemented"));
     });
-    it('should return a 200 when succeeds', function(done) {
-      done(new Error("Not Implemented"));
-    });
-    it('should return 404 if calf is not member of bull', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return activities sorted by create date asc', function(done) {
+
     });
   });
 });

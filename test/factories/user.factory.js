@@ -1,14 +1,14 @@
 var factory = require('factory-girl');
+var faker = require('faker');
 var Account    = require('../../models/account');
 var User    = require('../../models/user');
 
 var AccountFactory    = require('../../test/factories/account.factory');
+var MembershipFactory    = require('../../test/factories/membership.factory');
 
 factory.define('user', User, function(buildOptions) {
   var user = {
-    email_address: factory.sequence(function(n) {
-      return 'user' + n + '@demo.com';
-    }),
+    email_address: faker.internet.email(),
     password: "test123",
     status: "active",
     roles: ["Calf"]
@@ -27,12 +27,4 @@ factory.define('bull', User, function(buildOptions) {
   };
 
   return user;
-  // async functions can be used by accepting a callback as an argument
-  // async: function(callback) {
-  //   somethingAsync(callback);
-  // },
-  // you can refer to other attributes using `this`
-  // username: function() {
-  //   return this.email;
-  // }
 });

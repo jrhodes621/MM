@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 var Schema       = mongoose.Schema;
 var mongoosePaginate = require('mongoose-paginate');
 var bcrypt = require('bcrypt');
-
 var UserServices = require('../models/user.services')
 
 var UserSchema   = new Schema({
@@ -114,7 +113,11 @@ UserSchema.set('toJSON', {
     }
 });
 UserSchema.virtual('member_count').get(function () {
-  return this.members.length;
+  if(this.members) {
+    return this.members.length
+  } else {
+    return 0;
+  }
 });
 // UserSchema.virtual('gravatar_url').get(function() {
 //   return gravatar.url(this.email_address, {s: '100', r: 'x', d: 'retro'}, true);
