@@ -4,7 +4,7 @@ var StripeImportProcessor = require('../helpers/stripe_import_processor');
 var Upload = require('s3-uploader');
 var multer  = require('multer');
 var jackrabbit = require('jackrabbit');
-var config = required('../lib/config');
+var config = require('../lib/config');
 
 var OnboardingController = {
   ConnectStripe: function(req, res, next) {
