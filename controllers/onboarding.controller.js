@@ -4,6 +4,7 @@ var StripeImportProcessor = require('../helpers/stripe_import_processor');
 var Upload = require('s3-uploader');
 var multer  = require('multer');
 var jackrabbit = require('jackrabbit');
+var config = required('../lib/config');
 
 var OnboardingController = {
   ConnectStripe: function(req, res, next) {
@@ -16,7 +17,7 @@ var OnboardingController = {
       if(err) { return next(err); }
 
       //start job to import plans
-      var rabbit = jackrabbit('amqp://localhost');
+      var rabbit = jackrabbit(config.rabbit_url);
       rabbit.default().publish({ account_id: account._id }, { key: 'stripe_import_queue' });
 
       res.status(200).json(req.current_user)
