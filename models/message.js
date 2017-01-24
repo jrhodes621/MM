@@ -1,37 +1,36 @@
-var mongoose = require('mongoose');
-var Schema       = mongoose.Schema;
-var User = require('../models/user');
-var mongoosePaginate = require('mongoose-paginate');
+const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
+const MessageServices = require('../models/message.services');
 
-var MessageServices    = require('../models/message.services')
+const Schema = mongoose.Schema;
 
-var MessageSchema = new Schema({
+const MessageSchema = new Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   content: {
     type: String,
-    required: true
+    required: true,
   },
   viewed: {
     type: Boolean,
     required: true,
-    default: true
+    default: true,
   },
   viewed_at: {
-    type: Date
+    type: Date,
   },
   delivered_push: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   delivered_push_at: {
     type: Date,
@@ -39,19 +38,20 @@ var MessageSchema = new Schema({
   delivered_email: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   delivered_email_at: {
-    type: Date
-  }
-},
-{
-    timestamps: true
+    type: Date,
+  },
+}, {
+  timestamps: true,
 });
 
 MessageSchema.plugin(mongoosePaginate);
 
-MessageSchema.statics.GetPlans = MessageServices.GetMessageById
-MessageSchema.statics.GetPlan = MessageServices.SaveMessage
+MessageSchema.statics = {
+  GetMessageById: MessageServices.GetMessageById,
+  SaveMessage: MessageServices.SaveMessage,
+};
 
 module.exports = mongoose.model('Message', MessageSchema);

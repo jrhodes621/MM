@@ -1,40 +1,38 @@
-var mongoose   = require('mongoose');
-var Schema     = mongoose.Schema;
-var Membership    = require('../models/membership');
-var Coupon    = require('../models/coupon');
-var Subscription    = require('../models/subscription');
+const mongoose = require('mongoose');
+const DiscountServices = require('../models/discount.services');
 
-var DiscountServices   = require('../models/discount.services')
+const Schema = mongoose.Schema;
 
-var DiscountSchema   = new Schema({
+const DiscountSchema = new Schema({
   membership: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Membership',
-    required: true
+    required: true,
   },
   coupon: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Coupon',
-    required: true
+    required: true,
   },
   subscription: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Subscription',
-    required: true
+    required: true,
   },
   start: {
-    type:  Date,
-    required: true
+    type: Date,
+    required: true,
   },
   end: {
-    type: Date
-  }
-},
-{
-    timestamps: true
+    type: Date,
+  },
+}, {
+  timestamps: true,
 });
 
-DiscountSchema.statics.GetChargeById = DiscountServices.GetDiscountById
-DiscountSchema.statics.SaveCharge = DiscountServices.SaveDiscount
+DiscountSchema.statics = {
+  GetDiscountById: DiscountServices.GetDiscountById,
+  SaveDiscount: DiscountServices.SaveDiscount,
+};
 
 module.exports = mongoose.model('Discount', DiscountSchema);

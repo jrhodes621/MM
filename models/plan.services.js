@@ -1,40 +1,34 @@
-var PlanServices = {
-  GetPlans: function(params, callback) {
+const Upload = require('s3-uploader');
+
+const PlanServices = {
+  GetPlans: (params, callback) => {
     this.paginate(params.query, params.paging, callback);
   },
-  GetPlan: function(params, callback) {
+  GetPlan: (params, callback) => {
     this.findById(params.plan_id, callback);
   },
-  SavePlan: function(plan, callback) {
-    plan.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SavePlan: (plan, callback) => {
+    plan.save(callback);
   },
-  ArchivePlan: function(plan, callback) {
+  ArchivePlan: (plan, callback) => {
     plan.archive = true;
-    plan.save(function(err) {
-      callback(err, plan);
-    });
+    plan.save(callback);
   },
-  UploadAvatar: function(plan, avatar_path, callback) {
-    console.log("uploading images");
+  UploadAvatar: (plan, avatarPath, callback) => {
+    const s3BucketName = process.env.S3_BUCKET_NAME;
 
-    var s3BucketName = process.env.S3_BUCKET_NAME;
-
-    var client = new Upload(s3BucketName, {
+    const client = new Upload(s3BucketName, {
       aws: {
         path: 'plans/' + plan._id + '/',
         region: 'us-east-1',
-        acl: 'public-read'
+        acl: 'public-read',
       },
       cleanup: {
         versions: true,
-        original: false
+        original: false,
       },
       original: {
-        awsImageAcl: 'private'
+        awsImageAcl: 'private',
       },
       versions: [{
         maxHeight: 200,
@@ -42,46 +36,44 @@ var PlanServices = {
         aspect: '1:1',
         format: 'png',
         suffix: '-large',
-        size: 'large'
-      },{
+        size: 'large',
+      }, {
         maxHeight: 150,
         maxWidth: 150,
         aspect: '1:1',
         format: 'png',
         suffix: '-medium',
-        size: 'medium'
-      },{
+        size: 'medium',
+      }, {
         maxHeight: 80,
         maxWidth: 80,
         aspect: '1:1',
         format: 'png',
         suffix: '-small',
-        size: 'small'
-      },{
+        size: 'small',
+      }, {
         maxHeight: 40,
         maxWidth: 40,
         aspect: '1:1',
         format: 'png',
         suffix: '-thumb1',
-        size: 'thumb'
-      }]
+        size: 'thumb',
+      }],
     });
 
-    client.upload(avatar_path, {}, function(err, versions, meta) {
-      if (err) {
-        throw err;
-      }
+    client.upload(avatarPath, {}, (err, versions) => {
+      if (err) { throw err; }
 
-      var avatar_images = {};
-      versions.forEach(function(image) {
-        if(image.size){
-          avatar_images[image.size] = image.url;
+      const avatarImages = {};
+      versions.forEach((image) => {
+        if (image.size) {
+          avatarImages[image.size] = image.url;
         }
       });
 
-      callback(avatar_images);
+      callback(avatarImages);
     });
-  }
-}
+  },
+};
 
-module.exports = PlanServices
+module.exports = PlanServices;

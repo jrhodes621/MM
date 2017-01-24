@@ -1,28 +1,24 @@
-var ChargeServices = {
-  GetChargesForUser: function(membership, callback) {
-    this.find({'membership': membership})
+const ChargeServices = {
+  GetChargesForUser: (userMembership, callback) => {
+    this.find({ membership: userMembership })
     .populate('payment_card')
     .exec(callback);
   },
-  GetChargeById: function(charge_id, callback) {
-    this.findById(charge_id)
+  GetChargeById: (chargeId, callback) => {
+    this.findById(chargeId)
     .populate('membership')
     .populate('payment_card')
     .exec(callback);
   },
-  GetChargeByReferenceId: function(reference_id, callback) {
-    this.findOne({ "reference_id": reference_id })
+  GetChargeByReferenceId: (referenceId, callback) => {
+    this.findOne({ reference_id: referenceId })
     .populate('membership')
     .populate('payment_card')
     .exec(callback);
   },
-  SaveCharge: function(charge, callback) {
-    charge.save(function(err) {
-      if(err) { console.log(err); }
+  SaveCharge: (charge, callback) => {
+    charge.save(callback);
+  },
+};
 
-      callback(err);
-    });
-  }
-}
-
-module.exports = ChargeServices
+module.exports = ChargeServices;

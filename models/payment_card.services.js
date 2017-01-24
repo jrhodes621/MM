@@ -1,46 +1,39 @@
-var PaymentCard = require('../models/payment_card');
+const PaymentCard = require('../models/payment_card');
 
-var PaymentCardServices = {
-  GetPaymentCardById: function(payment_card_id, callback) {
-    this.findById(coupon_id)
+const PaymentCardServices = {
+  GetPaymentCardById: (paymentCardId, callback) => {
+    this.findById(paymentCardId)
     .exec(callback);
   },
-  GetPaymentCardByReferenceId: function(reference_id, callback) {
-    this.findOne({ "reference_id": reference_id })
+  GetPaymentCardByReferenceId: (referenceId, callback) => {
+    this.findOne({ reference_id: referenceId })
     .exec(callback);
   },
-  SavePaymentCard: function(payment_card, callback) {
-    payment_card.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
+  SavePaymentCard: (paymentCard, callback) => {
+    paymentCard.save(callback);
+  },
+  ArchivePaymentCard: (user, paymentCard, stripeCard, callback) => {
+    paymentCard.archive = true;
+    paymentCard.save((err) => {
+      callback(err, user, paymentCard);
     });
   },
-  ArchivePaymentCard: function(user, payment_card, stripe_card, callback) {
-    parsePaymentCardFromStripe(user, payment_card, stripe_card, function(err, user, payment_card) {
-      if(!payment_card) { return callback(new Error("Can't create payment card"), user, payment_card); }
+  AddPaymentCard: (user, referenceId, name, brand, cardLastFour, expirationMonth, expirationYear,
+    status, callback) => {
+    const paymentCard = new PaymentCard();
 
-      payment_card.archive = true;
-      payment_card.save(function(err) {
-        callback(err, user, payment_card);
-      });
-    });
-  },
-  AddPaymentCard: function(user, reference_id, name, brand, card_last_four, expiration_month, expiration_year, status, callback) {
-    var paymentCard = new PaymentCard();
-
-    paymentCard.reference_id = reference_id;
+    paymentCard.reference_id = referenceId;
     paymentCard.name = name;
     paymentCard.brand = brand;
-    paymentCard.last4 = card_last_four;
-    paymentCard.exp_month = expiration_month;
-    paymentCard.exp_year = expiration_year;
-    paymentCard.status = "Active";
+    paymentCard.last4 = cardLastFour;
+    paymentCard.exp_month = expirationMonth;
+    paymentCard.exp_year = expirationYear;
+    paymentCard.status = 'Active';
 
-    paymentCard.save(function(err) {
-      callback(err, paymentCard)
+    paymentCard.save((err) => {
+      callback(err, paymentCard);
     });
-  }
-}
+  },
+};
 
-module.exports = PaymentCardServices
+module.exports = PaymentCardServices;

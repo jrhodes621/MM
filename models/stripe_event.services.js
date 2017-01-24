@@ -1,15 +1,11 @@
-var StripeEventServices = {
-  GetStripeEventById: function(refund_id, callback) {
-    this.findById(refund_id)
+const StripeEventServices = {
+  GetStripeEventById: (stripeEventId, callback) => {
+    this.findById(stripeEventId)
     .exec(callback);
   },
-  SaveStripeEvent: function(stripe_event, callback) {
-    stripe_event.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveStripeEvent: (stripeEvent, callback) => {
+    stripeEvent.save(callback);
   },
-}
+};
 
-module.exports = StripeEventServices
+module.exports = StripeEventServices;

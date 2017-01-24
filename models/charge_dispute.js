@@ -1,47 +1,48 @@
-var mongoose                = require('mongoose');
-var Schema                  = mongoose.Schema;
-var Charge                  = require('../models/charge');
-var ChargeDisputeServices   = require('../models/charge_dispute.services')
+const mongoose = require('mongoose');
+const ChargeDisputeServices = require('../models/charge_dispute.services');
 
-var ChargeDisputeSchema   = new Schema({
+const Schema = mongoose.Schema;
+
+const ChargeDisputeSchema = new Schema({
   reference_id: {
     type: String,
-    required: true
+    required: true,
   },
   charge: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Charge',
-    required: true
+    required: true,
   },
   amount: {
     type: Number,
-    required: true
+    required: true,
   },
   dispute_created: {
     type: Date,
-    required: true
+    required: true,
   },
   is_charge_refundable: {
     type: Boolean,
     required: true,
-    default: true
+    default: true,
   },
   evidence: mongoose.Schema.Types.Mixed,
   evidence_details: mongoose.Schema.Types.Mixed,
   reason: {
     type: String,
-    required: true
+    required: true,
   },
   status: {
     type: String,
-    required: true
-  }
-},
-{
-    timestamps: true
+    required: true,
+  },
+}, {
+  timestamps: true,
 });
 
-ChargeDisputeSchema.statics.GetChargeDisputeByReferenceId = ChargeDisputeServices.GetChargeDisputeByReferenceId
-ChargeDisputeSchema.statics.SaveChargeDispute = ChargeDisputeServices.SaveChargeDispute
+ChargeDisputeSchema.statics = {
+  GetChargeDisputeByReferenceId: ChargeDisputeServices.GetChargeDisputeByReferenceId,
+  SaveChargeDispute: ChargeDisputeServices.SaveChargeDispute,
+};
 
 module.exports = mongoose.model('ChargeDispute', ChargeDisputeSchema);

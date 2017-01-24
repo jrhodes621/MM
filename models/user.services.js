@@ -1,41 +1,35 @@
-var StripeServices = require('../services/stripe.services');
-var multer  = require('multer');
-var Upload = require('s3-uploader');
-var fs = require('fs');
-var async = require("async");
+const Upload = require('s3-uploader');
 
-var UserServices = {
-  GetUserById: function(user_id, callback) {
-    this.findById(user_id)
+const UserServices = {
+  GetUserById: (userId, callback) => {
+    this.findById(userId)
     .exec(callback);
   },
-  GetUserByEmailAddress: function(email_address, callback) {
-    this.findOne({ email_address: email_address })
+  GetUserByEmailAddress: (emailAddress, callback) => {
+    this.findOne({ email_address: emailAddress })
     .populate('subscriptions')
-    .exec(callback)
+    .exec(callback);
   },
-  SaveUser: function(user, callback) {
-    user.save(function(err) {
-      if(err) { console.log(err); }
-
+  SaveUser: (user, callback) => {
+    user.save((err) => {
       callback(err);
     });
   },
-  UploadAvatar: function(user, avatar_path, callback) {
-    var s3BucketName = process.env.S3_BUCKET_NAME;
+  UploadAvatar: (user, avatarPath, callback) => {
+    const s3BucketName = process.env.S3_BUCKET_NAME;
 
-    var client = new Upload(s3BucketName, {
+    const client = new Upload(s3BucketName, {
       aws: {
         path: 'users/' + user._id + '/',
         region: 'us-east-1',
-        acl: 'public-read'
+        acl: 'public-read',
       },
       cleanup: {
         versions: true,
-        original: false
+        original: false,
       },
       original: {
-        awsImageAcl: 'private'
+        awsImageAcl: 'private',
       },
       versions: [{
         maxHeight: 200,
@@ -43,67 +37,44 @@ var UserServices = {
         aspect: '1:1',
         format: 'png',
         suffix: '-large',
-        size: 'large'
-      },{
+        size: 'large',
+      }, {
         maxHeight: 150,
         maxWidth: 150,
         aspect: '1:1',
         format: 'png',
         suffix: '-medium',
-        size: 'medium'
-      },{
+        size: 'medium',
+      }, {
         maxHeight: 80,
         maxWidth: 80,
         aspect: '1:1',
         format: 'png',
         suffix: '-small',
-        size: 'small'
-      },{
+        size: 'small',
+      }, {
         maxHeight: 40,
         maxWidth: 40,
         aspect: '1:1',
         format: 'png',
         suffix: '-thumb1',
-        size: 'thumb'
-      }]
+        size: 'thumb',
+      }],
     });
 
-    client.upload(avatar_path, {}, function(err, versions, meta) {
-      if (err) {
-        throw err;
-      }
+    client.upload(avatarPath, {}, (err, versions) => {
+      if (err) { throw err; }
 
-      var avatar_images = {};
-      versions.forEach(function(image) {
-        if(image.size){
-          avatar_images[image.size] = image.url;
+      const avatarImages = {};
+      versions.forEach((image) => {
+        if (image.size) {
+          avatarImages[image.size] = image.url;
         }
       });
 
-      callback(avatar_images);
+      callback(avatarImages);
     });
   },
-  ParseReferencePlans: function(user, reference_id, callback) {
-    async.waterfall([
-      function getPlan(callback) {
-        Plan.findOne({ "reference_id": reference_id, "user": user })
-        .exec(function(err, plan) {
-          callback(err, plan);
-        });
-      },
-      function parsePlan(plan, callback) {
-        if(!plan) {
-          module.exports.createPlan(user, reference_id, function(err, plan) {
-            callback(err, plan);
-          });
-        } else {
-          callback(null, plan);
-        }
-      }
-    ], function(err, plan) {
-      callback(err, plan)
-    });
-  }
-}
+};
 
-module.exports = UserServices
+module.exports = UserServices;

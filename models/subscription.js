@@ -1,52 +1,53 @@
-var mongoose    = require('mongoose');
-var Schema      = mongoose.Schema;
+const mongoose = require('mongoose');
+const SubscriptionServices = require('../models/subscription.services');
 
-var SubscriptionServices = require('../models/subscription.services')
+const Schema = mongoose.Schema;
 
-var SubscriptionSchema   = new Schema({
+const SubscriptionSchema = new Schema({
   plan: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Plan',
-    required: true
+    required: true,
   },
   membership: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Membership',
-    required: true
+    required: true,
   },
   reference_id: {
-    type: String
+    type: String,
   },
   subscription_created_at: {
     type: Date,
-    required: true
+    required: true,
   },
   subscription_canceled_at: {
-    type: Date
+    type: Date,
   },
   trial_start: {
-    type: Date
+    type: Date,
   },
   trial_end: {
-    type: Date
+    type: Date,
   },
   status: {
     type: String,
-    required: true
+    required: true,
   },
   synced: {
     type: Boolean,
     required: true,
-    default: false
-  }
-},
-{
-    timestamps: true
+    default: false,
+  },
+}, {
+  timestamps: true,
 });
 
-SubscriptionSchema.statics.SubscribeToPlan = SubscriptionServices.SubscribeToPlan
-SubscriptionSchema.statics.GetSubscriptionByReferenceId = SubscriptionServices.GetSubscriptionByReferenceId
-SubscriptionSchema.statics.GetMemberMooseFreePlan = SubscriptionServices.GetMemberMooseFreePlan
-SubscriptionSchema.statics.GetMemberMoosePrimePlan = SubscriptionServices.GetMemberMoosePrimePlan
+SubscriptionSchema.statics = {
+  SubscribeToPlan: SubscriptionServices.SubscribeToPlan,
+  GetSubscriptionByReferenceId: SubscriptionServices.GetSubscriptionByReferenceId,
+  GetMemberMooseFreePlan: SubscriptionServices.GetMemberMooseFreePlan,
+  GetMemberMoosePrimePlan: SubscriptionServices.GetMemberMoosePrimePlan,
+};
 
 module.exports = mongoose.model('Subscription', SubscriptionSchema);

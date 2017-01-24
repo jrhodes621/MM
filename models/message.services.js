@@ -1,15 +1,11 @@
-var MessageServices = {
-  GetMessageById: function(message_id, callback) {
-    this.findById(message_id)
+const MessageServices = {
+  GetMessageById: (messageId, callback) => {
+    this.findById(messageId)
     .exec(callback);
   },
-  SaveMessage: function(message, callback) {
-    message.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveMessage: (message, callback) => {
+    message.save(callback);
   },
-}
+};
 
-module.exports = MessageServices
+module.exports = MessageServices;

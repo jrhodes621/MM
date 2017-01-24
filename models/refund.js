@@ -1,53 +1,52 @@
-var mongoose          = require('mongoose');
-var Schema            = mongoose.Schema;
-var Charge            = require('../models/charge');
-var mongoosePaginate  = require('mongoose-paginate');
+const mongoose = require('mongoose');
+const RefundServices = require('../models/refund.services');
 
-var RefundServices = require('../models/refund.services')
+const Schema = mongoose.Schema;
 
-var RefundSchema   = new Schema({
+const RefundSchema = new Schema({
   charge: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Charge',
-    required: true
+    required: true,
   },
   reference_id: {
     type: String,
-    required: true
+    required: true,
   },
   amount: {
     type: Number,
-    required: true
+    required: true,
   },
   currency: {
     type: String,
     required: true,
-    default: 'usd'
+    default: 'usd',
   },
   refund_created: {
     type: Date,
-    required: true
+    required: true,
   },
   description: {
-    type: String
+    type: String,
   },
   reason: {
-    type: String
+    type: String,
   },
   receipt_number: {
-    type: String
+    type: String,
   },
   status: {
     type: String,
-    required: true
-  }
-},
-{
-    timestamps: true
+    required: true,
+  },
+}, {
+  timestamps: true,
 });
 
-RefundSchema.statics.GetStripeEventById = RefundServices.GetRefundById
-RefundSchema.statics.GetRefundByReferenceId = RefundServices.GetRefundByReferenceId
-RefundSchema.statics.SaveRefund = RefundServices.SaveRefund
+RefundSchema.statics = {
+  GetStripeEventById: RefundServices.GetRefundById,
+  GetRefundByReferenceId: RefundServices.GetRefundByReferenceId,
+  SaveRefund: RefundServices.SaveRefund,
+};
 
 module.exports = mongoose.model('Refund', RefundSchema);

@@ -1,23 +1,21 @@
-var mongoose = require('mongoose');
-var Schema       = mongoose.Schema;
-var Membership = require('../models/membership');
-var mongoosePaginate = require('mongoose-paginate');
+const mongoose = require('mongoose');
+const InvoiceServices = require('../models/invoice.services');
 
-var InvoiceServices   = require('../models/invoice.services')
+const Schema = mongoose.Schema;
 
-var InvoiceSchema   = new Schema({
+const InvoiceSchema = new Schema({
   membership: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Membership',
-    required: true
+    required: true,
   },
   reference_id: {
     type: String,
-    required: true
+    required: true,
   },
   amount_due: {
     type: Number,
-    required: true
+    required: true,
   },
   application_fee: {
     type: Number,
@@ -25,16 +23,16 @@ var InvoiceSchema   = new Schema({
   attempt_count: {
     type: Number,
     required: true,
-    default: 0
+    default: 0,
   },
   attempted: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   charge: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Charge'
+    ref: 'Charge',
   },
   closed: {
     type: Boolean,
@@ -44,77 +42,78 @@ var InvoiceSchema   = new Schema({
   currency: {
     type: String,
     required: true,
-    default: 'usd'
+    default: 'usd',
   },
   invoice_date: {
     type: Date,
-    required: true
+    required: true,
   },
   description: {
-    type: String
+    type: String,
   },
   discount: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Discount'
+    ref: 'Discount',
   },
   ending_balance: {
     type: Number,
     required: true,
-    default: 0
+    default: 0,
   },
   forgiven: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   lines: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'InvoiceLineItem'
+    ref: 'InvoiceLineItem',
   }],
   next_payment_attempt: {
-    type: Date
+    type: Date,
   },
   paid: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   period_end: {
     type: Date,
-    required: true
+    required: true,
   },
   period_start: {
     type: Date,
-    required: true
+    required: true,
   },
   statement_descriptor: {
-    type: String
+    type: String,
   },
   subscription: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Subscription'
+    ref: 'Subscription',
   },
   subtotal: {
     type: Number,
-    required: true
+    required: true,
   },
   tax: {
-    type: Number
+    type: Number,
   },
   tax_percent: {
-    type: Number
+    type: Number,
   },
   total: {
     type: Number,
-    required: true
-  }
-},
-{
-    timestamps: true
+    required: true,
+  },
+}, {
+  timestamps: true,
 });
 
-InvoiceSchema.statics.GetChargeById = InvoiceServices.GetInvoiceById
-InvoiceSchema.statics.GetChargeByReferenceId = InvoiceServices.GetInvoiceByReferenceId
-InvoiceSchema.statics.SaveCharge = InvoiceServices.SaveInvoice
+InvoiceSchema.statics = {
+  GetInvoiceById: InvoiceServices.GetInvoiceById,
+  GetInvoiceByReferenceId: InvoiceServices.GetInvoiceByReferenceId,
+  SaveInvoice: InvoiceServices.SaveInvoice,
+};
 
 module.exports = mongoose.model('Invoice', InvoiceSchema);

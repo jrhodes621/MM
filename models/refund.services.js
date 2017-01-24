@@ -1,19 +1,15 @@
-var RefundServices = {
-  GetRefundById: function(refund_id, callback) {
-    this.findById(refund_id)
+const RefundServices = {
+  GetRefundById: (refundId, callback) => {
+    this.findById(refundId)
     .exec(callback);
   },
-  GetRefundByReferenceId: function(reference_id, callback) {
-    this.findOne({ "reference_id": reference_id })
+  GetRefundByReferenceId: (referenceId, callback) => {
+    this.findOne({ reference_id: referenceId })
     .exec(callback);
   },
-  SaveRefund: function(refund, callback) {
-    refund.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveRefund: (refund, callback) => {
+    refund.save(callback);
   },
-}
+};
 
-module.exports = RefundServices
+module.exports = RefundServices;

@@ -1,65 +1,66 @@
-var mongoose   = require('mongoose');
-var Schema     = mongoose.Schema;
+const mongoose = require('mongoose');
+const CouponServices = require('../models/coupon.services');
 
-var CouponServices   = require('../models/coupon.services')
+const Schema = mongoose.Schema;
 
-var CouponSchema   = new Schema({
+const CouponSchema = new Schema({
   account: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Account',
-    required: true
+    required: true,
   },
   plan: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan'
+    ref: 'Plan',
   },
   reference_id: {
     type: String,
-    required: true
+    required: true,
   },
   amount_off: {
-    type: Number
+    type: Number,
   },
   coupon_created: {
     type: Date,
-    required: true
+    required: true,
   },
   currency: {
     type: String,
-    required: true
+    required: true,
   },
   duration: {
     type: String,
-    required: true
+    required: true,
   },
   duration_in_months: {
-    type: Number
+    type: Number,
   },
   max_redemptions: {
-    type: Number
+    type: Number,
   },
   percent_off: {
-    type: Number
+    type: Number,
   },
   redeem_by: {
-    type: Date
+    type: Date,
   },
   times_redeemed: {
     type: Number,
-    required: true
+    required: true,
   },
   valid: {
     type: Boolean,
     required: true,
-    default: true
-  }
-},
-{
-    timestamps: true
+    default: true,
+  },
+}, {
+  timestamps: true,
 });
 
-CouponSchema.statics.GetChargeById = CouponServices.GetCouponById
-CouponSchema.statics.GetChargeByReferenceId = CouponServices.GetCouponByReferenceId
-CouponSchema.statics.SaveCharge = CouponServices.SaveCoupon
+CouponSchema.statics = {
+  GetCouponById: CouponServices.GetCouponById,
+  GetCouponByReferenceId: CouponServices.GetCouponByReferenceId,
+  SaveCoupon: CouponServices.SaveCoupon,
+};
 
 module.exports = mongoose.model('Coupon', CouponSchema);

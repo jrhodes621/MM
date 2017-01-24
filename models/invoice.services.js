@@ -1,19 +1,15 @@
-var InvoiceServices = {
-  GetInvoiceById: function(invoice_id, callback) {
-    this.findById(invoice_id)
+const InvoiceServices = {
+  GetInvoiceById: (invoiceId, callback) => {
+    this.findById(invoiceId)
     .exec(callback);
   },
-  GetInvoiceByReferenceId: function(reference_id, callback) {
-    this.findOne({ "reference_id": reference_id })
+  GetInvoiceByReferenceId: (referenceId, callback) => {
+    this.findOne({ reference_id: referenceId })
     .exec(callback);
   },
-  SaveInvoice: function(invoice, callback) {
-    invoice.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveInvoice: (invoice, callback) => {
+    invoice.save(callback);
   },
-}
+};
 
-module.exports = InvoiceServices
+module.exports = InvoiceServices;

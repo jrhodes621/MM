@@ -1,103 +1,103 @@
-var mongoose         = require('mongoose');
-var Schema           = mongoose.Schema;
-var Membership       = require('../models/membership');
+const mongoose = require('mongoose');
+const ChargeServices = require('../models/charge.services');
 
-var ChargeServices   = require('../models/charge.services')
+const Schema = mongoose.Schema;
 
-var ChargeSchema   = new Schema({
+const ChargeSchema = new Schema({
   membership: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Membership',
-    required: true
+    required: true,
   },
   payment_card: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PaymentCard',
-    required: true
+    required: true,
   },
   reference_id: {
     type: String,
-    required: true
+    required: true,
   },
   amount: {
     type: Number,
-    required: true
+    required: true,
   },
   amount_refunded: {
     type: Number,
-    required: true
+    required: true,
   },
   balance_transaction: {
-    type: String
+    type: String,
   },
   captured: {
     type: Boolean,
-    required: true
+    required: true,
   },
   charge_created: {
     type: Date,
-    required: true
+    required: true,
   },
   currency: {
     type: String,
-    required: true
+    required: true,
   },
   description: {
-    type: String
+    type: String,
   },
   destination: {
-    type: String
+    type: String,
   },
   dispute: {
-    type: String
+    type: String,
   },
   failure_code: {
-    type: String
+    type: String,
   },
   failure_message: {
-    type: String
+    type: String,
   },
   invoice: {
-    type: String
+    type: String,
   },
   paid: {
-    type: Boolean
+    type: Boolean,
   },
   receipt_email: {
-    type: String
+    type: String,
   },
   receipt_number: {
-    type: String
+    type: String,
   },
   refunded: {
-    type: Boolean
+    type: Boolean,
   },
   shipping: {
-    type: String
+    type: String,
   },
   source_transfer: {
-    type: String
+    type: String,
   },
   statement_descriptor: {
-    type: String
+    type: String,
   },
   status: {
     type: String,
-    required: true
+    required: true,
   },
   card_info: {
     type: String,
     required: true,
-    default: 'unknown card'
-  }
-},
-{
-    timestamps: true
+    default: 'unknown card',
+  },
+}, {
+  timestamps: true,
 });
 
-ChargeSchema.statics.GetChargesForUser = ChargeServices.GetChargesForUser
-ChargeSchema.statics.GetChargeById = ChargeServices.GetChargeById
-ChargeSchema.statics.GetChargeByReferenceId = ChargeServices.GetChargeByReferenceId
-ChargeSchema.statics.SaveCharge = ChargeServices.SaveCharge
+ChargeSchema.statics = {
+  GetChargesForUser: ChargeServices.GetChargesForUser,
+  GetChargeById: ChargeServices.GetChargeById,
+  GetChargeByReferenceId: ChargeServices.GetChargeByReferenceId,
+  SaveCharge: ChargeServices.SaveCharge,
+};
 
 module.exports = mongoose.model('Charge', ChargeSchema);

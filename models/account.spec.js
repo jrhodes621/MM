@@ -1,32 +1,32 @@
-var expect    = require('chai').expect;
-var Account   = require('../models/account');
+const expect = require('chai').expect;
+const Account = require('../models/account');
 
-describe('Account', function(done) {
-  it('should be invalid if company_name is empty', function(done) {
-      var account = new Account();
+describe('Account', () => {
+  it('should be invalid if company_name is empty', (done) => {
+    const account = new Account();
 
-      account.validate(function(err) {
-        expect(err.errors.company_name).to.exist;
+    account.validate((err) => {
+      expect(err.errors.company_name).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if subdomain is empty', function(done) {
-      var account = new Account();
+  it('should be invalid if subdomain is empty', (done) => {
+    const account = new Account();
 
-      account.validate(function(err) {
-        expect(err.errors.subdomain).to.exist;
+    account.validate((err) => {
+      expect(err.errors.subdomain).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if status is empty', function(done) {
-      var account = new Account();
+  it('should be invalid if status is empty', (done) => {
+    const account = new Account();
 
-      account.validate(function(err) {
-        expect(err.errors.status).to.exist;
+    account.validate((err) => {
+      expect(err.errors.status).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
 });

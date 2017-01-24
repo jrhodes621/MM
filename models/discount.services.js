@@ -1,15 +1,11 @@
-var DiscountServices = {
-  GetDiscountById: function(discount, callback) {
-    this.findById(coupon_id)
+const DiscountServices = {
+  GetDiscountById: (discountId, callback) => {
+    this.findById(discountId)
     .exec(callback);
   },
-  SaveDiscount: function(discount, callback) {
-    discount.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveDiscount: (discount, callback) => {
+    discount.save(callback);
   },
-}
+};
 
-module.exports = DiscountServices
+module.exports = DiscountServices;

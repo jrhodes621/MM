@@ -1,15 +1,11 @@
-var InvoiceItemServices = {
-  GetInvoiceById: function(invoice_item_id, callback) {
-    this.findById(invoice_item_id)
+const InvoiceItemServices = {
+  GetInvoiceById: (invoiceItemId, callback) => {
+    this.findById(invoiceItemId)
     .exec(callback);
   },
-  SaveInvoiceItem: function(coupon, callback) {
-    this.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveInvoiceItem: (invoiceItem, callback) => {
+    invoiceItem.save(callback);
   },
-}
+};
 
-module.exports = InvoiceItemServices
+module.exports = InvoiceItemServices;

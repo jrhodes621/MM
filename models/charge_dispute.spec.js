@@ -1,69 +1,69 @@
-var expect    = require('chai').expect;
-var ChargeDispute   = require('../models/charge_dispute');
+const expect = require('chai').expect;
+const ChargeDispute = require('../models/charge_dispute');
 
-describe('Charge Dispute', function(done) {
-  it('should be invalid if reference_id is empty', function(done) {
-      var charge_dispute = new ChargeDispute();
+describe('Charge Dispute', () => {
+  it('should be invalid if reference_id is empty', (done) => {
+    const chargeDispute = new ChargeDispute();
 
-      charge_dispute.validate(function(err) {
-        expect(err.errors.reference_id).to.exist;
+    chargeDispute.validate((err) => {
+      expect(err.errors.reference_id).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if charge is empty', function(done) {
-      var charge_dispute = new ChargeDispute();
+  it('should be invalid if charge is empty', (done) => {
+    const chargeDispute = new ChargeDispute();
 
-      charge_dispute.validate(function(err) {
-        expect(err.errors.charge).to.exist;
+    chargeDispute.validate((err) => {
+      expect(err.errors.charge).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if amount is empty', function(done) {
-    var charge_dispute = new ChargeDispute();
+  it('should be invalid if amount is empty', (done) => {
+    const chargeDispute = new ChargeDispute();
 
-      charge_dispute.validate(function(err) {
-        expect(err.errors.amount).to.exist;
+    chargeDispute.validate((err) => {
+      expect(err.errors.amount).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if dispute created is empty', function(done) {
-    var charge_dispute = new ChargeDispute();
+  it('should be invalid if dispute created is empty', (done) => {
+    const chargeDispute = new ChargeDispute();
 
-      charge_dispute.validate(function(err) {
-        expect(err.errors.dispute_created).to.exist;
+    chargeDispute.validate((err) => {
+      expect(err.errors.dispute_created).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if is charge refundable is empty', function(done) {
-    var charge_dispute = new ChargeDispute();
-      charge_dispute.is_charge_refundable = null;
+  it('should be invalid if is charge refundable is empty', (done) => {
+    const chargeDispute = new ChargeDispute();
+    chargeDispute.is_charge_refundable = null;
 
-      charge_dispute.validate(function(err) {
-        expect(err.errors.is_charge_refundable).to.exist;
+    chargeDispute.validate((err) => {
+      expect(err.errors.is_charge_refundable).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if is reason is empty', function(done) {
-    var charge_dispute = new ChargeDispute();
+  it('should be invalid if is reason is empty', (done) => {
+    const chargeDispute = new ChargeDispute();
 
-      charge_dispute.validate(function(err) {
-        expect(err.errors.reason).to.exist;
+    chargeDispute.validate((err) => {
+      expect(err.errors.reason).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
-  it('should be invalid if is status is empty', function(done) {
-    var charge_dispute = new ChargeDispute();
+  it('should be invalid if is status is empty', (done) => {
+    const chargeDispute = new ChargeDispute();
 
-      charge_dispute.validate(function(err) {
-        expect(err.errors.status).to.exist;
+    chargeDispute.validate((err) => {
+      expect(err.errors.status).to.exist;
 
-        done();
-      });
+      done();
+    });
   });
 });

@@ -1,49 +1,47 @@
-var mongoose     = require('mongoose');
-var Schema       = mongoose.Schema;
+const mongoose = require('mongoose');
+const ActivityServices = require('../models/activity.services');
 
-var Plan         = require('../models/plan');
-var User         = require('../models/user');
+const Schema = mongoose.Schema;
 
-var ActivityServices = require('../models/activity.services')
-
-var ActivitySchema   = new Schema({
+const ActivitySchema = new Schema({
   bull: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   calf: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
   },
   plan: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
   },
   type: {
     type: String,
-    required: true
+    required: true,
   },
   message_calf: {
-    type: String
+    type: String,
   },
   message_bull: {
-    type: String
+    type: String,
   },
   received_at: {
-    type: Date
+    type: Date,
   },
   source: {
-    type: String
+    type: String,
   },
-},
-{
-    timestamps: true
+}, {
+  timestamps: true,
 });
 
-ActivitySchema.statics.GetAccountById = ActivityServices.GetActivities
-ActivitySchema.statics.SaveAccount = ActivityServices.GetActivity
-ActivitySchema.statics.UploadAvatar = ActivityServices.SaveActivity
-ActivitySchema.statics.CreateActivity = ActivityServices.CreateActivity
+ActivitySchema.statics = {
+  GetAccountById: ActivityServices.GetActivities,
+  SaveAccount: ActivityServices.GetActivity,
+  UploadAvatar: ActivityServices.SaveActivity,
+  CreateActivity: ActivityServices.CreateActivity,
+};
 
 module.exports = mongoose.model('Activity', ActivitySchema);

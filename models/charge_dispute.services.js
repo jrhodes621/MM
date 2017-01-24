@@ -1,20 +1,12 @@
-var ChargeDispute = require('../models/charge_dispute');
-
-var ChargeDisputeServices = {
-  GetChargeDisputeByReferenceId: function(charge_dispute_id, callback) {
-    this.findOne({ "reference_id": charge_dispute_id })
+const ChargeDisputeServices = {
+  GetChargeDisputeByReferenceId: (chargeDisputeId, callback) => {
+    this.findOne({ reference_id: chargeDisputeId })
     .populate('charge')
-    .exec(function(err, charge_dispute) {
-      callback(err, charge_dispute);
-    });
+    .exec(callback);
   },
-  SaveChargeDispute: function(plan, callback) {
-    this.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveChargeDispute: (chargeDispute, callback) => {
+    chargeDispute.save(callback);
   },
-}
+};
 
-module.exports = ChargeDisputeServices
+module.exports = ChargeDisputeServices;

@@ -1,19 +1,15 @@
-var CouponServices = {
-  GetCouponById: function(coupon_id, callback) {
-    this.findById(coupon_id)
+const CouponServices = {
+  GetCouponById: (couponId, callback) => {
+    this.findById(couponId)
     .exec(callback);
   },
-  GetCouponByReferenceId: function(reference_id, callback) {
-    this.findOne({ "reference_id": reference_id })
+  GetCouponByReferenceId: (referenceId, callback) => {
+    this.findOne({ reference_id: referenceId })
     .exec(callback);
   },
-  SaveCoupon: function(coupon, callback) {
-    coupon.save(function(err) {
-      if(err) { console.log(err); }
-
-      callback(err);
-    });
+  SaveCoupon: (coupon, callback) => {
+    coupon.save(callback);
   },
-}
+};
 
-module.exports = CouponServices
+module.exports = CouponServices;

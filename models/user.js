@@ -1,135 +1,139 @@
-var mongoose = require('mongoose');
-var Schema       = mongoose.Schema;
-var mongoosePaginate = require('mongoose-paginate');
-var bcrypt = require('bcrypt');
-var UserServices = require('../models/user.services')
+const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
+const bcrypt = require('bcrypt');
+const UserServices = require('../models/user.services');
 
-var UserSchema   = new Schema({
+const Schema = mongoose.Schema;
+
+const UserSchema = new Schema({
   email_address: {
     type: String,
     required: true,
     index: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   first_name: {
-    type: String
+    type: String,
   },
   last_name: {
-    type: String
+    type: String,
   },
   account: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Account'
+    ref: 'Account',
   },
   avatar: {},
   memberships: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Membership',
-    default: []
+    default: [],
   }],
   payment_cards: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PaymentCard',
-    default: []
+    default: [],
   }],
   charges: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Charge',
-    default: []
+    default: [],
   }],
   roles: [{
     type: String,
-    unique: true
+    unique: true,
   }],
   status: {
     type: String,
-    required: true
+    required: true,
   },
   refresh_token: {
-    type: String
+    type: String,
   },
   devices: [{
     device_type: {
       type: String,
       required: true,
-      default: "iPhone"
+      default: 'iPhone',
     },
     device_identifier: {
       type: String,
-      required: true
+      required: true,
     },
     token: {
       type: String,
-      required: true
-    }
-  }]
-},
-{
-    timestamps: true
-});
-UserSchema.pre('save', function (next) {
-    var user = this;
-    if (this.isModified('password') || this.isNew) {
-        bcrypt.genSalt(10, function (err, salt) {
-            if (err) {
-                return next(err);
-            }
-            bcrypt.hash(user.password, salt, function (err, hash) {
-                if (err) {
-                    return next(err);
-                }
-                user.password = hash;
-                next();
-            });
-        });
-    } else {
-        return next();
-    }
+      required: true,
+    },
+  }],
+}, {
+  timestamps: true,
 });
 
-UserSchema.methods.comparePassword = function (passw, cb) {
-    bcrypt.compare(passw, this.password, function (err, isMatch) {
-        if (err) {
-            return cb(err);
-        }
-        cb(null, isMatch);
+UserSchema.pre('save', (next) => {
+  const user = this;
+
+  if (this.isModified('password') || this.isNew) {
+    bcrypt.genSalt(10, (err, salt) => {
+      if (err) { return next(err); }
+
+      bcrypt.hash(user.password, salt, (err2, hash) => {
+        if (err2) { return next(err2); }
+
+        user.password = hash;
+        return next();
+      });
     });
-};
-UserSchema.methods.UpdateUser = function(callback) {
-  this.save(function(err) {
-    callback(err)
-  });
-}
-UserSchema.set('toJSON', {
-    getters: true,
-    virtuals: true,
-    transform: function(doc, ret, options) {
-        delete ret.password;
-        return ret;
-    }
-});
-UserSchema.virtual('member_count').get(function () {
-  if(this.members) {
-    return this.members.length
   } else {
-    return 0;
+    return next();
   }
+});
+
+UserSchema.methods = {
+  comparePassword(passw, callback) {
+    bcrypt.compare(passw, this.password, (err, isMatch) => {
+      if (err) { return callback(err); }
+
+      callback(null, isMatch);
+    });
+  },
+  UpdateUser(callback) {
+    this.save(callback);
+  },
+};
+UserSchema.statics = {
+  GetUserById: UserServices.GetUserById,
+  GetUserByEmailAddress: UserServices.GetUserByEmailAddress,
+  SaveUser: UserServices.SaveUser,
+  UploadAvatar: UserServices.UploadAvatar,
+  ParseReferencePlans: UserServices.ParseReferencePlans,
+};
+
+UserSchema.set('toJSON', {
+  getters: true,
+  virtuals: true,
+  transform: (doc, ret) => {
+    delete ret.password;
+
+    return ret;
+  },
+});
+UserSchema.virtual('member_count').get(() => {
+  let length = 0;
+
+  if (this.members) {
+    length = this.members.length;
+  }
+
+  return length;
 });
 // UserSchema.virtual('gravatar_url').get(function() {
 //   return gravatar.url(this.email_address, {s: '100', r: 'x', d: 'retro'}, true);
 // });
 UserSchema.plugin(mongoosePaginate);
 
-UserSchema.statics.GetUserById = UserServices.GetUserById
-UserSchema.statics.GetUserByEmailAddress = UserServices.GetUserByEmailAddress
-UserSchema.statics.SaveUser = UserServices.SaveUser
-UserSchema.statics.UploadAvatar = UserServices.UploadAvatar
-UserSchema.statics.ParseReferencePlans = UserServices.ParseReferencePlans
-
-var User = mongoose.model('User', UserSchema)
+const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

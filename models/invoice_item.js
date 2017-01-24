@@ -1,60 +1,59 @@
-var mongoose = require('mongoose');
-var Schema       = mongoose.Schema;
-var User = require('../models/user');
-var mongoosePaginate = require('mongoose-paginate');
+const mongoose = require('mongoose');
+const InvoiceItemServices = require('../models/invoice_item.services');
 
-var InvoiceItemServices   = require('../models/invoice_item.services')
+const Schema = mongoose.Schema;
 
-var InvoiceItemSchema   = new Schema({
+const InvoiceItemSchema = new Schema({
   amount: {
     type: Number,
-    required: true
+    required: true,
   },
   currency: {
     type: String,
     required: true,
-    default: 'usd'
+    default: 'usd',
   },
   description: {
-    type: String
+    type: String,
   },
   discountable: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   period_start: {
-    type: Date
+    type: Date,
   },
   period_end: {
-    type: Date
+    type: Date,
   },
   plan: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan'
+    ref: 'Plan',
   },
   proration: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   quantity: {
-    type: Number
+    type: Number,
   },
   subscription: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Subscription'
+    ref: 'Subscription',
   },
   invoice_line_item_type: {
     type: String,
-    required: true
-  }
-},
-{
-    timestamps: true
+    required: true,
+  },
+}, {
+  timestamps: true,
 });
 
-InvoiceItemSchema.statics.GetChargeById = InvoiceItemServices.GetInvoiceById
-InvoiceItemSchema.statics.SaveCharge = InvoiceItemServices.SaveInvoiceItem
+InvoiceItemSchema.statics = {
+  GetInvoiceItemById: InvoiceItemServices.GetInvoiceItemById,
+  SaveInvoiceItem: InvoiceItemServices.SaveInvoiceItem,
+};
 
 module.exports = mongoose.model('InvoiceItem', InvoiceItemSchema);
