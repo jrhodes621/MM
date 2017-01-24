@@ -1,5 +1,6 @@
 var async                        = require("async");
 var PushNotificationServices     = require('../services/push_notification.services');
+var Activity                     = require('../models/activity');
 var User                         = require('../models/user');
 
 module.exports = {
