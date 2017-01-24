@@ -23,9 +23,6 @@ var StripeEventsController = {
     stripe_event.livemode = livemode;
     stripe_event.raw_object = event_json;
 
-    var params = {
-      account_id: account_id
-    }
     Account.GetAccountById(account_id, function(err, account) {
       if(err) { return next(err); }
 

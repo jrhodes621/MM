@@ -58,8 +58,8 @@ var AccountSchema   = new Schema({
     timestamps: true
 });
 
-AccountSchema.statics.GetAccountById = function(params, callback) {
-  this.findById(params.account_id, callback);
+AccountSchema.statics.GetAccountById = function(account_id, callback) {
+  this.findById(account_id, callback);
 }
 AccountSchema.statics.SaveAccount = function(account, callback) {
   account.save(function(err) {
