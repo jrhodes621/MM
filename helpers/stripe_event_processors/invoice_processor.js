@@ -138,7 +138,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      Subscription.GetSubscriptionByReferenceId(stripe_invoice.subscription, function(err, subscription) {
+      Subscription.GetSubscriptionByReferenceId(subscription_id, function(err, subscription) {
         if(err) { return callback(err, null); }
         if(!subscription) { return callback(new Error("Subscription not found"), null) }
 
