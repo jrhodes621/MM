@@ -1,3 +1,5 @@
+var Activity         = require('../models/activity');
+
 var ActivityServices = {
   GetActivities: function(params, callback) {
     this.paginate(params.query, params.paging, callback);
