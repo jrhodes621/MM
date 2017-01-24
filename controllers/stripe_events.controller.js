@@ -8,7 +8,7 @@ var StripeEventsController = {
   CreateStripeEvent: function(req, res, next) {
     // Retrieve the request's body and parse it as JSON
     var event_json = req.body;
-    var account_id = event_json.user_id;
+    var stripe_user_id = event_json.user_id;
     var event_id = event_json.id;
     var event_type = event_json.type;
     var request_id = event_json.request;
@@ -23,7 +23,7 @@ var StripeEventsController = {
     stripe_event.livemode = livemode;
     stripe_event.raw_object = event_json;
 
-    Account.findOne({ "account_id": account_id }, function(err, account) {
+    Account.findOne({ "stripe_user_id": stripe_user_id }, function(err, account) {
       if(err) { return next(err); }
 
       if(account) {
