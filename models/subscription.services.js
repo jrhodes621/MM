@@ -1,4 +1,5 @@
-var Plan = require('../models/plan');
+var Plan          = require('../models/plan');
+var Subscription  = require('../models/subscription');
 
 var SubscriptionServices = {
   SubscribeToPlan: function(membership, plan, reference_id, callback) {
