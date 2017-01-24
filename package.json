@@ -8,7 +8,7 @@
     "test2": "NODE_ENV=test mocha 'helpers/**/*.spec.js' 'models/**/*.spec.js' 'controllers/**/*.spec.js' 'parsers/**/*.spec.js' 'services/**/*.spec.js' 'jobs/**/*.spec.js'",
     "test-models": "NODE_ENV=test mocha 'models/**/*.spec.js'",
     "test-controllers": "NODE_ENV=test mocha 'controller/**/*.spec.js'",
-    "test": "NODE_ENV=test mocha 'controllers/members.controller.spec.js' ",
+    "test": "NODE_ENV=test mocha 'controllers/stripe_events.controller.spec.js' ",
     "test-services": "NODE_ENV=test mocha 'services/**/*.spec.js'",
     "test-jobs": "NODE_ENV=test mocha 'jobs/**/*.spec.js'",
     "testx": "NODE_ENV=test mocha 'helpers/stripe_event_processors/**/*.spec.js'"
@@ -35,7 +35,6 @@
     "dotenv": "^2.0.0",
     "events": "^1.1.1",
     "express": "^4.9.7",
-    "factory-girl": "aexmachina/factory-girl",
     "foreman": "^0.4.2",
     "format-currency": "^1.0.0",
     "gravatar": "^1.5.2",
@@ -79,11 +78,14 @@
     "wildcard-subdomains": "^1.0.0"
   },
   "devDependencies": {
+    "factory-girl": "aexmachina/factory-girl",
+    "faker": "^3.1.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-connect": "^3.2.1",
     "gulp-ruby-sass": "^2.0.6",
     "gulp-sass": "^2.2.0",
+    "mockgoose": "^6.0.8",
     "node-mocks-http": "^1.5.5",
     "node-sass": "^3.8.0",
     "nodemon": "^1.9.2",
