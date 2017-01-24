@@ -15,7 +15,7 @@ var SubscriptionServices = {
     subscription.save(callback);
   },
   GetSubscriptionByReferenceId: function(reference_id, callback) {
-    this.findOne(reference_id )
+    this.findOne({ "reference_id": reference_id })
     .populate('plan')
     .populate({
       path: 'plan',

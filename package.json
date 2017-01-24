@@ -7,8 +7,8 @@
     "build-css": "node-sass --include-path scss scss/main.scss   public/stylesheets/main.css",
     "test2": "NODE_ENV=test mocha 'helpers/**/*.spec.js' 'models/**/*.spec.js' 'controllers/**/*.spec.js' 'parsers/**/*.spec.js' 'services/**/*.spec.js' 'jobs/**/*.spec.js'",
     "test-models": "NODE_ENV=test mocha 'models/**/*.spec.js'",
-    "test-controllers": "NODE_ENV=test mocha 'controller/**/*.spec.js'",
-    "test": "NODE_ENV=test mocha 'controllers/stripe_events.controller.spec.js' ",
+    "test-controllers": "NODE_ENV=test mocha 'helpers/**/*.spec.js'",
+    "test": "NODE_ENV=test mocha 'parsers/**/*.spec.js' ",
     "test-services": "NODE_ENV=test mocha 'services/**/*.spec.js'",
     "test-jobs": "NODE_ENV=test mocha 'jobs/**/*.spec.js'",
     "testx": "NODE_ENV=test mocha 'helpers/stripe_event_processors/**/*.spec.js'"
