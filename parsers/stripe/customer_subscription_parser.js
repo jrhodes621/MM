@@ -1,4 +1,4 @@
-var async              = require("async");
+var async              = require('async');
 var StripeServices     = require('../../services/stripe.services');
 var Membership         = require('../../models/membership');
 var Plan               = require('../../models/plan');
@@ -8,7 +8,7 @@ var PlanParser         = require('../../parsers/stripe/plan_parser');
 
 function parse(bull, stripe_subscription, callback) {
   var result = null;
-  var stripe_api_key = bull.stripe_connect.access_token;
+  var stripeApiKey = bull.stripe_connect.access_token;
 
   async.waterfall([
     function getStripeCustomer(callback) {
@@ -46,7 +46,7 @@ function parse(bull, stripe_subscription, callback) {
       //     "url": "/v1/customers/cus_9tagyvZXCzFCj9/subscriptions"
       //   }
       // }
-      StripeServices.getCustomer(stripe_api_key, stripe_subscription.customer, function(err, stripe_customer) {
+      StripeServices.getCustomer(stripeApiKey, stripe_subscription.customer, function(err, stripe_customer) {
         if(!stripe_customer) { return callback(new Error("Can't get customer from Stripe"), null); }
 
         callback(err, stripe_customer);
@@ -69,7 +69,7 @@ function parse(bull, stripe_subscription, callback) {
       user.roles.push("Calf");
       user.status = "active";
 
-      user.save(function(err) {
+      user.save((err) => {
         callback(err, user)
       });
     },
@@ -87,7 +87,7 @@ function parse(bull, stripe_subscription, callback) {
       membership.account = bull;
       membership.member_since = new Date(); //ToDo: consider real implementation
 
-      membership.save(function(err) {
+      membership.save((err) => {
         callback(err, membership);
       });
     },
@@ -114,13 +114,13 @@ function parse(bull, stripe_subscription, callback) {
       subscription.trial_end = stripe_subscription.trial_end;
       subscription.status = stripe_subscription.status;
 
-      subscription.save(function(err) {
+      subscription.save((err) => {
         result = subscription;
 
         callback(err);
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   });
 }

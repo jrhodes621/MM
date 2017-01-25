@@ -1,59 +1,65 @@
 require('dotenv').config({ silent: true });
 
-var jwt    = require('jsonwebtoken');
-var randtoken = require('rand-token')
-var User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const randtoken = require('rand-token');
+const User = require('../models/user');
 
-var SessionsController = {
-  CreateSession: function(req, res, next) {
-    var email_address = req.body.email_address;
-    var password = req.body.password;
-    console.log("creating a session for " + email_address);
+const SessionsController = {
+  CreateSession: (req, res, next) => {
+    const emailAddress = req.body.email_address;
+    const password = req.body.password;
 
-    User.findOne({ "email_address": email_address }, function(err, user) {
-      console.log(user);
+    User.findOne({ email_address: emailAddress }, (err, user) => {
       if (err) { return next(err); }
 
       if (!user) {
         return res.status(403).send({ success: false, minor_code: 1004, message: 'Authentication failed. User not found.' });
-      } else {
-        // check if password matches
-        user.comparePassword(req.body.password, function (err, isMatch) {
-          if (isMatch && !err) {
-            var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
-            var refresh_token = randtoken.uid(256)
-
-            user.refresh_token = refresh_token;
-            user.save(function(err) {
-              if(err) { return next(err); }
-
-              res.status(200).json({success: true, token: token, refresh_token: refresh_token, user_id: user._id });
-            });
-          } else {
-            return res.status(403).send({ success: false, minor_code: 1005, message: 'Authentication failed.' });
-          }
-        });
       }
-    });
-  },
-  RefreshSession: function(req, res, next) {
-    var refresh_token = req.body.refresh_token;
 
-    User.findOne({ "refresh_token": refresh_token }, function(err, user) {
-      if(err) { return next(err); }
-      if(!user) { return res.status(403).send({ success: false, minor_code: 1006, message: 'Invalid Refresh Token.' }); }
+      user.comparePassword(password, (err, isMatch) => {
+        if (isMatch && !err) {
+          const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+          const refreshToken = randtoken.uid(256);
 
-      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
-      var refresh_token = randtoken.uid(256)
+          user.refresh_token = refreshToken;
+          user.save((err) => {
+            if (err) { return next(err); }
 
-      user.refresh_token = refresh_token;
-      user.save(function(err) {
-        if(err) { return next(err); }
-
-        res.status(200).json({success: true, token: token, refresh_token: refresh_token, user_id: user._id });
+            return res.status(200).json({
+              success: true,
+              token,
+              refresh_token: refreshToken,
+              user_id: user._id,
+            });
+          });
+        } else {
+          return res.status(403).send({ success: false, minor_code: 1005, message: 'Authentication failed.' });
+        }
       });
     });
-  }
-}
+  },
+  RefreshSession: (req, res, next) => {
+    const refreshToken = req.body.refresh_token;
 
-module.exports = SessionsController
+    User.findOne({ refresh_token: refreshToken }, (err, user) => {
+      if (err) { return next(err); }
+      if (!user) { return res.status(403).send({ success: false, minor_code: 1006, message: 'Invalid Refresh Token.' }); }
+
+      const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+      const newRefreshToken = randtoken.uid(256);
+
+      user.refresh_token = newRefreshToken;
+      user.save((err) => {
+        if (err) { return next(err); }
+
+        return res.status(200).json({
+          success: true,
+          token,
+          refresh_token: newRefreshToken,
+          user_id: user._id });
+      });
+    });
+  },
+};
+
+module.exports = SessionsController;

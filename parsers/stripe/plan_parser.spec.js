@@ -1,6 +1,6 @@
 var expect                = require("chai").expect;
 var mongoose              = require("mongoose");
-var async                 = require("async");
+var async                 = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var PlanFixtures              = require("../../test/fixtures/plan.fixtures.js");
@@ -9,10 +9,10 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var PlanParser            = require("../../parsers/stripe/plan_parser");
 
-describe("Plan Parser", function() {
+describe("Plan Parser", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -25,17 +25,17 @@ describe("Plan Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Stripe Plan", function() {
-    it("parses a Stripe Plan JSON object into a plan object", function(done) {
+  describe("Parse Stripe Plan", () => {
+    it("parses a Stripe Plan JSON object into a plan object", (done) => {
       PlanParser.parse(bull, PlanFixtures.StripePlan, function(err, plan) {
         //expect(mongoose.Schema.Types.ObjectId(plan.user._id)).to.equal(mongoose.Schema.Types.ObjectId(user._id));
         expect(plan.name).to.equal(PlanFixtures.StripePlan.name);

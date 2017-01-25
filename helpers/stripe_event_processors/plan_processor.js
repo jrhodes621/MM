@@ -33,7 +33,7 @@ module.exports = {
         if(err) { return callback(err, null) }
 
         plan.archive = true;
-        Plan.SavePlan(plan, function(err) {
+        Plan.SavePlan(plan, (err) => {
           if(err) { return callback(err, null) }
 
           var message_bull= "Your plan, " + plan.name + ", was deleted.";

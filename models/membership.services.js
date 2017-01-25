@@ -1,5 +1,5 @@
 const MembershipServices = {
-  CreateMembership: (calf, bull, referenceId, callback) => {
+  CreateMembership: function(calf, bull, referenceId, callback) {
     const membership = new this();
 
     membership.reference_id = referenceId;
@@ -11,10 +11,10 @@ const MembershipServices = {
       callback(err, membership);
     });
   },
-  GetMembership: (user, account, callback) => {
+  GetMembership: function(user, account, callback) {
     this.findOne({ account: account, user: user }, callback);
   },
-  GetMembershipById: (membershipId, callback) => {
+  GetMembershipById: function(membershipId, callback) {
     this.findOne(membershipId)
     .populate('user')
     .populate('account')
@@ -26,7 +26,7 @@ const MembershipServices = {
     })
     .exec(callback);
   },
-  GetMembershipByReferenceId: (referenceId, callback) => {
+  GetMembershipByReferenceId: function(referenceId, callback) {
     this.findOne({ reference_id: referenceId })
     .populate('user')
     .populate('account')

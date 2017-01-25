@@ -1,5 +1,5 @@
 var Coupon      = require('../../models/coupon');
-var async       = require("async");
+var async       = require('async');
 
 function parse(bull, stripe_coupon, callback) {
   var result = null;
@@ -25,13 +25,13 @@ function parse(bull, stripe_coupon, callback) {
       coupon.times_redeemed = stripe_coupon.times_redeemed;
       coupon.valid = stripe_coupon.valid;
 
-      coupon.save(function(err) {
+      coupon.save((err) => {
         result = coupon;
 
         callback(err);
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   });
 }

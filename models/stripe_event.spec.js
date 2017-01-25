@@ -51,7 +51,7 @@ describe('StripeEvent', () => {
     const stripeEvent = new StripeEvent();
 
     stripeEvent.processed = null;
-    stripeEvent.validate(function(err) {
+    stripeEvent.validate((err) => {
       expect(err.errors.processed).to.exist;
 
       done();

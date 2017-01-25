@@ -1,5 +1,5 @@
 const InvoiceItemServices = {
-  GetInvoiceById: (invoiceItemId, callback) => {
+  GetInvoiceById: function(invoiceItemId, callback) {
     this.findById(invoiceItemId)
     .exec(callback);
   },

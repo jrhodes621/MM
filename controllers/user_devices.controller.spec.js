@@ -1,47 +1,45 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const User = require('../models/user');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
-
-var User = require('../models/user');
-
-describe("User Devices API Endpoint", function() {
-  beforeEach(function(done) {
+describe('User Devices API Endpoint', () => {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
-        BeforeHooks.SetupDatabase(callback)
-      }
-    ], function(err) {
+        BeforeHooks.SetupDatabase(callback);
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Add a Device", function() {
-    it('should return a 201 when succeeds', function(done) {
-      let user = factory.buildSync('user');
+  describe('Add a Device', () => {
+    it('should return a 201 when succeeds', (done) => {
+      const user = factory.buildSync('user');
 
-      user.save(function(err) {
-        if(err) { done(err); }
+      user.save((err) => {
+        if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
-          if(err) { done(err); }
+        security.generate_token(user, process.env.SECRET, (err, token) => {
+          if (err) { done(err); }
+
           request(app)
           .post('/api/users/' + user._id + '/devices')
           .set('x-access-token', token)
           .send({
-            "device_type": "iPhone",
-            "device_identifier": "DEVICEABC",
-            "device_token": "TOKENABC"
+            device_type: 'iPhone',
+            device_identifier: 'DEVICEABC',
+            device_token: 'TOKENABC',
           })
           .expect(201)
           .then((res) => {
@@ -52,25 +50,26 @@ describe("User Devices API Endpoint", function() {
         });
       });
     });
-    it('should register a new device if not a device with same device identifier', function(done) {
-      let user = factory.buildSync('user');
+    it('should register a new device if not a device with same device identifier', (done) => {
+      const user = factory.buildSync('user');
 
-      user.save(function(err) {
-        if(err) { done(err); }
+      user.save((err) => {
+        if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
+        security.generate_token(user, process.env.SECRET, (err, token) => {
           if(err) { done(err); }
+
           request(app)
           .post('/api/users/' + user._id + '/devices')
           .set('x-access-token', token)
           .send({
-            "device_type": "iPhone",
-            "device_identifier": "DEVICEABC",
-            "device_token": "TOKENABC"
+            device_type: 'iPhone',
+            device_identifier: 'DEVICEABC',
+            device_token: 'TOKENABC',
           })
           .expect(201)
           .then((res) => {
-            User.findById(user._id, function(err, user) {
+            User.findById(user._id, (err, user) => {
               expect(user.devices.length).to.equal(1);
 
               done(err);
@@ -79,29 +78,27 @@ describe("User Devices API Endpoint", function() {
         });
       });
     });
-    it('should return a 200 if device already was added', function(done) {
-      let user = factory.buildSync('user');
-      var device = {
-        "device_type": "iPhone",
-        "device_identifier": "DEVICEABC",
-        "token": "TOKENABC"
+    it('should return a 200 if device already was added', (done) => {
+      const user = factory.buildSync('user');
+      const device = {
+        device_type: 'iPhone',
+        device_identifier: 'DEVICEABC',
+        device_token: 'TOKENABC',
       };
       user.devices.push(device);
 
-      user.save(function(err) {
-        if(err) { console.log(err);
+      user.save((err) => {
+        if (err) { done(err); }
 
-          done(err); }
-
-        security.generate_token(user, process.env.SECRET, function(err, token) {
-          if(err) { done(err); }
+        security.generate_token(user, process.env.SECRET, (err, token) => {
+          if (err) { done(err); }
           request(app)
           .post('/api/users/' + user._id + '/devices')
           .set('x-access-token', token)
           .send({
-            "device_type": "iPhone",
-            "device_identifier": "DEVICEABC",
-            "device_token": "TOKENABC"
+            device_type: 'iPhone',
+            device_identifier: 'DEVICEABC',
+            device_token: 'TOKENABC',
           })
           .expect(200)
           .then((res) => {
@@ -112,33 +109,32 @@ describe("User Devices API Endpoint", function() {
         });
       });
     });
-    it('should not register a new device if exists device with same device identifier', function(done) {
-      let user = factory.buildSync('user');
-      var device = {
-        "device_type": "iPhone",
-        "device_identifier": "DEVICEABC",
-        "token": "TOKENABC"
+    it('should not register a new device if exists device with same device identifier', (done) => {
+      const user = factory.buildSync('user');
+      const device = {
+        device_type: 'iPhone',
+        device_identifier: 'DEVICEABC',
+        device_token: 'TOKENABC',
       };
       user.devices.push(device);
 
-      user.save(function(err) {
-        if(err) { console.log(err);
+      user.save((err) => {
+        if (err) { done(err); }
 
-          done(err); }
+        security.generate_token(user, process.env.SECRET, (err, token) => {
+          if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
-          if(err) { done(err); }
           request(app)
           .post('/api/users/' + user._id + '/devices')
           .set('x-access-token', token)
           .send({
-            "device_type": "iPhone",
-            "device_identifier": "DEVICEABC",
-            "device_token": "TOKENABC"
+            device_type: 'iPhone',
+            device_identifier: 'DEVICEABC',
+            device_token: 'TOKENABC',
           })
           .expect(200)
           .then((res) => {
-            User.findById(user._id, function(err, user) {
+            User.findById(user._id, (err, user) => {
               expect(user.devices.length).to.equal(1);
 
               done(err);
@@ -147,28 +143,27 @@ describe("User Devices API Endpoint", function() {
         });
       });
     });
-    it('should return 403 if token is invalid', function(done) {
-      let user = factory.buildSync('user');
-      var device = {
-        "device_type": "iPhone",
-        "device_identifier": "DEVICEABC",
-        "token": "TOKENABC"
+    it('should return 403 if token is invalid', (done) => {
+      const user = factory.buildSync('user');
+      const device = {
+        device_type: 'iPhone',
+        device_identifier: 'DEVICEABC',
+        device_token: 'TOKENABC',
       };
       user.devices.push(device);
 
-      user.save(function(err) {
-        if(err) { console.log(err);
+      user.save((err) => {
+        if (err) { done(err); }
 
-          done(err); }
+        security.generate_token(user, process.env.SECRET, (err, token) => {
+          if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
-          if(err) { done(err); }
           request(app)
           .post('/api/users/' + user._id + '/devices')
           .send({
-            "device_type": "iPhone",
-            "device_identifier": "DEVICEABC",
-            "device_token": "TOKENABC"
+            device_type: 'iPhone',
+            device_identifier: 'DEVICEABC',
+            device_token: 'TOKENABC',
           })
           .expect(403)
           .then((res) => {
@@ -179,21 +174,22 @@ describe("User Devices API Endpoint", function() {
         });
       });
     });
-    it('should return a device json object', function(done) {
-      let user = factory.buildSync('user');
+    it('should return a device json object', (done) => {
+      const user = factory.buildSync('user');
 
-      user.save(function(err) {
-        if(err) { done(err); }
+      user.save((err) => {
+        if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
-          if(err) { done(err); }
+        security.generate_token(user, process.env.SECRET, (err, token) => {
+          if (err) { done(err); }
+
           request(app)
           .post('/api/users/' + user._id + '/devices')
           .set('x-access-token', token)
           .send({
-            "device_type": "iPhone",
-            "device_identifier": "DEVICEABC",
-            "device_token": "TOKENABC"
+            device_type: 'iPhone',
+            device_identifier: 'DEVICEABC',
+            device_token: 'TOKENABC',
           })
           .expect(201)
           .then((res) => {

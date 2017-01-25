@@ -1,165 +1,150 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const BeforeHooks = require('../test/hooks/before.hooks');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var ChargeFactory       = require("../test/factories/charge.factory.js");
-var MembershipFactory   = require("../test/factories/membership.factory.js");
-var PaymentCardFactory   = require("../test/factories/payment_card.factory.js");
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
+describe('User Charges API Endpoint', () => {
+  let bull = null;
+  let bullUser = null;
+  let jsonWebToken = null;
+  let calf = null;
 
-var User = require('../models/user');
-
-describe("User Charges API Endpoint", function() {
-  var bull = null;
-  var bull_user = null;
-  var json_web_token = null;
-  var calf = null;
-
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
-        BeforeHooks.SetupDatabase(callback)
+        BeforeHooks.SetupDatabase(callback);
       },
       function createBull(callback) {
-        factory.create('account', function(err, account) {
+        factory.create('account', (err, account) => {
           bull = account;
 
           callback();
         });
       },
       function createBullUser(callback) {
-        factory.create('bull', function(err, user) {
-          user.account = bull
-          user.save(function(err) {
-            bull_user = user;
+        factory.create('bull', (err, user) => {
+          user.account = bull;
+          user.save((err) => {
+            bullUser = user;
 
-            security.generate_token(bull_user, process.env.SECRET, function(err, token) {
-              if(err) { console.log(err); }
+            security.generate_token(bullUser, process.env.SECRET, (err, token) => {
+              if (err) { callback(err); }
 
-              json_web_token = token;
+              jsonWebToken = token;
 
-              callback(err)
+              callback(err);
             });
           });
         });
       },
       function createUser(callback) {
-        factory.create('user', function(err, user) {
-          calf = user
+        factory.create('user', (err, user) => {
+          calf = user;
 
           callback(err);
-        })
+        });
       },
       function createMembership(callback) {
         factory.create('membership', {}, {
-          calf: calf,
-          bull: bull
-        }, function(err, membership) {
+          calf,
+          bull,
+        }, (err, membership) => {
           calf.memberships.push(membership);
 
-          calf.save(function(err) {
+          calf.save((err) => {
             callback(err);
           });
         });
       },
       function createPaymentCard(callback) {
-        factory.create('payment_card', function(err, payment_card) {
-          calf.payment_cards.push(payment_card);
+        factory.create('payment_card', (err, paymentCard) => {
+          calf.payment_cards.push(paymentCard);
 
-          calf.save(function(err) {
+          calf.save((err) => {
             callback(err);
           });
         });
-      }
-    ], function(err) {
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Get Charges", function() {
-    it('should return a 200 when succeeds', function(done) {
-
+  describe('Get Charges', () => {
+    it('should return a 200 when succeeds', (done) => {
       factory.createMany('charge', {}, 35,
-        { "membership": calf.memberships[0],
-          "payment_card": calf.payment_cards[0],
-        }, function(err, charges) {
+        { membership: calf.memberships[0],
+          payment_card: calf.payment_cards[0],
+        }, (err) => {
+          request(app)
+          .get('/api/users/' + calf._id + '/charges')
+          .set('x-access-token', jsonWebToken)
+          .expect(200)
+          .then((res) => {
+            expect(res.body).to.be.an('array');
+            expect(res.body).to.have.length(35);
+
+            done();
+          });
+        });
+    });
+    it('should return array of charges', (done) => {
+      done(new Error('Not Implemented'));
+    });
+    it('should only return charges for the current bull', (done) => {
+      done(new Error('Not Implemented'));
+    });
+    it('should return a 200 when succeeds', (done) => {
+      done(new Error('Not Implemented'));
+    });
+    it('should return 404 if calf is not member of bull', (done) => {
+      done(new Error('Not Implemented'));
+    });
+  });
+  describe('Create a One Time Charge', () => {
+    it('should return a 201 when succeeds', (done) => {
+      const user = factory.createSync('user');
+      security.generate_token(user, process.env.SECRET, (err, token) => {
+        if (err) { done(err); }
+
         request(app)
-        .get('/api/users/' + calf._id + '/charges')
-        .set('x-access-token', json_web_token)
-        .expect(200)
+        .post('/api/users/' + user._id + '/charges')
+        .set('x-access-token', token)
+        .send({
+          amount: '100.00',
+          currency: 'usd',
+          description: 'test charge',
+        })
+        .expect(201)
         .then((res) => {
-          expect(res.body).to.be.an('array');
-          expect(res.body).to.have.length(35);
+          expect(res.body).to.be.an('object');
 
           done();
         });
       });
     });
-    it('should return array of charges', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return a 403 if bull is not connected to Stripe', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should only return charges for the current bull', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return a Stripe reference_id if connected to Stripe', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should return a 200 when succeeds', function(done) {
-      done(new Error("Not Implemented"));
+    it('should call Stripe to create a charge', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should return 404 if calf is not member of bull', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return a charge json object', (done) => {
+      done(new Error('Not Implemented'));
     });
-  });
-  describe("Create a One Time Charge", function() {
-    it('should return a 201 when succeeds', function(done) {
-      it('should return a 201 when succeeds', function(done) {
-        let user = factory.buildSync('user');
-
-        user.save(function(err) {
-          if(err) { done(err); }
-
-          security.generate_token(user, process.env.SECRET, function(err, token) {
-            if(err) { done(err); }
-            request(app)
-            .post('/api/users/' + user._id + '/charges')
-            .set('x-access-token', token)
-            .send({
-              "amount": "100.00",
-              "currency": "usd",
-              "description": "test charge"
-            })
-            .expect(201)
-            .then((res) => {
-              expect(res.body).to.be.an('object');
-
-              done();
-            });
-          });
-        });
-      });
-    });
-    it('should return a 403 if bull is not connected to Stripe', function(done) {
-      done(new Error("Not Implemented"));
-    });
-    it('should return a Stripe reference_id if connected to Stripe', function(done) {
-      done(new Error("Not Implemented"));
-    });
-    it('should call Stripe to create a charge', function(done) {
-      done(new Error("Not Implemented"));
-    });
-    it('should return a charge json object', function(done) {
-      done(new Error("Not Implemented"));
-    });
-    it('should add a charge to the current user', function(done) {
-      done(new Error("Not Implemented"));
+    it('should add a charge to the current user', (done) => {
+      done(new Error('Not Implemented'));
     });
   });
-
 });

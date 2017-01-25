@@ -1,5 +1,5 @@
 const MessageServices = {
-  GetMessageById: (messageId, callback) => {
+  GetMessageById: function(messageId, callback) {
     this.findById(messageId)
     .exec(callback);
   },

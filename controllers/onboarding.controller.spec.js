@@ -1,37 +1,36 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
-var faker         = require('faker');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const faker = require('faker');
+const UserFactory = require('../test/factories/user.factory.js');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
-
-describe("On Boarding API Endpoint", function() {
-  beforeEach(function(done) {
+describe('On Boarding API Endpoint', () => {
+  beforeEach((done) => {
     done();
   });
-  afterEach(function(done) {
+  afterEach((done) => {
     done();
   });
-  describe("Connect Stripe", function() {
-    it('should return a 200 when successful', function(done) {
-      done(new Error("Not Implemented"));
+  describe('Connect Stripe', () => {
+    it('should return a 200 when successful', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should return the sign in user', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return the sign in user', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should save the Stripe connect information to the user', function(done) {
-      done(new Error("Not Implemented"));
+    it('should save the Stripe connect information to the user', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should save the account_id returned by Stripe in the reference_id of the user', function(done) {
-      done(new Error("Not Implemented"));
+    it('should save the account_id returned by Stripe in the reference_id of the user', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should return an error if the json web token is invalid', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return an error if the json web token is invalid', (done) => {
+      done(new Error('Not Implemented'));
     });
   });
 });

@@ -1,89 +1,84 @@
 require('dotenv').config({ silent: true });
 
-var jwt    = require('jsonwebtoken');
-var User = require('../models/user');
-var randomstring = require("randomstring");
+const jwt = require('jsonwebtoken');
+const Account = require('../models/account');
+const Subscription = require('../models/subscription');
+const User = require('../models/user');
+const randomstring = require('randomstring');
 
-var FunnelController = {
-  Step1: function(req, res, next) {
-    var user = new User();
-    var full_name = req.body.name;
+const FunnelController = {
+  Step1: (req, res, next) => {
+    const user = new User();
+    const fullName = req.body.name;
 
-    var name = full_name.split(" ");
-    var first_name = name[0];
-    var last_name = name[1];
-    var email_address = "user+" + randomstring.generate() + "@membermoose.com";
-    var password = "password";
+    const name = fullName.split(' ');
+    const firstName = name[0];
+    const lastName = name[1];
+    const emailAddress = 'user+' + randomstring.generate() + '@membermoose.com';
+    const password = 'password';
 
-    user.first_name = first_name;
-    user.last_name = last_name;
-    user.email_address = email_address;
+    user.first_name = firstName;
+    user.last_name = lastName;
+    user.email_address = emailAddress;
     user.password = password;
 
-    user.roles.push("Bull");
+    user.roles.push('Bull');
 
-    user.save(function(err) {
-      if(err)
-        return res.status(400).send(err);
+    user.save((err) => {
+      if (err) { next(err); }
 
-      var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+      const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
 
-      res.status(200).json({success: true, token: token, user: user});
+      return res.status(200).json({ success: true, token, user });
     });
   },
-  Step2: function(req, res, next) {
-    var user = req.current_user;
+  Step2: (req, res, next) => {
+    const user = req.currentUser;
+    const account = new Account();
 
-    var account = new Account();
+    const companyName = req.body.company_name;
+    const subdomain = company_name.replace(/\W/g, '').toLowerCase();
 
-    var company_name = req.body.company_name;
-    var subdomain = company_name.replace(/\W/g, '').toLowerCase();
-
-    account.company_name = company_name;
+    account.company_name = companyName;
     account.subdomain = subdomain;
-    account.status = "Pending";
+    account.status = 'Pending';
 
-    account.save(function(err) {
-      if(err)
-        return res.status(400).send(err);
+    account.save((err) => {
+      if (err) { return next(err); }
 
-      SubscriptionHelper.getFreePlan(function(err, plan) {
-        if(err)
-          return res.status(400).send(err);
+      Subscription.getFreePlan((err, plan) => {
+        if (err) { return next(err); }
 
-        SubscriptionHelper.subscribeToPlan(user, plan, function(err, subscription) {
-          if(err)
-            return res.status(400).send(err);
+        Subscription.subscribeToPlan(user, plan, (err, subscription) => {
+          if (err) { return next(err); }
 
           account.subscription = subscription;
 
           user.account = account;
-          user.save(function(err) {
-            if(err)
-              return res.status(400).send(err);
+          user.save((err) => {
+            if (err) { return next(err); }
 
-            res.status(200).json(user);
+            return res.status(200).json(user);
           });
         });
       });
     });
   },
-  Step3: function(req, res, next) {
-    var user = req.current_user;
+  Step3: (req, res, next) => {
+    const user = req.currentUser;
 
-    var email_address = req.body.email_address;
-    var password = req.body.password;
+    const emailAddress = req.body.email_address;
+    const password = req.body.password;
 
-    user.email_address = email_address;
+    user.email_address = emailAddress;
     user.password = password;
 
-    user.save(function(err) {
-      if(err)
-        return res.status(400).send(err);
+    user.save((err) => {
+      if (err) { return next(err); }
 
-      res.status(200).json(user);
+      return res.status(200).json(user);
     });
-  }
-}
+  },
+};
 
-module.exports = FunnelController
+module.exports = FunnelController;

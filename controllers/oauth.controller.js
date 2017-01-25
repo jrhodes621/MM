@@ -1,28 +1,29 @@
 require('dotenv').config({ silent: true });
 
-var User = require('../models/user');
-var StripeOauthHelper = require("../services/stripe.oauth.services");
+const User = require('../models/user');
+const StripeOauthHelper = require('../services/stripe.oauth.services');
 
-var OAuthController = {
-  StripeConnectCallback: function(req, res, next) {
-    var code = req.query.code;
-    var userId = req.query.state;
+const OAuthController = {
+  StripeConnectCallback: (req, res, next) => {
+    const code = req.query.code;
+    const userId = req.query.state;
 
-    User.findById(userId,function(err, user) {
-      if(err) { return res.status(400).send({error: "User Not Found."}); }
+    User.findById(userId, (err, user) => {
+      if (err) { return next(err); }
 
-      StripeOauthHelper.getAccessToken(process.env.STRIPE_CONNECT_SECRET_KEY, code, function(err, response) {
-        if(err) { return res.status(400).send({error: err}); }
+      StripeOauthHelper.getAccessToken(process.env.STRIPE_CONNECT_SECRET_KEY, code,
+      (err, response) => {
+        if (err) { return next(err); }
 
         user.stripe_connect = JSON.parse(response);
-        user.save(function(err) {
-          if(err) { return res.status(400).send({error: err}); }
+        user.save((err) => {
+          if (err) { return next(err); }
 
-          res.status(200).redirect('/dashboard/plans');
+          return res.status(200).redirect('/dashboard/plans');
         });
       });
     });
-  }
-}
+  },
+};
 
-module.exports = OAuthController
+module.exports = OAuthController;

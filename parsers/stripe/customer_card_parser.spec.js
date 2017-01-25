@@ -1,6 +1,6 @@
 var expect                = require("chai").expect;
 var mongoose              = require("mongoose");
-var async                 = require("async");
+var async                 = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var PaymentCardFixtures       = require("../../test/fixtures/payment_card.fixtures.js");
@@ -13,10 +13,10 @@ var CustomerCardParser        = require("../../parsers/stripe/customer_card_pars
 
 var status = "Active";
 
-describe("Customer Card Parser", function() {
+describe("Customer Card Parser", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -43,17 +43,17 @@ describe("Customer Card Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Stripe Card", function() {
-    it("parses a Stripe Card JSON object into a card object", function(done) {
+  describe("Parse Stripe Card", () => {
+    it("parses a Stripe Card JSON object into a card object", (done) => {
       CustomerCardParser.parse(PaymentCardFixtures.StripeCard, function(err, payment_card) {
         if(err) { console.log(err); }
 

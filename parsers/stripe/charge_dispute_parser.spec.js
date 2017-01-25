@@ -1,6 +1,6 @@
 var expect                    = require("chai").expect;
 var mongoose                  = require("mongoose");
-var async                     = require("async");
+var async                     = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var ChargeFixtures            = require("../../test/fixtures/charge.fixtures.js");
@@ -15,14 +15,14 @@ var Charge                    = require("../../models/charge");
 
 var ChargeDisputeParser       = require("../../parsers/stripe/charge_dispute_parser");
 
-describe("Charge Dispute Parser", function() {
+describe("Charge Dispute Parser", () => {
   var bull = null;
   var user = null;
   var membership = null;
   var payment_card = null;
   var charge = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -63,17 +63,17 @@ describe("Charge Dispute Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Stripe Charge Dispute", function() {
-    it("parses a Stripe Charge dispute JSON object into a charge_dispute", function(done) {
+  describe("Parse Stripe Charge Dispute", () => {
+    it("parses a Stripe Charge dispute JSON object into a charge_dispute", (done) => {
       ChargeDisputeParser.parse(ChargeDisputeFixtures.StripeChargeDispute, function(err, charge_dispute) {
         if(err) { console.log(err); }
         expect(charge_dispute.reference_id).to.equal(ChargeDisputeFixtures.StripeChargeDispute.id);
@@ -89,8 +89,8 @@ describe("Charge Dispute Parser", function() {
         done(err);
       });
     });
-    it("returns error if the charge does not exist", function(done) {
-      Charge.remove({}, function() {
+    it("returns error if the charge does not exist", (done) => {
+      Charge.remove({}, () => {
         ChargeDisputeParser.parse(ChargeDisputeFixtures.StripeChargeDispute, function(err, charge_dispute) {
           expect(err).to.be.an('error');
 

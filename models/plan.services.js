@@ -1,11 +1,12 @@
 const Upload = require('s3-uploader');
+const Plan = require('../models/plan');
 
 const PlanServices = {
   GetPlans: (params, callback) => {
-    this.paginate(params.query, params.paging, callback);
+    this.Plan.paginate(params.query, params.paging, callback);
   },
   GetPlan: (params, callback) => {
-    this.findById(params.plan_id, callback);
+    Plan.findById(params.plan_id, callback);
   },
   SavePlan: (plan, callback) => {
     plan.save(callback);

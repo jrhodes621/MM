@@ -1,6 +1,6 @@
 var expect                = require("chai").expect;
 var mongoose              = require("mongoose");
-var async                 = require("async");
+var async                 = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var ChargeFixtures            = require("../../test/fixtures/charge.fixtures.js");
@@ -15,14 +15,14 @@ var ChargeParser              = require("../../parsers/stripe/charge_parser");
 
 var status = "succeeded";
 
-describe("Charge Parser", function() {
+describe("Charge Parser", () => {
   var bull = null;
   var user = null;
   var membership = null;
   var payment_card = null;
   var current_charge = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -56,17 +56,17 @@ describe("Charge Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Stripe Charge", function() {
-    it("parses a Stripe Charge JSON object into a charge object", function(done) {
+  describe("Parse Stripe Charge", () => {
+    it("parses a Stripe Charge JSON object into a charge object", (done) => {
       ChargeParser.parse(membership, ChargeFixtures.StripeCharge, status, function(err, charge) {
         if(err) { console.log(err); }
 

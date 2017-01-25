@@ -14,7 +14,7 @@ var StripeInvoiceParser               = require('../parsers/stripe/invoice_parse
 
 var StripeServices                    = require('../services/stripe.services');
 
-var async = require("async");
+var async = require('async');
 
 function processImport(bull, callback) {
   var imported_plans = [];
@@ -69,17 +69,17 @@ function processImport(bull, callback) {
         callback(err);
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, imported_plans, imported_subscriptions, imported_charges, imported_coupons, imported_invoices);
   });
 }
 function importPlans(bull, callback) {
-  var stripe_api_key = bull.stripe_connect.access_token;
+  var stripeApiKey = bull.stripe_connect.access_token;
   var all_plans = [];
 
   async.waterfall([
     function getStripePlans(callback) {
-      StripeServices.listPlans(stripe_api_key, function(err, stripe_plans) {
+      StripeServices.listPlans(stripeApiKey, function(err, stripe_plans) {
         callback(err, stripe_plans.data);
       });
     },
@@ -92,25 +92,25 @@ function importPlans(bull, callback) {
 
           callback(err, plan);
         });
-      }, function(err) {
+      }, (err) => {
         callback(err);
       });
     }
-  ], function(err) {
+  ], (err) => {
     console.log("Imported " + all_plans.length + " plan.");
 
     callback(err, all_plans);
   });
 }
 function importSubscriptions(bull, plans, callback) {
-  var stripe_api_key = bull.stripe_connect.access_token;
+  var stripeApiKey = bull.stripe_connect.access_token;
   var all_subscriptions_all_plans = [];
 
   async.eachSeries(plans, function(plan, callback) {
     var all_subscriptions = [];
     async.waterfall([
       function getSubscriptionsFromStripe(callback) {
-        StripeServices.listSubscriptions(stripe_api_key, plan.reference_id, null, [], callback);
+        StripeServices.listSubscriptions(stripeApiKey, plan.reference_id, null, [], callback);
       },
       function parseSubscriptions(stripe_subscriptions, callback) {
         async.eachSeries(stripe_subscriptions, function(stripe_subscription, callback) {
@@ -119,31 +119,31 @@ function importSubscriptions(bull, plans, callback) {
 
             callback(err, subscription);
           });
-        }, function(err) {
+        }, (err) => {
           callback(err);
         })
       }
-    ], function(err) {
+    ], (err) => {
       console.log("Imported " + all_subscriptions.length + " subscriptions for " + plan.name + " plan.");
       all_subscriptions_all_plans.push.apply(all_subscriptions_all_plans, all_subscriptions);
 
       callback(err);
     });
-  }, function(err) {
+  }, (err) => {
     console.log("Imported " + all_subscriptions_all_plans.length + " subscriptions for all " + plans.length + " plans.");
 
     callback(err, all_subscriptions_all_plans);
   });
 }
 function importCharges(bull, subscriptions, callback) {
-  var stripe_api_key = bull.stripe_connect.access_token;
+  var stripeApiKey = bull.stripe_connect.access_token;
   var all_charges_all_memberships = [];
 
   async.eachSeries(subscriptions, function(subscription, callback) {
     var all_charges = [];
     async.waterfall([
       function getStripeCharges(callback) {
-        StripeServices.listCharges(stripe_api_key, subscription.membership.reference_id, function(err, stripe_charges) {
+        StripeServices.listCharges(stripeApiKey, subscription.membership.reference_id, function(err, stripe_charges) {
           callback(err, stripe_charges.data, subscription.membership);
         });
       },
@@ -154,29 +154,29 @@ function importCharges(bull, subscriptions, callback) {
 
             callback(err)
           })
-        }, function(err) {
+        }, (err) => {
           callback(err, all_charges)
         })
       }
-    ], function(err) {
+    ], (err) => {
       console.log("Imported " + all_charges.length + " charges for " + subscription.membership.user.email_address + ".");
 
       all_charges_all_memberships.push.apply(all_charges_all_memberships, all_charges);
       callback(err);
     });
-  }, function(err) {
+  }, (err) => {
     console.log("Imported " + all_charges_all_memberships.length + " charges.");
 
     callback(err, all_charges_all_memberships);
   });
 }
 function importCoupons(bull, callback) {
-  var stripe_api_key = bull.stripe_connect.access_token;
+  var stripeApiKey = bull.stripe_connect.access_token;
   var all_coupons = [];
 
   async.waterfall([
     function getStripeCoupons(callback) {
-      StripeServices.listCoupons(stripe_api_key, function(err, stripe_coupons) {
+      StripeServices.listCoupons(stripeApiKey, function(err, stripe_coupons) {
         callback(err, stripe_coupons);
       });
     },
@@ -187,25 +187,25 @@ function importCoupons(bull, callback) {
 
           callback(err)
         })
-      }, function(err) {
+      }, (err) => {
         callback(err);
       })
     }
-  ], function(err) {
+  ], (err) => {
     console.log("Imported " + all_coupons.length + " coupons.");
 
     callback(err, all_coupons);
   });
 }
 function importInvoices(bull, subscriptions, callback) {
-  var stripe_api_key = bull.stripe_connect.access_token;
+  var stripeApiKey = bull.stripe_connect.access_token;
   var all_invoices_all_memberships = [];
 
   async.eachSeries(subscriptions, function(subscription, callback) {
     var all_invoices = [];
     async.waterfall([
       function getStripeCharges(callback) {
-        StripeServices.listInvoices(stripe_api_key, subscription.membership.reference_id, function(err, stripe_invoices) {
+        StripeServices.listInvoices(stripeApiKey, subscription.membership.reference_id, function(err, stripe_invoices) {
           callback(err, stripe_invoices.data, subscription.membership);
         });
       },
@@ -216,17 +216,17 @@ function importInvoices(bull, subscriptions, callback) {
 
             callback(err)
           })
-        }, function(err) {
+        }, (err) => {
           callback(err)
         })
       }
-    ], function(err) {
+    ], (err) => {
       console.log("Imported " + all_invoices.length + " invoices for " + subscription.membership.user.email_address + ".");
 
       all_invoices_all_memberships.push.apply(all_invoices_all_memberships, all_invoices);
       callback(err);
     });
-  }, function(err) {
+  }, (err) => {
     console.log("Imported " + all_invoices_all_memberships.length + " invoices.");
 
     callback(err, all_invoices_all_memberships);

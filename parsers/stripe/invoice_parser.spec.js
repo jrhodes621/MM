@@ -1,6 +1,6 @@
 var expect                = require("chai").expect;
 var mongoose              = require("mongoose");
-var async                 = require("async");
+var async                 = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var ChargeFixtures            = require("../../test/fixtures/charge.fixtures.js");
@@ -14,14 +14,14 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var InvoiceParser             = require("../../parsers/stripe/invoice_parser");
 
-describe("Invoice Parser", function() {
+describe("Invoice Parser", () => {
   var bull = null;
   var user = null;
   var membership = null;
   var payment_card = null;
   var current_charge = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -55,17 +55,17 @@ describe("Invoice Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Invoice", function() {
-    it("parses a Invoice JSON object into a invoice object", function(done) {
+  describe("Parse Invoice", () => {
+    it("parses a Invoice JSON object into a invoice object", (done) => {
       InvoiceParser.parse(bull, InvoiceFixtures.StripeInvoice, membership, function(err, invoice) {
         if(err) { console.log(err); }
         //expect(charge.card_info).to.equal(stripe_charge.card_info);

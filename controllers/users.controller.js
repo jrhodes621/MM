@@ -1,98 +1,88 @@
-var Account = require('../models/account');
-var Plan = require('../models/plan');
-var Subscription = require('../models/subscription');
-var User = require('../models/user');
+const Account = require('../models/account');
+const Subscription = require('../models/subscription');
+const User = require('../models/user');
+const security = require('../security');
+const StripeServices = require('../services/stripe.services');
 
-var security      = require('../security');
+const UsersController = {
+  CreateUser: (req, res, next) => {
+    const emailAddress = req.body.email_address;
+    const password = req.body.password;
+    const role = req.body.role;
+    const companyName = req.body.company_name;
+    const subdomain = companyName.replace(/\W/g, '').toLowerCase();
+    const firstName = req.body.first_name;
+    const lastName = req.body.last_name;
 
-var UsersController = {
-  CreateUser: function(req, res, next) {
-    var email_address = req.body.email_address;
-    var password = req.body.password;
-    var role = req.body.role;
-    var company_name = req.body.company_name;
-    var subdomain = company_name.replace(/\W/g, '').toLowerCase();
-    var first_name = req.body.first_name;
-    var last_name = req.body.last_name;
+    User.findOne({ email_address: emailAddress }, (err, duplicateUser) => {
+      if (err) { return next(err); }
+      if (duplicateUser) { return next(new Error('Email Address is already in user')); }
 
-    User.findOne({email_address : email_address}, function (err, user) {
-      if(err) { return next(err) }
-      if(user) { return next(new Error("Email Address is already in user")) }
+      const user = new User();
 
-      var user = new User();
-
-      console.log(req.body);
-      user.email_address = email_address;
+      user.email_address = emailAddress;
       user.password = password;
-      user.first_name = first_name;
-      user.last_name = last_name;
+      user.first_name = firstName;
+      user.last_name = lastName;
       user.roles.push(role);
-      user.status = "Pending";
+      user.status = 'Pending';
 
-      var account = new Account();
-      account.company_name = company_name;
+      const account = new Account();
+      account.companyName = companyName;
       account.subdomain = subdomain;
-      account.status = "Pending"
+      account.status = 'Pending';
 
-      Subscription.GetMemberMooseFreePlan(function(err, plan) {
-        if(err) {
-          console.log(err);
-          return res.status(400).send(err);
-        }
-        console.log(plan);
-        if(!plan) {
-          console.log("Membermoose Free Plan Not Found, so we'll create a user with no subscriptions!");
+      Subscription.GetMemberMooseFreePlan((err, plan) => {
+        if (err) { return res.status(400).send(err); }
+        if (!plan) {
+          if (req.file) {
+            User.UploadAvatar(user, req.file.path, (avatarImages) => {
+              account.avatar = avatarImages;
 
-          if(req.file) {
-            User.UploadAvatar(user, req.file.path, function(avatar_images) {
-              account.avatar = avatar_images;
-
-              account.save(function(err) {
-                if(err) { return next(err); }
+              account.save((err) => {
+                if (err) { return next(err); }
 
                 user.account = account;
-                user.save(function(err) {
-                  if(err) { return next(err); }
+                user.save((err) => {
+                  if (err) { return next(err); }
 
-                  security.generate_token(user, process.env.SECRET, function(err, token) {
-                    if(err) { return next(err); }
+                  security.generate_token(user, process.env.SECRET, (err, token) => {
+                    if (err) { return next(err); }
 
-                    res.status(201).json({success: true, token: token, user_id: user._id});
+                    return res.status(201).json({ success: true, token, user_id: user._id });
                   });
                 });
               });
             });
           } else {
-            account.save(function(err) {
-              if(err) { return next(err); }
+            account.save((err) => {
+              if (err) { return next(err); }
 
               user.account = account;
-              user.save(function(err) {
-                if(err) { return next(err); }
+              user.save((err) => {
+                if (err) { return next(err); }
 
-                security.generate_token(user, process.env.SECRET, function(err, token) {
-                  if(err) { return next(err); }
+                security.generate_token(user, process.env.SECRET, (err, token) => {
+                  if (err) { return next(err); }
 
-                  res.status(201).json({success: true, token: token, user_id: user._id});
+                  return res.status(201).json({ success: true, token, user_id: user._id });
                 });
               });
             });
           }
         } else {
-          console.log(plan);
-          var stripe_api_key = plan.user.account.stripe_connect.access_token;
-          StripeServices.createCustomer(stripe_api_key, user, plan, function(err, customer) {
+          const stripeApiKey = plan.user.account.stripe_connect.access_token;
 
-            var numberOfSubscriptions = customer.subscriptions.data.length;
-            customer.subscriptions.data.forEach(function(stripe_subscription) {
-              var subscription = new Subscription();
+          StripeServices.createCustomer(stripeApiKey, user, plan, (err, customer) => {
+            customer.subscriptions.data.forEach((stripeSubscription) => {
+              const subscription = new Subscription();
               subscription.plan = plan;
-              subscription.reference_id = stripe_subscription.id;
-              subscription.subscription_created_at = stripe_subscription.created_at;
-              subscription.subscription_canceled_at = stripe_subscription.canceled_at;
-              subscription.trial_start = stripe_subscription.trial_start;
-              subscription.trial_end = stripe_subscription.trial_end;
-              subscription.status = stripe_subscription.status;
+              subscription.reference_id = stripeSubscription.id;
+              subscription.subscription_created_at = stripeSubscription.created_at;
+              subscription.subscription_canceled_at = stripeSubscription.canceled_at;
+              subscription.trial_start = stripeSubscription.trial_start;
+              subscription.trial_end = stripeSubscription.trial_end;
+              subscription.status = stripeSubscription.status;
 
               user.memberships.push({
                 reference_id: customer.id,
@@ -100,53 +90,55 @@ var UsersController = {
                 company_name: plan.user.account.company_name,
                 plan_names: [plan.name],
                 member_since: customer.created,
-                subscription: subscription
-              })
-              user.status = "Active";
+                subscription,
+              });
+              user.status = 'Active';
 
-              subscription.save(function(err) {
-                if(err) { return next(err); }
+              subscription.save((err) => {
+                if (err) { return next(err); }
 
                 plan.user.members.push(user);
 
-                if(req.file) {
-                  User.UploadAvatar(user, req.file.path, function(avatar_images) {
-                    account.avatar = avatar_images;
+                if (req.file) {
+                  User.UploadAvatar(user, req.file.path, (avatarImages) => {
+                    account.avatar = avatarImages;
 
-                    account.save(function(err) {
-                      if(err) { return next(err); }
+                    account.save((err) => {
+                      if (err) { return next(err); }
 
                       user.account = account;
-                      user.save(function(err) {
-                        if(err) { return next(err); }
+                      user.save((err) => {
+                        if (err) { return next(err); }
 
-                        plan.user.save(function(err) {
-                          if(err) { return next(err); }
+                        plan.user.save((err) => {
+                          if (err) { return next(err); }
 
-                          security.generate_token(user, process.env.SECRET, function(err, token) {
-                            if(err) { return next(err); }
+                          security.generate_token(user, process.env.SECRET, (err, token) => {
+                            if (err) { return next(err); }
 
-                            res.status(201).json({success: true, token: token, user_id: user._id});
+                            return res.status(201).json({ success: true, token, user_id: user._id});
                           });
                         })
                       });
                     });
                   })
                 } else {
-                  account.save(function(err){
-                    if(err) { return next(err); }
+                  account.save((err) => {
+                    if (err) { return next(err); }
 
                     user.account = account;
-                    user.save(function(err) {
-                      if(err) { return next(err); }
+                    user.save((err) => {
+                      if (err) { return next(err); }
 
-                      plan.user.save(function(err) {
-                        if(err) { return next(err); }
+                      plan.user.save((err) => {
+                        if (err) { return next(err); }
 
-                        var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: 18000 });
+                        const token = jwt.sign({ _id: user._id },
+                          process.env.SECRET,
+                          { expiresIn: 18000 });
 
-                        res.status(201).json({success: true, token: token, user_id: user._id});
-                      })
+                        return res.status(201).json({ success: true, token, user_id: user._id });
+                      });
                     });
                   });
                 }
@@ -154,37 +146,37 @@ var UsersController = {
             });
           });
         }
-      })
+      });
     });
   },
-  UpdateUser: function(req, res, next) {
-    User.findById(req.params.user_id, function(err, user) {
-      if(err) { return next(err); }
-
-      if(!user) { return next(new Error("User not found")); }
+  UpdateUser: (req, res, next) => {
+    User.findById(req.params.user_id, (err, user) => {
+      if (err) { return next(err); }
+      if (!user) { return next(new Error('User not found')); }
 
       user.first_name = req.body.first_name;
       user.last_name = req.body.last_name;
       user.email_address = req.body.email_address;
-      if(req.body.password) {
+
+      if (req.body.password) {
         user.password = req.body.password;
       }
 
-      if(req.file) {
-        User.UploadAvatar(user, req.file.path, function(avatar_images) {
-          user.avatar = avatar_images;
+      if (req.file) {
+        User.UploadAvatar(user, req.file.path, (avatarImages) => {
+          user.avatar = avatarImages;
 
-          user.save(function(err) {
-            if(err) { return next(err); }
+          user.save((err) => {
+            if (err) { return next(err); }
 
-            res.status(200).json(user);
+            return res.status(200).json(user);
           });
         });
       } else {
-        res.status(200).json(user);
+        return res.status(200).json(user);
       }
     });
-  }
-}
+  },
+};
 
-module.exports = UsersController
+module.exports = UsersController;

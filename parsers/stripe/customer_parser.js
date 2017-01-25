@@ -2,7 +2,7 @@ var Membership            = require('../../models/membership');
 var User                  = require('../../models/user');
 var PaymentCard           = require('../../models/payment_card');
 var Subscription          = require('../../models/subscription');
-var async                 = require("async");
+var async                 = require('async');
 
 function parse(bull, stripe_customer, callback) {
   var result = null;
@@ -28,7 +28,7 @@ function parse(bull, stripe_customer, callback) {
       user.reference_id = stripe_customer.id
       user.status = "Active"
 
-      user.save(function(err) {
+      user.save((err) => {
         callback(err, user);
       });
     },
@@ -47,7 +47,7 @@ function parse(bull, stripe_customer, callback) {
       membership.account = bull;
       membership.member_since = stripe_customer.created;
 
-      membership.save(function(err) {
+      membership.save((err) => {
         if (user.memberships.indexOf(membership._id) === -1) {
             user.memberships.push(membership);
         }
@@ -82,8 +82,8 @@ function parse(bull, stripe_customer, callback) {
         callback(err);
       });
     }
-  ], function(err) {
-    result.save(function(err) {
+  ], (err) => {
+    result.save((err) => {
       callback(err, result);
     })
   });

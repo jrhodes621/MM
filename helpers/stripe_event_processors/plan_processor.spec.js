@@ -1,6 +1,6 @@
 var expect                    = require("chai").expect;
 var mongoose                  = require("mongoose");
-var async                     = require("async");
+var async                     = require('async');
 
 var StripeWebhookFixtures     = require("../../test/fixtures/stripe/webhooks/plan.fixtures.js");
 var AccountFixtures            = require("../../test/fixtures/account.fixtures.js");
@@ -9,10 +9,10 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var PlanProcessor             = require("../stripe_event_processors/plan_processor.js");
 
-describe("stripe plan webhooks", function() {
+describe("stripe plan webhooks", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     async.waterfall([
       function openConnection(callback) {
         BeforeHooks.SetupDatabase(callback)
@@ -24,17 +24,17 @@ describe("stripe plan webhooks", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   })
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("plan created", function() {
-    it("should create new plan", function(done) {
+  describe("plan created", () => {
+    it("should create new plan", (done) => {
       var stripe_event = StripeWebhookFixtures.Created;
 
       PlanProcessor.processCreated(stripe_event, bull, function(err, plan) {
@@ -54,8 +54,8 @@ describe("stripe plan webhooks", function() {
     //
     // }
   });
-  describe("plan updated", function() {
-    it("should find and update the plan", function(done) {
+  describe("plan updated", () => {
+    it("should find and update the plan", (done) => {
       var stripe_event = StripeWebhookFixtures.Updated;
 
       PlanProcessor.processUpdated(stripe_event, bull, function(err, plan, activities) {
@@ -80,8 +80,8 @@ describe("stripe plan webhooks", function() {
     //
     // }
   });
-  describe("plan deleted", function() {
-    it("should update the archive flag to true", function(done) {
+  describe("plan deleted", () => {
+    it("should update the archive flag to true", (done) => {
       var stripe_event = StripeWebhookFixtures.Deleted;
 
       PlanProcessor.processDeleted(stripe_event, bull, function(err, plan, activities) {

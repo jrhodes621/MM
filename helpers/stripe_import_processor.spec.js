@@ -9,15 +9,15 @@ var ChargeDisputeParser   = require("../parsers/stripe/charge_dispute_parser");
 var StripeImportProcessor     = require('../helpers/stripe_import_processor');
 var expect                    = require("chai").expect;
 var mongoose                  = require("mongoose");
-var async                     = require("async");
+var async                     = require('async');
 
 var AccountFixtures           = require("../test/fixtures/account.fixtures.js");
-var BeforeHooks               = require("../test/hooks/before.hooks.js");
-var AfterHooks                = require("../test/hooks/after.hooks.js");
+var BeforeHooks               = require('../test/hooks/before.hooks.js');
+var AfterHooks                = require('../test/hooks/after.hooks.js');
 
 var StripeServices            = require('../services/stripe.services');
 
-describe("Stripe Import Processor", function() {
+describe("Stripe Import Processor", () => {
   var bull = null;
   var number_of_plans = null;
   var number_of_subscriptions = null;
@@ -25,7 +25,7 @@ describe("Stripe Import Processor", function() {
   var number_of_coupons = null;
   var number_of_invoices = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     async.waterfall([
       function openConnection(callback) {
         BeforeHooks.SetupDatabase(callback)
@@ -37,19 +37,19 @@ describe("Stripe Import Processor", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   })
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Import Account", function() {
+  describe("Import Account", () => {
     this.timeout(600000);
 
-    it("should import from stripe", function(done) {
+    it("should import from stripe", (done) => {
       StripeImportProcessor.processImport(bull, function(err,  plans, subscriptions, charges, coupons, invoices) {
         if(err) { console.log(err); }
 

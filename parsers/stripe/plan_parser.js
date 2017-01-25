@@ -1,5 +1,5 @@
 var Plan      = require('../../models/plan');
-var async     = require("async");
+var async     = require('async');
 
 function parse(bull, stripe_plan, callback) {
   var result = null;
@@ -22,13 +22,13 @@ function parse(bull, stripe_plan, callback) {
       plan.statement_descriptor = stripe_plan.statement_descriptor;
       plan.trial_period_days = stripe_plan.trial_period_days || 0;
 
-      plan.save(function(err) {
+      plan.save((err) => {
         result = plan;
 
         if(bull.plans.indexOf(plan._id) === -1) {
           bull.plans.push(plan);
 
-          bull.save(function(err) {
+          bull.save((err) => {
             callback(err)
           })
         } else {
@@ -36,7 +36,7 @@ function parse(bull, stripe_plan, callback) {
         }
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   });
 }

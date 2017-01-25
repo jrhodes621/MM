@@ -11,7 +11,7 @@ module.exports = {
     };
 
     var service = new apn.Provider(options);
-    service.on("connected", function() {
+    service.on("connected", () => {
         console.log("Connected");
     });
     service.on("transmitted", function(notification, device) {
@@ -26,7 +26,7 @@ module.exports = {
     service.on("timeout", function () {
         console.log("Connection Timeout");
     });
-    service.on("disconnected", function() {
+    service.on("disconnected", () => {
         console.log("Disconnected from APNS");
     });
     service.on("socketError", console.error);

@@ -1,7 +1,7 @@
 const Plan = require('../models/plan');
 
 const SubscriptionServices = {
-  SubscribeToPlan: (membership, plan, referenceId, callback) => {
+  SubscribeToPlan: function(membership, plan, referenceId, callback) {
     const subscription = new this();
 
     subscription.plan = plan;
@@ -13,7 +13,7 @@ const SubscriptionServices = {
 
     subscription.save(callback);
   },
-  GetSubscriptionByReferenceId: (referenceId, callback) => {
+  GetSubscriptionByReferenceId: function(referenceId, callback) {
     this.findOne({ reference_id: referenceId })
     .populate('plan')
     .populate({

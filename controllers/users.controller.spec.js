@@ -1,44 +1,39 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
+const User = require('../models/user');
 
-var User = require('../models/user');
-
-describe("Users API Endpoint", function() {
-  var user = null;
-
-  beforeEach(function(done) {
+describe('Users API Endpoint', () => {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
-        BeforeHooks.SetupDatabase(callback)
-      }
-    ], function(err) {
+        BeforeHooks.SetupDatabase(callback);
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Create User", function() {
-    it('should return 201 when succeeds', function(done) {
+  describe('Create User', () => {
+    it('should return 201 when succeeds', (done) => {
       request(app)
       .post('/api/users')
       .send({
-        "company_name": "ABC Company",
-        "email_address": "test@demo.com",
-        "password": "test123",
-        "first_name": "Test",
-        "last_name": "User",
-        "role": "Bull"
+        company_name: 'ABC Company',
+        email_address: 'test@demo.com',
+        password: 'test123',
+        first_name: 'Test',
+        last_name: 'User',
+        role: 'Bull',
       })
       .expect(201)
       .then((res) => {
@@ -50,16 +45,16 @@ describe("Users API Endpoint", function() {
         done();
       });
     });
-    it('should return a jwt token and user id', function(done) {
+    it('should return a jwt token and user id', (done) => {
       request(app)
       .post('/api/users')
       .send({
-        "company_name": "ABC Company",
-        "email_address": "test@demo.com",
-        "password": "test123",
-        "first_name": "Test",
-        "last_name": "User",
-        "role": "Bull"
+        company_name: 'ABC Company',
+        email_address: 'test@demo.com',
+        password: 'test123',
+        first_name: 'Test',
+        last_name: 'User',
+        role: 'Bull',
       })
       .expect(201)
       .then((res) => {
@@ -70,86 +65,86 @@ describe("Users API Endpoint", function() {
         done();
       });
     });
-    it('should create new user', function(done) {
+    it('should create new user', (done) => {
       request(app)
       .post('/api/users')
       .send({
-        "company_name": "ABC Company",
-        "email_address": "test@demo.com",
-        "password": "test123",
-        "first_name": "Test",
-        "last_name": "User",
-        "role": "Bull"
+        company_name: 'ABC Company',
+        email_address: 'test@demo.com',
+        password: 'test123',
+        first_name: 'Test',
+        last_name: 'User',
+        role: 'Bull',
       })
       .expect(201)
       .then((res) => {
-        var user_id = res.body.user_id;
+        const userId = res.body.user_id;
 
-        User.findById(user_id, function(err, user) {
-          expect(user.email_address).to.equal("test@demo.com");
+        User.findById(userId, (err, user) => {
+          expect(user.email_address).to.equal('test@demo.com');
 
           done(err);
         });
       });
     });
-    it('should create new account', function(done) {
+    it('should create new account', (done) => {
       request(app)
       .post('/api/users')
       .send({
-        "company_name": "ABC Company",
-        "email_address": "test@demo.com",
-        "password": "test123",
-        "first_name": "Test",
-        "last_name": "User",
-        "role": "Bull"
+        company_name: 'ABC Company',
+        email_address: 'test@demo.com',
+        password: 'test123',
+        first_name: 'Test',
+        last_name: 'User',
+        role: 'Bull',
       })
       .expect(201)
       .then((res) => {
-        var user_id = res.body.user_id;
+        const userId = res.body.user_id;
 
-        User.findById(user_id)
+        User.findById(userId)
         .populate('account')
-        .exec(function(err, user) {
-          console.log(user);
-
+        .exec((err, user) => {
           expect(user).to.have.property('account');
-          expect(user.account.company_name).to.equal("ABC Company");
+          expect(user.account.company_name).to.equal('ABC Company');
 
           done(err);
         });
       });
     });
-    it('should create a Stripe customer if bull is connected to stripe', function(done) {
-      done(new Error("Not Implemented"));
+    it('should create a Stripe customer if bull is connected to stripe', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should return a 404 if the email address is already used' , function(done) {
-      let user = factory.buildSync('user');
+    it('should return a 404 if the email address is already used', (done) => {
+      const user = factory.buildSync('user');
 
-      user.save(function(err) {
+      user.save((err) => {
         request(app)
         .post('/api/users')
         .send({
-          "company_name": "ABC Company",
-          "email_address": user.email_address,
-          "password": "test123",
-          "first_name": "Test",
-          "last_name": "User",
-          "role": "Bull"
+          company_name: 'ABC Company',
+          email_address: user.email_address,
+          password: 'test123',
+          first_name: 'Test',
+          last_name: 'User',
+          role: 'Bull',
         })
         .expect(201)
         .then((res) => {
           expect(res.body).to.be.an('object');
           expect(res.body.sucucess).to.equal(false);
+
+          done(err);
         });
       });
     });
-    it('should subscribe the user to the Membermoose free plan' , function(done) {
-      done(new Error("Not Implemented"));
+    it('should subscribe the user to the Membermoose free plan', (done) => {
+      done(new Error('Not Implemented'));
     });
   });
-  describe("Update User", function() {
-    it('should return a 200 when successful', function(done) {
-      done(new Error("Not Implemented"));
+  describe('Update User', () => {
+    it('should return a 200 when successful', (done) => {
+      done(new Error('Not Implemented'));
     });
   });
-})
+});

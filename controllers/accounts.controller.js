@@ -1,30 +1,29 @@
-var Account = require('../models/account');
-var User = require('../models/user');
+const Account = require('../models/account');
 
-var AccountsController = {
-  UpdateAccount: function(req, res, next) {
-    var current_user = req.current_user;
+const AccountsController = {
+  UpdateAccount: (req, res, next) => {
+    const currentUser = req.currentUser;
 
-    current_user.account.company_name = req.body.company_name;
-    current_user.account.subdomain = req.body.subdomain;
+    currentUser.account.company_name = req.body.company_name;
+    currentUser.account.subdomain = req.body.subdomain;
 
-    if(req.file) {
-      Account.UploadAvatar(current_user.account, req.file.path, function(avatar_images) {
-        current_user.account.avatar = avatar_images;
-        Account.SaveAccount(current_user.account, function(err) {
-          if(err) { return next(err); }
+    if (req.file) {
+      Account.UploadAvatar(currentUser.account, req.file.path, (avatarImages) => {
+        currentUser.account.avatar = avatarImages;
+        Account.SaveAccount(currentUser.account, (err) => {
+          if (err) { return next(err); }
 
-          res.json(current_user.account);
+          return res.json(currentUser.account);
         });
       });
     } else {
-      Account.SaveAccount(current_user.account, function(err) {
-        if(err) { return next(err); }
+      Account.SaveAccount(currentUser.account, (err) => {
+        if (err) { return next(err); }
 
-        res.json(current_user.account);
+        return res.json(currentUser.account);
       });
     }
-  }
-}
+  },
+};
 
-module.exports = AccountsController
+module.exports = AccountsController;

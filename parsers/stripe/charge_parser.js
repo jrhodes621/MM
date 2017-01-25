@@ -1,6 +1,6 @@
 var Charge                    = require('../../models/charge');
 var PaymentCard               = require('../../models/payment_card');
-var async                     = require("async");
+var async                     = require('async');
 var StripeCustomerCardParser  = require('../../parsers/stripe/customer_card_parser');
 
 
@@ -52,13 +52,13 @@ function parse(membership, stripe_charge, status, callback) {
       charge.membership = membership._id;
       charge.payment_card = payment_card;
 
-      charge.save(function(err) {
+      charge.save((err) => {
         result = charge;
 
         callback(err, charge);
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   });
 }

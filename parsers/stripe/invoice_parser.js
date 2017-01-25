@@ -10,11 +10,11 @@ var SubscriptionParser  = require('../../parsers/stripe/customer_subscription_pa
 
 var StripeServices      = require('../../services/stripe.services');
 
-var async               = require("async");
+var async               = require('async');
 
 function parse(bull, stripe_invoice, membership, callback) {
   var result = null;
-  var stripe_api_key = bull.stripe_connect.access_token;
+  var stripeApiKey = bull.stripe_connect.access_token;
 
   async.waterfall([
     function getMembership(callback) {
@@ -32,7 +32,7 @@ function parse(bull, stripe_invoice, membership, callback) {
       if(stripe_invoice.charge) {
         Charge.findOne({"reference_id": stripe_invoice.charge }, function(err, charge) {
           if(!charge) {
-            StripeServices.getCharge(stripe_api_key, stripe_invoice.charge, function(err, stripe_charge) {
+            StripeServices.getCharge(stripeApiKey, stripe_invoice.charge, function(err, stripe_charge) {
               if(err) { return callback(err, null, membership); }
               if(!stripe_charge) { return callback(new Error("Unable to retrieve charge from Stripe"), null, membership); }
 
@@ -102,13 +102,13 @@ function parse(bull, stripe_invoice, membership, callback) {
       invoice.tax_percent = stripe_invoice.tax_percent;
       invoice.total = stripe_invoice.total;
 
-      invoice.save(function(err) {
+      invoice.save((err) => {
         result = invoice;
 
         callback(err);
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   });
 }

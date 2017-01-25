@@ -1,39 +1,37 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
+describe('Me API Endpoint', () => {
+  let user = null;
 
-describe("Me API Endpoint", function() {
-  var user = null;
-
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
-        BeforeHooks.SetupDatabase(callback)
-      }
-    ], function(err) {
+        BeforeHooks.SetupDatabase(callback);
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Get User", function() {
-    it('should return a 200 when session is valid', function(done) {
+  describe('Get User', () => {
+    it('should return a 200 when session is valid', (done) => {
       let user = factory.buildSync('user');
 
-      user.save(function(err) {
-        if(err) { console.log(err); }
+      user.save((err) => {
+        if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
+        security.generate_token(user, process.env.SECRET, (err, token) => {
           request(app)
           .get('/api/me')
           .set('x-access-token', token)
@@ -45,19 +43,21 @@ describe("Me API Endpoint", function() {
           });
         });
       });
-    })
-    it('should return a 403 when session is invalid', function(done) {
+    });
+    it('should return a 403 when session is invalid', (done) => {
       let user = factory.buildSync('user');
 
-      user.save(function(err) {
-        if(err) { console.log(err); }
+      user.save((err) => {
+        if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
-          var bad_token = "abc";
+        security.generate_token(user, process.env.SECRET, (err, token) => {
+          if (err) { done(err); }
+
+          const badToken = 'abc';
 
           request(app)
           .get('/api/me')
-          .set('x-access-token', bad_token)
+          .set('x-access-token', badToken)
           .expect(403)
           .then((res) => {
             expect(res.body).to.be.an('object');
@@ -66,14 +66,14 @@ describe("Me API Endpoint", function() {
           });
         });
       });
-    })
-    it('should return a User when session is valid', function(done) {
+    });
+    it('should return a User when session is valid', (done) => {
       let user = factory.buildSync('user');
 
-      user.save(function(err) {
-        if(err) { console.log(err); }
+      user.save((err) => {
+        if (err) { done(err); }
 
-        security.generate_token(user, process.env.SECRET, function(err, token) {
+        security.generate_token(user, process.env.SECRET, (err, token) => {
           request(app)
           .get('/api/me')
           .set('x-access-token', token)
@@ -85,6 +85,6 @@ describe("Me API Endpoint", function() {
           });
         });
       });
-    })
+    });
   });
 });

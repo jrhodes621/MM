@@ -1,26 +1,25 @@
 require('dotenv').config({ silent: true });
 
-var Message = require('../models/message');
-var User = require('../models/user');
+const Message = require('../models/message');
 
-var MessagesController = {
-  GetMessages: function(req, res, next) {
-    var recipient = req.current_user;
+const MessagesController = {
+  GetMessages: (req, res, next) => {
+    const recipient = req.currentUser;
 
-    Message.find({"recipient": recipient})
+    Message.find({ recipient })
     .populate('sender')
     .populate({
       path: 'sender',
       populate: [{
-        path: 'account'
-      }]
+        path: 'account',
+      }],
     })
-    .exec(function(err, messages) {
-      if(err) { next(err); }
+    .exec((err, messages) => {
+      if (err) { next(err); }
 
-      res.status(200).send(messages);
+      return res.status(200).send(messages);
     });
-  }
-}
+  },
+};
 
-module.exports = MessagesController
+module.exports = MessagesController;

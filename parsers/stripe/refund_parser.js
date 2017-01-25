@@ -1,6 +1,6 @@
 var Charge      = require('../../models/charge');
 var Refund      = require('../../models/refund');
-var async       = require("async");
+var async       = require('async');
 
 function parse(stripe_refund, callback) {
   var result = null;
@@ -32,13 +32,13 @@ function parse(stripe_refund, callback) {
       refund.receipt_number = stripe_refund.receipt_number;
       refund.status = stripe_refund.status;
 
-      refund.save(function(err) {
+      refund.save((err) => {
         result = refund;
 
         callback(err);
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   });
 }

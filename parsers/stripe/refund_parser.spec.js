@@ -1,6 +1,6 @@
 var expect                    = require("chai").expect;
 var mongoose                  = require("mongoose");
-var async                     = require("async");
+var async                     = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var ChargeFixtures            = require("../../test/fixtures/charge.fixtures.js");
@@ -18,14 +18,14 @@ var RefundParser          = require("../../parsers/stripe/refund_parser");
 
 var charge_id = "ch_1754tJ4IZxLlgOpC0AhdTwTn";
 
-describe("Refund Parser", function() {
+describe("Refund Parser", () => {
   var bull = null;
   var user = null;
   var membership = null;
   var payment_card = null;
   var charge = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -66,17 +66,17 @@ describe("Refund Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Stripe Refund", function() {
-    it("parses a Stripe Refund JSON object into a refund object", function(done) {
+  describe("Parse Stripe Refund", () => {
+    it("parses a Stripe Refund JSON object into a refund object", (done) => {
       RefundParser.parse(RefundFixtures.StripeRefund, function(err, refund) {
         if(err) { console.log(err); }
 

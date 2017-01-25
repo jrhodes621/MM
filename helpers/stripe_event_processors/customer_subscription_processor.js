@@ -18,7 +18,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      var stripe_api_key = membership.account.stripe_connect.access_token;
+      var stripeApiKey = membership.account.stripe_connect.access_token;
 
       Subscription.GetMembershipByReferenceId(subscription_id, function(err, subscription) {
         if(err) { return callback(err, null); }
@@ -48,7 +48,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      var stripe_api_key = membership.account.stripe_connect.access_token;
+      var stripeApiKey = membership.account.stripe_connect.access_token;
 
       Subscription.GetMembershipByReferenceId(subscription_id, function(err, subscription) {
         if(err) { return callback(err, null); }
@@ -76,7 +76,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      var stripe_api_key = membership.account.stripe_connect.access_token;
+      var stripeApiKey = membership.account.stripe_connect.access_token;
 
       Subscription.GetSubscriptionByReferenceId(subscription_id, function(err, subscription) {
         if(err) { return callback(err, null); }
@@ -104,7 +104,7 @@ module.exports = {
       if(err) { return callback(err, null); }
       if(!membership) { return callback(new Error("Calf not found"), null) }
 
-      var stripe_api_key = membership.account.stripe_connect.access_token;
+      var stripeApiKey = membership.account.stripe_connect.access_token;
 
       Subscription.GetSubscriptionByReferenceId(subscription_id, function(err, subscription) {
         if(err) { return callback(err, null); }

@@ -1,6 +1,6 @@
 var PaymentCard      = require('../../models/payment_card');
 var Membership       = require('../../models/membership');
-var async            = require("async");
+var async            = require('async');
 
 function parse(stripe_card, callback) {
   var result = null;
@@ -32,7 +32,7 @@ function parse(stripe_card, callback) {
       payment_card.exp_year = stripe_card.exp_year;
       payment_card.status = "Active";
 
-      payment_card.save(function(err) {
+      payment_card.save((err) => {
         if(err) { callback(err, user, payment_card); }
 
         result = payment_card;
@@ -40,7 +40,7 @@ function parse(stripe_card, callback) {
         if(user.payment_cards.indexOf(payment_card._id) === -1) {
           user.payment_cards.push(payment_card);
 
-          user.save(function(err) {
+          user.save((err) => {
             callback(err)
           })
         } else {
@@ -48,7 +48,7 @@ function parse(stripe_card, callback) {
         }
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   });
 }

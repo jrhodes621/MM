@@ -2,7 +2,7 @@ var StripeEventHelper         = require('../../helpers/stripe_event_helper');
 var StripeCustomerParser      = require('../../parsers/stripe/customer_parser');
 var Membership                = require('../../models/membership');
 var User                      = require('../../models/user');
-var async                     = require("async");
+var async                     = require('async');
 const source                  = "Stripe";
 
 module.exports = {
@@ -38,7 +38,7 @@ module.exports = {
 
           user.memberships.pull(membership._id);
 
-          user.save(function(err) {
+          user.save((err) => {
             if(err) { return callback(err, null); }
 
             var message_bull= "Your customer " + user.email_address + " was deleted!";

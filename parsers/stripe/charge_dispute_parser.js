@@ -1,4 +1,4 @@
-var async               = require("async");
+var async               = require('async');
 var Charge              = require('../../models/charge');
 var ChargeDispute       = require('../../models/charge_dispute');
 
@@ -36,13 +36,13 @@ function parse(stripe_charge_dispute, callback) {
       charge_dispute.reason = stripe_charge_dispute.reason;
       charge_dispute.status = stripe_charge_dispute.status;
 
-      charge_dispute.save(function(err) {
+      charge_dispute.save((err) => {
         result = charge_dispute;
 
         callback(err);
       });
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, result);
   })
 }

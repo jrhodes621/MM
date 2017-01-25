@@ -72,7 +72,7 @@ const UserSchema = new Schema({
   timestamps: true,
 });
 
-UserSchema.pre('save', (next) => {
+UserSchema.pre('save', function(next) {
   const user = this;
 
   if (this.isModified('password') || this.isNew) {
@@ -129,7 +129,7 @@ UserSchema.virtual('member_count').get(() => {
 
   return length;
 });
-// UserSchema.virtual('gravatar_url').get(function() {
+// UserSchema.virtual('gravatar_url').get(() => {
 //   return gravatar.url(this.email_address, {s: '100', r: 'x', d: 'retro'}, true);
 // });
 UserSchema.plugin(mongoosePaginate);

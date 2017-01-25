@@ -1,6 +1,6 @@
 var expect                = require("chai").expect;
 var mongoose              = require("mongoose");
-var async                 = require("async");
+var async                 = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var UserFixtures              = require("../../test/fixtures/user.fixtures.js");
@@ -10,10 +10,10 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var SubscriptionParser        = require("../../parsers/stripe/customer_subscription_parser");
 
-describe("Customer Subscription Parser", function() {
+describe("Customer Subscription Parser", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -26,17 +26,17 @@ describe("Customer Subscription Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Stripe Customer Subscription", function() {
-    it("parses a Stripe Subscription JSON object into a subscription", function(done) {
+  describe("Parse Stripe Customer Subscription", () => {
+    it("parses a Stripe Subscription JSON object into a subscription", (done) => {
       SubscriptionParser.parse(bull, SubscriptionFixtures.StripeSubscription, function(err, subscription) {
         if(err) { console.log(err); }
 

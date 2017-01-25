@@ -85,7 +85,7 @@ PlanSchema.set('toJSON', {
 });
 PlanSchema.plugin(mongoosePaginate);
 
-PlanSchema.virtual('member_count').get(() => {
+PlanSchema.virtual('member_count').get(function() {
   return this.members.length;
 });
 

@@ -1,5 +1,5 @@
 const ChargeDisputeServices = {
-  GetChargeDisputeByReferenceId: (chargeDisputeId, callback) => {
+  GetChargeDisputeByReferenceId: function(chargeDisputeId, callback) {
     this.findOne({ reference_id: chargeDisputeId })
     .populate('charge')
     .exec(callback);

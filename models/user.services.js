@@ -1,11 +1,11 @@
 const Upload = require('s3-uploader');
 
 const UserServices = {
-  GetUserById: (userId, callback) => {
+  GetUserById: function(userId, callback) {
     this.findById(userId)
     .exec(callback);
   },
-  GetUserByEmailAddress: (emailAddress, callback) => {
+  GetUserByEmailAddress: function(emailAddress, callback) {
     this.findOne({ email_address: emailAddress })
     .populate('subscriptions')
     .exec(callback);

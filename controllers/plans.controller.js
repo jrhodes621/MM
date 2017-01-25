@@ -1,59 +1,61 @@
-var Plan = require('../models/plan');
-var User = require('../models/user');
+const Plan = require('../models/plan');
+const StripeService = require('../services/stripe.services');
 
-var StripeService = require('../services/stripe.services');
+const PlansController = {
+  GetPlans: (req, res, next) => {
+    const currentUser = req.currentUser;
+    const pageSize = 10;
+    const page = req.query.page || 1;
+    const offset = (page - 1) * pageSize;
 
-var PlansController = {
-  GetPlans: function(req, res, next) {
-    var current_user = req.current_user;
-    var page_size = 10;
-    var page = req.query.page || 1;
-    var offset = (page-1)*page_size;
+    const params = {
+      query: { account: currentUser.account, archive: false },
+      paging: { offset, limit: pageSize, sort: { name: 'asc' } },
+    };
+    Plan.paginate(params.query, params.paging, (err, result) => {
+      if (err) { return next(err); }
 
-    var params = {
-      query: { "account": current_user.account, "archive": false },
-      paging: { offset: offset, limit: page_size, sort: { name: 'asc'} }
-    }
-    Plan.GetPlans(params, function(err, result) {
-      if(err) { return next(err) };
-
-      res.json({ results: result.docs, total: result.total, limit: result.limit, offset: result.offset, max_pages: Math.ceil(result.total/page_size) });
+      return res.json({ results: result.docs,
+        total: result.total,
+        limit: result.limit,
+        offset: result.offset,
+        max_pages: Math.ceil(result.total / pageSize) });
     });
   },
-  GetPlan: function(req, res, next) {
-    var params = {
-      plan_id: req.params.plan_id
-    }
-    Plan.GetPlan(params, function(err, plan) {
-      if(err) { return next(err); }
-      if(!plan) { return res.status(404).send(new Error("Plan Not Found")); }
+  GetPlan: (req, res, next) => {
+    const params = {
+      plan_id: req.params.plan_id,
+    };
+    Plan.GetPlan(params, (err, plan) => {
+      if (err) { return next(err); }
+      if (!plan) { return res.status(404).send(new Error('Plan Not Found')); }
 
       res.send(plan);
     });
   },
-  CreatePlan: function(req, res, next) {
-    var user = req.current_user;
+  CreatePlan: (req, res, next) => {
+    const user = req.currentUser;
 
-    var plan = new Plan();
+    const plan = new Plan();
 
     plan.account = user.account._id;
     plan.name = req.body.name;
     plan.description = req.body.description;
     plan.features = req.body.features;
-    plan.amount =req.body.amount;
+    plan.amount = req.body.amount;
     plan.interval = req.body.interval;
     plan.interval_count = req.body.interval_count;
     plan.statement_descriptor = req.body.statement_descriptor;
     plan.trial_period_days = req.body.trial_period_days || 0;
     plan.statement_description = req.body.statement_description;
-    plan.terms_of_service =req.body.terms_of_service;
+    plan.terms_of_service = req.body.terms_of_service;
 
-    Plan.SavePlan(plan, function(err) {
-      if(err) { return next(err); }
+    Plan.SavePlan(plan, (err) => {
+      if (err) { return next(err); }
 
-      res.status(201).send(plan);
+      return res.status(201).send(plan);
       // user.plans.push(plan);
-      // user.UpdateUser(function(err) {
+      // user.UpdateUser((err) => {
       //   console.log("using real");
       //   if(err) { return next(err); }
       //
@@ -61,19 +63,19 @@ var PlansController = {
       // });
     });
     // if(user.account.stripe_connect) {
-    //   var stripe_api_key = user.account.stripe_connect.access_token;
+    //   const stripeApiKey = user.account.stripe_connect.access_token;
     //
-    //   StripeService.createPlan(stripe_api_key, plan, function(err, stripe_plan) {
+    //   StripeService.createPlan(stripeApiKey, plan, function(err, stripe_plan) {
     //     if(err) { return next(err); }
     //
     //     plan.reference_id = stripe_plan.id;
     //
-    //     plan.save(function(err) {
+    //     plan.save((err) => {
     //       if(err) { return next(err); }
     //
     //       user.plans.push(plan);
     //
-    //       user.save(function(err) {
+    //       user.save((err) => {
     //         if(err) { return next(err); }
     //
     //         if(req.file) {
@@ -81,7 +83,7 @@ var PlansController = {
     //             console.log(avatar_images);
     //             plan.avatar = avatar_images;
     //
-    //             plan.save(function(err) {
+    //             plan.save((err) => {
     //               if(err) { return next(err); }
     //
     //               res.status(201).json(plan);
@@ -94,19 +96,19 @@ var PlansController = {
     //     });
     //   });
     // } else {
-    //   plan.save(function(err) {
+    //   plan.save((err) => {
     //     if(err) { return next(err); }
     //
     //     user.plans.push(plan);
     //
-    //     user.save(function(err) {
+    //     user.save((err) => {
     //       if(err) { return next(err); }
     //
     //       if(req.file) {
     //         PlanHelper.uploadAvatar(plan, req.file.path, function(avatar_images) {
     //           plan.avatar = avatar_images;
     //
-    //           plan.save(function(err) {
+    //           plan.save((err) => {
     //             if(err) { return next(err); }
     //
     //             res.status(201).json(plan);
@@ -119,9 +121,9 @@ var PlansController = {
     //   });
     // }
   },
-  UpdatePlan: function(req, res, next) {
-    var current_user = req.current_user;
-    var plan = req.plan;
+  UpdatePlan: (req, res, next) => {
+    const currentUser = req.currentUser;
+    const plan = req.plan;
 
     plan.name = req.body.name;
     plan.one_time_amount = req.body.one_time_amount;
@@ -130,75 +132,75 @@ var PlansController = {
     plan.features = req.body.features;
     plan.terms_of_service = req.body.terms_of_service;
 
-    if(!current_user.account.stripe_connect || !current_user.account.stripe_connect.access_token) {
-      Plan.SavePlan(plan, function(err) {
-        if(err) { return next(err); }
+    if (!currentUser.account.stripe_connect || !currentUser.account.stripe_connect.access_token) {
+      Plan.SavePlan(plan, (err) => {
+        if (err) { return next(err); }
 
-        if(req.file) {
-          PlanHelper.uploadAvatar(plan, req.file.path, function(avatar_images) {
-            plan.avatar = avatar_images;
+        if (req.file) {
+          Plan.uploadAvatar(plan, req.file.path, (avatarImages) => {
+            plan.avatar = avatarImages;
 
-            Plan.SavePlan(plan, function(err) {
-              if(err) { return next(err); }
+            Plan.SavePlan(plan, (err) => {
+              if (err) { return next(err); }
 
-              return res.status(200).send(plan)
-            })
+              return res.status(200).send(plan);
+            });
           });
         } else {
           return res.status(200).send(plan);
         }
       });
     } else {
-      var stripe_api_key = current_user.account.stripe_connect.access_token;
+      const stripeApiKey = currentUser.account.stripe_connect.access_token;
 
-      Plan.SavePlan(plan, function(err) {
-        if(err) { return next(err); }
+      Plan.SavePlan(plan, (err) => {
+        if (err) { return next(err); }
 
-        StripeService.updatePlan(stripe_api_key, plan, function(err, stripe_plan) {
-          if(err) { return next(err); }
+        StripeService.updatePlan(stripeApiKey, plan, (err, stripePlan) => {
+          if (err) { return next(err); }
 
-          if(req.file) {
-            PlanHelper.uploadAvatar(plan, req.file.path, function(avatar_images) {
-              plan.avatar = avatar_images;
+          if (req.file) {
+            Plan.uploadAvatar(plan, req.file.path, (avatarImages) => {
+              plan.avatar = avatarImages;
 
-              Plan.SavePlan(plan, function(err) {
-                if(err) { return next(err); }
+              Plan.SavePlan(plan, (err) => {
+                if (err) { return next(err); }
 
-                res.status(200).send(plan)
+                return res.status(200).send(plan);
               });
             });
           } else {
-            res.status(200).send(plan);
+            return res.status(200).send(plan);
           }
         });
       });
     }
   },
-  DeletePlan: function(req, res, next) {
-    var current_user = req.current_user;
-    var plan = req.plan;
+  DeletePlan: (req, res, next) => {
+    const currentUser = req.currentUser;
+    const plan = req.plan;
     plan.archive = true;
 
-    if(current_user.account.stripe_connect.access_token) {
-      var stripe_api_key = current_user.account.stripe_connect.access_token;
+    if (currentUser.account.stripe_connect.access_token) {
+      const stripeApiKey = currentUser.account.stripe_connect.access_token;
 
-      StripeService.deletePlan(stripe_api_key, plan, function(err, confirmation) {
-        if(err) { return next(err); }
+      StripeService.deletePlan(stripeApiKey, plan, (err, confirmation) => {
+        if (err) { return next(err); }
 
-        Plan.save(plan, function(err) {
-          if(err) { return next(err); }
+        Plan.save(plan, (err) => {
+          if (err) { return next(err); }
 
-          res.sendStatus(202);
+          return res.sendStatus(202);
         });
       });
     } else {
-      Plan.SavePlan(plan, function(err) {
-        if(err) { return next(err); }
+      Plan.SavePlan(plan, (err) => {
+        if (err) { return next(err); }
 
-        res.sendStatus(202);
+        return res.sendStatus(202);
       });
     }
-  }
-}
+  },
+};
 
-module.exports = PlansController
+module.exports = PlansController;

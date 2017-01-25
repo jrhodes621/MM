@@ -1,6 +1,6 @@
 var expect                = require("chai").expect;
 var mongoose              = require("mongoose");
-var async                 = require("async");
+var async                 = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var CouponFixtures            = require("../../test/fixtures/coupon.fixtures.js");
@@ -9,10 +9,10 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var CouponParser              = require("../../parsers/stripe/coupon_parser");
 
-describe("Coupon Parser", function() {
+describe("Coupon Parser", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -25,18 +25,18 @@ describe("Coupon Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
 
-  describe("Parse Stripe Coupon", function() {
-    it("parses a Stripe Coupon JSON object into a charge object", function(done) {
+  describe("Parse Stripe Coupon", () => {
+    it("parses a Stripe Coupon JSON object into a charge object", (done) => {
       CouponParser.parse(bull, CouponFixtures.StripeCoupon, function(err, coupon) {
         expect(coupon.account).to.equal(bull);
         expect(coupon.reference_id).to.equal(CouponFixtures.StripeCoupon.id);

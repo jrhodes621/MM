@@ -1,33 +1,29 @@
-var Activity = require('../models/activity');
-var User = require('../models/user');
+const Activity = require('../models/activity');
 
-var UserActivitiesController = {
-  GetActivities: function(req, res, next) {
-    console.log("getting activities");
-
-    var current_user = req.current_user;
-    var user = req.user;
+const UserActivitiesController = {
+  GetActivities: (req, res, next) => {
+    const user = req.user;
 
     Activity.aggregate([
-      { $match: { "calf": user._id } },
+      { $match: { calf: user._id } },
       { $group: {
-           _id: { year: { $year : "$createdAt" }, month: { $month : "$createdAt" },day: { $dayOfMonth : "$createdAt" } },
-           date_group: { $first : '$createdAt' },
-          activities: { $push: '$$ROOT'}
-      } },
-      { $project: {
-          _id: 0,
-          date_group: 1,
-          activities: 1
-        }
-      }
+        _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' }, day: { $dayOfMonth: '$createdAt' } },
+        date_group: { $first: '$createdAt' },
+        activities: { $push: '$$ROOT' },
+      },
+      }, { $project: {
+        _id: 0,
+        date_group: 1,
+        activities: 1,
+      },
+      },
     ])
-    .exec(function(err, activities) {
-      if(err) { return next(err) }
+    .exec((err, activities) => {
+      if (err) { return next(err); }
 
-      res.status(200).send(activities);
-    })
-  }
-}
+      return res.status(200).send(activities);
+    });
+  },
+};
 
-module.exports = UserActivitiesController
+module.exports = UserActivitiesController;

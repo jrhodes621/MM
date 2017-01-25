@@ -1,85 +1,69 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
-var faker         = require('faker');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var User  = require('../models/user');
+describe('Members API Endpoint', () => {
+  let bull = null;
+  let bullUser = null;
+  let jsonWebToken = null;
 
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
-
-describe("Members API Endpoint", function() {
-  var bull = null;
-  var bull_user = null;
-  var json_web_token = null;
-
-  var other_bull = null;
-
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
-        BeforeHooks.SetupDatabase(callback)
+        BeforeHooks.SetupDatabase(callback);
       },
       function createBull(callback) {
-        factory.create('account', function(err, account) {
+        factory.create('account', (err, account) => {
           bull = account;
 
           callback();
         });
       },
       function createUser(callback) {
-        factory.create('bull', function(err, user) {
-          user.account = bull
-          user.save(function(err) {
-            bull_user = user;
+        factory.create('bull', (err, user) => {
+          user.account = bull;
+          user.save((err) => {
+            bullUser = user;
 
-            security.generate_token(bull_user, process.env.SECRET, function(err, token) {
-              if(err) { console.log(err); }
+            security.generate_token(bullUser, process.env.SECRET, (err, token) => {
+              if (err) { callback(err); }
 
-              json_web_token = token;
+              jsonWebToken = token;
 
-              callback(err)
+              callback(err);
             });
           });
         });
-      }
-    ], function(err) {
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Get Members", function() {
-    it('should return a 200 when successfull', function(done) {
-      factory.createMany('membership', {}, 3, { "bull": bull, }, function(err, memberships) {
-          console.log(memberships);
-          User.find({}, function(err, users) {
-            console.log(users);
-
+  describe('Get Members', () => {
+    it('should return a 200 when successfull', (done) => {
+      factory.createMany('membership', {}, 3, { bull }, (err, memberships) => {
         request(app)
         .get('/api/members')
-        .set('x-access-token', json_web_token)
+        .set('x-access-token', jsonWebToken)
         .expect(200)
         .then((res) => {
-          console.log(res.body);
           expect(res.body).to.be.an('object');
-          //expect(res.body[0].date_group).to.be.a('date');
-          //expect(res.body[0].activities).to.be.an('array');
-          //expect(res.body[0].activities).to.have.length(35);
 
           done();
         });
-        });
-      //});
+      });
     });
-    it('should return an array of members', function(done) {
+    it('should return an array of members', (done) => {
       // factory.createMany('member', {}, 35,
       //   { "bull": bull,
       //     "calf": user,
@@ -88,18 +72,14 @@ describe("Members API Endpoint", function() {
       //     "message_bull": "Message Bull"
       //   }, function(err, activities) {
       //     console.log(err);
-        request(app)
-        .get('/api/members')
-        .set('x-access-token', json_web_token)
-        .expect(200)
-        .then((res) => {
-          expect(res.body).to.be.an('array');
-          //expect(res.body[0].date_group).to.be.a('date');
-          //expect(res.body[0].activities).to.be.an('array');
-          //expect(res.body[0].activities).to.have.length(35);
+      request(app)
+      .get('/api/members')
+      .set('x-access-token', jsonWebToken)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.an('array');
 
-          done();
-        });
+        done();
       });
     });
   });

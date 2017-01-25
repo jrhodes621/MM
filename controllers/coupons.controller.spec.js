@@ -1,32 +1,31 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
-var faker         = require('faker');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const faker = require('faker');
+const UserFactory = require('../test/factories/user.factory.js');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
-
-describe("Coupon API Endpoint", function() {
-  beforeEach(function(done) {
+describe('Coupon API Endpoint', () => {
+  beforeEach((done) => {
     done();
   });
-  afterEach(function(done) {
+  afterEach((done) => {
     done();
   });
-  describe("Get Coupons", function() {
+  describe('Get Coupons', () => {
 
   });
-  describe("Get a Coupon", function() {
+  describe('Get a Coupon', () => {
 
   });
-  describe("Create a Coupon", function() {
+  describe('Create a Coupon', () => {
 
   });
-  describe("Update a Coupon", function() {
-    
+  describe('Update a Coupon', () => {
+
   });
 });

@@ -1,17 +1,12 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
-var faker         = require('faker');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var AccountFactory  = require('../test/factories/account.factory');
-var UserFactory     = require("../test/factories/user.factory.js");
-var BeforeHooks     = require("../test/hooks/before.hooks.js");
-var AfterHooks      = require("../test/hooks/after.hooks.js");
-
-var stripe_event = {
+const stripe_event = {
 "created": 1326853478,
 "livemode": false,
 "id": "evt_00000000000000",
@@ -109,36 +104,36 @@ var stripe_event = {
     }
   }
 }
-describe("Stripe Event API Endpoint", function() {
-  var bull = null;
+describe('Stripe Event API Endpoint', () => {
+  let bull = null;
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
-        BeforeHooks.SetupDatabase(callback)
+        BeforeHooks.SetupDatabase(callback);
       },
       function createAccount(callback) {
-        factory.create('account', function(err, account) {
+        factory.create('account', (err, account) => {
           account.reference_id = "acct_00000000000000";
 
-          account.save(function(err) {
+          account.save((err) => {
             bull = account;
-            console.log(bull);
+
             callback();
           });
         });
-      }
-    ], function(err) {
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done) {
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Post Event from Stripe", function() {
-    it('should return a 200 when succeeds', function(done) {
+  describe('Post Event from Stripe', () => {
+    it('should return a 200 when succeeds', (done) => {
       request(app)
       .post('/api/stripe_events')
       .send(stripe_event)

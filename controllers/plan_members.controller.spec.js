@@ -1,23 +1,11 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
-var faker         = require('faker');
-
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
-
-describe("Plan Members API Endpoint", function() {
-  beforeEach(function(done) {
+describe('Plan Members API Endpoint', () => {
+  beforeEach((done) => {
     done();
   });
-  afterEach(function(done) {
+  afterEach((done) => {
     done();
   });
-  describe("Get Members", function() {
-    
+  describe('Get Members', () => {
+
   });
 });

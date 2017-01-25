@@ -1,106 +1,99 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var ActivityFactory   = require("../test/factories/activity.factory.js");
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
+describe('User Activities API Endpoint', () => {
+  let bull = null;
+  let bullUser = null;
+  let jsonWebToken = null;
 
-var User = require('../models/user');
-
-describe("User Activities API Endpoint", function() {
-  var bull = null;
-  var bull_user = null;
-  var json_web_token = null;
-
-  var other_bull = null;
-
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
-        BeforeHooks.SetupDatabase(callback)
+        BeforeHooks.SetupDatabase(callback);
       },
       function createBull(callback) {
-        factory.create('account', function(err, account) {
+        factory.create('account', (err, account) => {
           bull = account;
 
           callback();
         });
       },
       function createOther(callback) {
-        factory.create('account', function(err, account) {
-          other_bull = account;
+        factory.create('account', (err, account) => {
+          otherBull = account;
 
           callback();
         });
       },
       function createUser(callback) {
-        factory.create('bull', function(err, user) {
+        factory.create('bull', (err, user) => {
+          if (err) { callback(err); }
+
           user.account = bull
-          user.save(function(err) {
-            bull_user = user;
+          user.save((err) => {
+            if (err) { callback(err); }
 
-            security.generate_token(bull_user, process.env.SECRET, function(err, token) {
-              if(err) { console.log(err); }
+            bullUser = user;
 
-              json_web_token = token;
+            security.generate_token(bullUser, process.env.SECRET, (err, token) => {
+              jsonWebToken = token;
 
-              callback(err)
+              callback(err);
             });
           });
         });
-      }
-    ], function(err) {
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Get Activities", function() {
-    it('should return a 200 when succeeds', function(done) {
-      let user = factory.buildSync('user');
+  describe('Get Activities', () => {
+    it('should return a 200 when succeeds', (done) => {
+      const user = factory.buildSync('user');
 
-      user.save(function(err) {
-        if(err) { done(err); }
+      user.save((err) => {
+        if (err) { done(err); }
 
         factory.createMany('activity', {}, 35,
-          { "bull": bull,
-            "calf": user,
-            "type": "test activity",
-            "message_calf": "Message Calf",
-            "message_bull": "Message Bull"
-          }, function(err, activities) {
-            console.log(err);
-          request(app)
-          .get('/api/users/' + user._id + '/activities')
-          .set('x-access-token', json_web_token)
-          .expect(200)
-          .then((res) => {
-            expect(res.body).to.be.an('array');
-            //expect(res.body[0].date_group).to.be.a('date');
-            expect(res.body[0].activities).to.be.an('array');
-            expect(res.body[0].activities).to.have.length(35);
+          { bull,
+            user,
+            type: 'test activity',
+            message_calf: 'Message Calf',
+            message_bull: 'Message Bull',
+          }, (err) => {
+            request(app)
+            .get('/api/users/' + user._id + '/activities')
+            .set('x-access-token', jsonWebToken)
+            .expect(200)
+            .then((res) => {
+              expect(res.body).to.be.an('array');
+              expect(res.body[0].activities).to.be.an('array');
+              expect(res.body[0].activities).to.have.length(35);
 
-            done();
+              done(err);
+            });
           });
-        });
       });
     });
-    it('should return 404 if calf is not member of bull', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return 404 if calf is not member of bull', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should return array of activities grouped by date', function(done) {
-      done(new Error("Not Implemented"));
+    it('should return array of activities grouped by date', (done) => {
+      done(new Error('Not Implemented'));
     });
-    it('should only return activities for the current bull', function(done) {
-      done(new Error("Not Implemented"));
+    it('should only return activities for the current bull', (done) => {
+      done(new Error('Not Implemented'));
     });
   });
 });

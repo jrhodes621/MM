@@ -3,7 +3,7 @@ var Discount      = require('../../models/discount');
 var Membership    = require('../../models/membership');
 var Subscription  = require('../../models/subscription');
 
-var async         = require("async");
+var async         = require('async');
 
 function parse(bull, stripe_discount, callback) {
   var discount_result = null;
@@ -30,7 +30,7 @@ function parse(bull, stripe_discount, callback) {
       coupon.times_redeemed = stripe_discount.coupon.times_redeemed;
       coupon.valid = stripe_discount.coupon.valid;
 
-      coupon.save(function(err) {
+      coupon.save((err) => {
         callback(err, coupon);
       });
     },
@@ -56,14 +56,14 @@ function parse(bull, stripe_discount, callback) {
       discount.start = stripe_discount.start;
       discount.end = stripe_discount.end;
 
-      discount.save(function(err) {
+      discount.save((err) => {
         discount_result = discount;
         coupon_result = coupon;
 
         callback(err);
       })
     }
-  ], function(err) {
+  ], (err) => {
     callback(err, discount_result, coupon_result);
   });
 }

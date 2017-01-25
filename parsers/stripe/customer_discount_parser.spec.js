@@ -1,6 +1,6 @@
 var expect                = require("chai").expect;
 var mongoose              = require("mongoose");
-var async                 = require("async");
+var async                 = require('async');
 
 var AccountFixtures           = require("../../test/fixtures/account.fixtures.js");
 var ChargeFixtures            = require("../../test/fixtures/charge.fixtures.js");
@@ -15,14 +15,14 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var CustomerDiscountParser    = require("../../parsers/stripe/customer_discount_parser");
 
-describe("Customer Discount Parser", function() {
+describe("Customer Discount Parser", () => {
   var bull = null;
   var user = null;
   var membership = null;
   var plan = null;
   var subscription = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     //add some test data
     async.waterfall([
       function openConnection(callback) {
@@ -78,17 +78,17 @@ describe("Customer Discount Parser", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Parse Stripe Discount", function() {
-    it("parses a Stripe Discount JSON object into a discount object", function(done) {
+  describe("Parse Stripe Discount", () => {
+    it("parses a Stripe Discount JSON object into a discount object", (done) => {
       CustomerDiscountParser.parse(bull, DiscountFixtures.StripeDiscount, function(err, discount, coupon) {
         if(err) { console.log(err); }
 

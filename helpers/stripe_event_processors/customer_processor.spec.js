@@ -1,6 +1,6 @@
 var expect                    = require("chai").expect;
 var mongoose                  = require("mongoose");
-var async                     = require("async");
+var async                     = require('async');
 
 var StripeWebhookFixtures     = require("../../test/fixtures/stripe/webhooks/customer.fixtures.js");
 var AccountFixtures            = require("../../test/fixtures/account.fixtures.js");
@@ -9,10 +9,10 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var CustomerProcessor         = require("../stripe_event_processors/customer_processor.js");
 
-describe("stripe customer webhooks", function() {
+describe("stripe customer webhooks", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     async.waterfall([
       function openConnection(callback) {
         BeforeHooks.SetupDatabase(callback)
@@ -24,17 +24,17 @@ describe("stripe customer webhooks", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   })
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("customer created", function() {
-    it("should create new user", function(done) {
+  describe("customer created", () => {
+    it("should create new user", (done) => {
       var stripe_event = StripeWebhookFixtures.Created;
 
       CustomerProcessor.processCreated(stripe_event, bull, function(err, user, activities) {
@@ -54,8 +54,8 @@ describe("stripe customer webhooks", function() {
     //
     // }
   });
-  describe("customer updated", function() {
-    it("should find and update the user", function(done) {
+  describe("customer updated", () => {
+    it("should find and update the user", (done) => {
       var stripe_event = StripeWebhookFixtures.Updated;
 
       CustomerProcessor.processUpdated(stripe_event, bull, function(err, user, activities) {
@@ -80,8 +80,8 @@ describe("stripe customer webhooks", function() {
     //
     // }
   });
-  describe("customer deleted", function() {
-    it("should update the archive flag to true", function(done) {
+  describe("customer deleted", () => {
+    it("should update the archive flag to true", (done) => {
       var stripe_event = StripeWebhookFixtures.Deleted;
 
       CustomerProcessor.processDeleted(stripe_event, bull, function(err, user, activities) {

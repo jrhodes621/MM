@@ -1,5 +1,5 @@
 const StripeEventServices = {
-  GetStripeEventById: (stripeEventId, callback) => {
+  GetStripeEventById: function(stripeEventId, callback) {
     this.findById(stripeEventId)
     .exec(callback);
   },

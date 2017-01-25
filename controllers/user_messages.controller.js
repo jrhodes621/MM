@@ -1,45 +1,42 @@
 require('dotenv').config({ silent: true });
 
-var Message = require('../models/message');
-var User = require('../models/user');
-var StripeServices = require('../services/stripe.services');
+const Message = require('../models/message');
 
-var UserMessagesController = {
-  GetMessages: function(req, res, next) {
-    var sender = req.current_user;
-    var recipient = req.user;
+const UserMessagesController = {
+  GetMessages: (req, res, next) => {
+    const recipient = req.user;
 
-    Message.find({"recipient": recipient})
+    Message.find({ recipient })
     .populate('sender')
     .populate({
       path: 'sender',
       populate: [{
-        path: 'account'
-      }]
+        path: 'account',
+      }],
     })
     .populate('recipient')
-    .exec(function(err, messages) {
-      if(err) { next(err); }
+    .exec((err, messages) => {
+      if (err) { next(err); }
 
-      res.status(200).send(messages);
+      return res.status(200).send(messages);
     });
   },
-  CreateMessage: function(req, res, next) {
-    var sender = req.current_user;
-    var recipient = req.user;
+  CreateMessage: (req, res, next) => {
+    const sender = req.currentUser;
+    const recipient = req.user;
 
-    var message = new Message();
+    const message = new Message();
 
     message.sender = sender;
     message.recipient = recipient;
     message.content = req.body.content;
 
-    message.save(function(err) {
-      if(err) { next(err); }
+    message.save((err) => {
+      if (err) { next(err); }
 
-      res.status(200).send(message);
+      return res.status(200).send(message);
     });
-  }
-}
+  },
+};
 
-module.exports = UserMessagesController
+module.exports = UserMessagesController;

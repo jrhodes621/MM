@@ -1,9 +1,9 @@
 const InvoiceServices = {
-  GetInvoiceById: (invoiceId, callback) => {
+  GetInvoiceById: function(invoiceId, callback) {
     this.findById(invoiceId)
     .exec(callback);
   },
-  GetInvoiceByReferenceId: (referenceId, callback) => {
+  GetInvoiceByReferenceId: function(referenceId, callback) {
     this.findOne({ reference_id: referenceId })
     .exec(callback);
   },

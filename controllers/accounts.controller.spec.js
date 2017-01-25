@@ -1,69 +1,67 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
-var faker         = require('faker');
+const expect = require('chai').expect;
+const async = require('async');
+const factory = require('factory-girl');
+const request = require('supertest');
+const app = require('../server');
+const security = require('../security');
+const faker = require('faker');
+const BeforeHooks = require('../test/hooks/before.hooks.js');
+const AfterHooks = require('../test/hooks/after.hooks.js');
 
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
+describe('Accounts API Endpoint', () => {
+  let bull = null;
+  let bullUser = null;
+  let jsonWebToken = null;
 
-describe("Accounts API Endpoint", function() {
-  var bull = null;
-  var bull_user = null;
-  var json_web_token = null;
-
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.waterfall([
       function openConnection(callback) {
         BeforeHooks.SetupDatabase(callback)
       },
       function createAccount(callback) {
-        factory.create('account', function(err, account) {
+        factory.create('account', (err, account) => {
           bull = account;
 
           callback();
         });
       },
       function createUser(callback) {
-        factory.create('bull', function(err, user) {
-          user.account = bull
-          user.save(function(err) {
-            if(err) { console.log(err); }
+        factory.create('bull', (err, user) => {
+          user.account = bull;
+          user.save((err) => {
+            if (err) { callback(err); }
 
-            bull_user = user;
+            bullUser = user;
 
-            security.generate_token(bull_user, process.env.SECRET, function(err, token) {
-              if(err) { console.log(err); }
+            security.generate_token(bullUser, process.env.SECRET, (err, token) => {
+              if (err) { callback(err); }
 
-              json_web_token = token;
+              jsonWebToken = token;
 
-              callback(err)
+              callback(err);
             });
           });
         });
-      }
-    ], function(err) {
+      },
+    ], (err) => {
       done(err);
     });
   });
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) => {
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("Update Account", function() {
-    it('should return 200 when succeeds', function(done) {
-      var update_params = {
-        "company_name": faker.company.companyName(),
-        "subdomain": faker.internet.domainWord()
+  describe('Update Account', () => {
+    it('should return 200 when succeeds', (done) => {
+      const updateParams = {
+        company_name: faker.company.companyName(),
+        subdomain: faker.internet.domainWord(),
       };
       request(app)
       .put('/api/accounts')
-      .set('x-access-token', json_web_token)
-      .send(update_params)
+      .set('x-access-token', jsonWebToken)
+      .send(updateParams)
       .expect(200)
       .then((res) => {
         expect(res.body).to.be.an('object');
@@ -71,21 +69,21 @@ describe("Accounts API Endpoint", function() {
         done();
       });
     });
-    it('returns an account', function(done) {
-      var update_params = {
-        "company_name": faker.company.companyName(),
-        "subdomain": faker.internet.domainWord()
+    it('returns an account', (done) => {
+      const updateParams = {
+        company_name: faker.company.companyName(),
+        subdomain: faker.internet.domainWord(),
       };
       request(app)
       .put('/api/accounts')
-      .set('x-access-token', json_web_token)
-      .send(update_params)
+      .set('x-access-token', jsonWebToken)
+      .send(updateParams)
       .expect(200)
       .then((res) => {
         expect(res.body).to.be.an('object');
         expect(res.body.reference_id).to.equal(bull.reference_id);
-        expect(res.body.company_name).to.equal(update_params.company_name);
-        expect(res.body.subdomain).to.equal(update_params.subdomain);
+        expect(res.body.company_name).to.equal(updateParams.company_name);
+        expect(res.body.subdomain).to.equal(updateParams.subdomain);
         expect(res.body.subscription).to.equal(bull.subscription);
         expect(res.body.plans).to.have.length(bull.plans.length);
         expect(res.body.members).to.have.length(bull.members.length);

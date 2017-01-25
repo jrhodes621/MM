@@ -1,6 +1,6 @@
 var expect                    = require("chai").expect;
 var mongoose                  = require("mongoose");
-var async                     = require("async");
+var async                     = require('async');
 
 var StripeWebhookFixtures     = require("../../test/fixtures/stripe/webhooks/customer_subscription.fixtures.js");
 var AccountFixtures            = require("../../test/fixtures/account.fixtures.js");
@@ -9,10 +9,10 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var StripeWebhookProcessor         = require("../stripe_event_processors/customer_subscription_processor.js");
 
-describe("stripe customer subscriptions webhooks", function() {
+describe("stripe customer subscriptions webhooks", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     async.waterfall([
       function openConnection(callback) {
         BeforeHooks.SetupDatabase(callback)
@@ -24,17 +24,17 @@ describe("stripe customer subscriptions webhooks", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   })
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("subscription created", function() {
-    it("should create a new subscription", function(done) {
+  describe("subscription created", () => {
+    it("should create a new subscription", (done) => {
       var stripe_event = StripeWebhookFixtures.Created;
 
       StripeWebhookProcessor.processCreated(stripe_event, bull, function(err, subscription, activities) {
@@ -56,8 +56,8 @@ describe("stripe customer subscriptions webhooks", function() {
     //
     // }
   });
-  describe("subscription updated", function() {
-    it("should find and update the subscription", function(done) {
+  describe("subscription updated", () => {
+    it("should find and update the subscription", (done) => {
       var stripe_event = StripeWebhookFixtures.Updated;
 
       StripeWebhookProcessor.processUpdated(stripe_event, bull, function(err, subscription, activities) {
@@ -82,8 +82,8 @@ describe("stripe customer subscriptions webhooks", function() {
     //
     // }
   });
-  describe("subscription deleted", function() {
-    it("should update the subscription to canceled", function(done) {
+  describe("subscription deleted", () => {
+    it("should update the subscription to canceled", (done) => {
       var stripe_event = StripeWebhookFixtures.Deleted;
 
       StripeWebhookProcessor.processDeleted(stripe_event, bull, function(err, subscription, activities) {

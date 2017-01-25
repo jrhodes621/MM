@@ -1,31 +1,17 @@
-var expect        = require('chai').expect;
-var async         = require("async");
-var factory       = require('factory-girl');
-var request       = require('supertest');
-var app           = require('../server');
-var security      = require('../security');
-var faker         = require('faker');
-
-var UserFactory   = require("../test/factories/user.factory.js");
-var BeforeHooks   = require("../test/hooks/before.hooks.js");
-var AfterHooks    = require("../test/hooks/after.hooks.js");
-
-describe("User Charges API Endpoint", function() {
-  beforeEach(function(done) {
+describe('User Charges API Endpoint', () => {
+  beforeEach((done) => {
     done();
   });
-  afterEach(function(done) {
-    mockery.disable();
-
+  afterEach((done) => {
     done();
   });
-  describe("Create Subscription", function() {
+  describe('Create Subscription', () => {
 
   });
-  describe("Delete Subscription", function() {
+  describe('Delete Subscription', () => {
 
   });
-  describe("Upgrade Subscription", function() {
+  describe('Upgrade Subscription', () => {
 
   });
 });

@@ -1,16 +1,16 @@
 const ChargeServices = {
-  GetChargesForUser: (userMembership, callback) => {
+  GetChargesForUser: function(userMembership, callback) {
     this.find({ membership: userMembership })
     .populate('payment_card')
     .exec(callback);
   },
-  GetChargeById: (chargeId, callback) => {
+  GetChargeById: function(chargeId, callback) {
     this.findById(chargeId)
     .populate('membership')
     .populate('payment_card')
     .exec(callback);
   },
-  GetChargeByReferenceId: (referenceId, callback) => {
+  GetChargeByReferenceId: function(referenceId, callback) {
     this.findOne({ reference_id: referenceId })
     .populate('membership')
     .populate('payment_card')

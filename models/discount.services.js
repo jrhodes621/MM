@@ -1,5 +1,5 @@
 const DiscountServices = {
-  GetDiscountById: (discountId, callback) => {
+  GetDiscountById: function(discountId, callback) {
     this.findById(discountId)
     .exec(callback);
   },

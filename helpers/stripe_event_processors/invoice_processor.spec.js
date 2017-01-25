@@ -1,6 +1,6 @@
 var expect                    = require("chai").expect;
 var mongoose                  = require("mongoose");
-var async                     = require("async");
+var async                     = require('async');
 
 var StripeWebhookFixtures     = require("../../test/fixtures/stripe/webhooks/invoice.fixtures.js");
 var AccountFixtures            = require("../../test/fixtures/account.fixtures.js");
@@ -9,10 +9,10 @@ var AfterHooks                = require("../../test/hooks/after.hooks.js");
 
 var StripeWebhookProcessor         = require("../stripe_event_processors/invoice_processor.js");
 
-describe("stripe invoice webhooks", function() {
+describe("stripe invoice webhooks", () => {
   var bull = null;
 
-  beforeEach(function(done){
+  beforeEach((done) =>{
     async.waterfall([
       function openConnection(callback) {
         BeforeHooks.SetupDatabase(callback)
@@ -25,17 +25,17 @@ describe("stripe invoice webhooks", function() {
           callback(err);
         });
       }
-    ], function(err) {
+    ], (err) => {
       done(err);
     });
   })
-  afterEach(function(done){
-    AfterHooks.CleanUpDatabase(function(err) {
+  afterEach((done) =>{
+    AfterHooks.CleanUpDatabase((err) => {
       done(err);
     });
   });
-  describe("invoice created", function() {
-    it("should create an invoice", function(done) {
+  describe("invoice created", () => {
+    it("should create an invoice", (done) => {
       var stripe_event = StripeWebhookFixtures.Created;
 
       StripeWebhookProcessor.processCreated(stripe_event, bull, function(err, invoice, activities) {
@@ -55,8 +55,8 @@ describe("stripe invoice webhooks", function() {
     //
     // }
   });
-  describe("invoice updated", function() {
-    it("should find and update the user", function(done) {
+  describe("invoice updated", () => {
+    it("should find and update the user", (done) => {
       var stripe_event = StripeWebhookFixtures.Updated;
 
       StripeWebhookProcessor.processUpdated(stripe_event, bull, function(err, invoice, activities) {
@@ -81,8 +81,8 @@ describe("stripe invoice webhooks", function() {
     //
     // }
   });
-  describe("invoice payment failed", function() {
-    it("should update the archive flag to true", function(done) {
+  describe("invoice payment failed", () => {
+    it("should update the archive flag to true", (done) => {
       var stripe_event = StripeWebhookFixtures.PaymentFailed;
 
       StripeWebhookProcessor.processPaymentFailed(stripe_event, bull, function(err, invoice, activities) {
@@ -104,8 +104,8 @@ describe("stripe invoice webhooks", function() {
     //
     // }
   });
-  describe("invoice payment succeeded", function() {
-    it("should update the status", function(done) {
+  describe("invoice payment succeeded", () => {
+    it("should update the status", (done) => {
       var stripe_event = StripeWebhookFixtures.PaymentSucceeded;
 
       StripeWebhookProcessor.processPaymentSucceeded(stripe_event, bull, function(err, invoice, activities) {
@@ -127,8 +127,8 @@ describe("stripe invoice webhooks", function() {
     //
     // }
   });
-  describe("invoice sent", function() {
-    it("should update the send status", function(done) {
+  describe("invoice sent", () => {
+    it("should update the send status", (done) => {
       var stripe_event = StripeWebhookFixtures.Sent;
 
       StripeWebhookProcessor.processSent(stripe_event, bull, function(err, invoice, activities) {
@@ -150,8 +150,8 @@ describe("stripe invoice webhooks", function() {
     //
     // }
   });
-  describe("invoice update", function() {
-    it("should update the invoice", function(done) {
+  describe("invoice update", () => {
+    it("should update the invoice", (done) => {
       var stripe_event = StripeWebhookFixtures.Sent;
 
       StripeWebhookProcessor.processUpdated(stripe_event, bull, function(err, invoice, activities) {

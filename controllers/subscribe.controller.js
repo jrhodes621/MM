@@ -1,78 +1,73 @@
 require('dotenv').config({ silent: true });
 
-var jwt    = require('jsonwebtoken');
-var User = require('../models/user');
-var StripeService = require("../services/stripe.services");
-var async         = require("async");
+const User = require('../models/user');
+const async = require('async');
+const Account = require('../models/account');
+const Membership = require('../models/membership');
+const Plan = require('../models/plan');
+const Subscription = require('../models/subscription');
 
-var Account = require('../models/account');
-var Membership = require('../models/membership');
-var Plan = require('../models/plan');
-var Subscription = require('../models/subscription');
-var User = require('../models/user');
+const SubscribeController = {
 
-var SubscribeController = {
+  CreateSubscription: (req, res, next) => {
+    let bull = null;
+    let calf = null;
+    let subscription = null;
 
-  CreateSubscription: function(req, res, next) {
-    var subdomain = req.params.subdomain;
-    var bull = null;
-    var calf = null;
-    var subscription = null;
-
-    var current_user = req.current_user;
-    var token = req.body.token;
-    var plan_id = req.body.plan_id;
-    var email_address = req.body.email_address;
-    var password = req.body.password;
-    var first_name = req.body.first_name;
-    var last_name = req.body.last_name;
+    const subdomain = req.params.subdomain;
+    const currentUser = req.currentUser;
+    const planId = req.body.plan_id;
+    const emailAddress = req.body.email_address;
+    const password = req.body.password;
+    const firstName = req.body.first_name;
+    const lastName = req.body.last_name;
 
     async.waterfall([
       function getBull(callback) {
-        Account.findOne({ 'subdomain': subdomain}, function(err, account) {
-          if(err) { return callback(err); }
-          if(!account) { return callback(new Error("Bull not found")); }
+        Account.findOne({ subdomain }, (err, account) => {
+          if (err) { return next(err); }
+          if (!account) { return next(new Error('Bull not found')); }
 
           bull = account;
 
-          callback(null);
+          return callback(err);
         });
       },
       function getUser(callback) {
-        if(current_user) {
-          calf = current_user;
+        if (currentUser) {
+          calf = currentUser;
 
           callback(null);
         } else {
-          User.findOne({ 'email_address': email_address}, function(err, user) {
-            if(err) { return callback(err); }
-            if(user) { return callback(new Error("User Exists")); }
+          User.findOne({ email_address: emailAddress }, (err, user) => {
+            if (err) { return next(err); }
+            if (user) { return next(new Error('User Exists')); }
 
             user = new User();
 
-            user.email_address = email_address;
+            user.email_address = emailAddress;
             user.password = password;
-            user.first_name = first_name;
-            user.last_name = last_name;
-            user.roles.push("Calf");
-            user.status = "Active";
+            user.first_name = firstName;
+            user.last_name = lastName;
+            user.roles.push('Calf');
+            user.status = 'Active';
 
-            user.save(function(err, user) {
-              if(err) { return callback(err); }
+            user.save((err) => {
+              if (err) { return next(err); }
 
               calf = user;
 
-              callback(null);
+              return callback(null);
             });
           });
         }
       },
       function getMembership(callback) {
-        Membership.GetMembership(calf, bull, function(err, membership) {
-          if(err) { return callback(err); }
+        Membership.GetMembership(calf, bull, (err, membership) => {
+          if (err) { return next(err); }
 
-          if(!membership) {
-            Membership.CreateMembership(calf, bull, null, function(err, membership) {
+          if (!membership) {
+            Membership.CreateMembership(calf, bull, null, (err, membership) => {
               callback(err, membership);
             });
           } else {
@@ -81,34 +76,34 @@ var SubscribeController = {
         });
       },
       function getPlan(membership, callback) {
-        Plan.findById(plan_id, function(err, plan) {
-          if(err) { return callback(err); }
-          if(!plan) { return callback(new Error("Plan Not Found")) }
+        Plan.findById(planId, (err, plan) => {
+          if (err) { return next(err); }
+          if (!plan) { return next(new Error('Plan Not Found')); }
 
           callback(err, plan, membership);
-        })
+        });
       },
       function createSubscription(plan, membership, callback) {
-        Subscription.SubscribeToPlan(membership, plan, null, function(err, subscription) {
-          if(err) { return callback(err); }
-          if(!subscription) { return callback(new Error("Unable to Subscribe to Plan")) }
+        Subscription.SubscribeToPlan(membership, plan, null, (err, subscription) => {
+          if (err) { return next(err); }
+          if (!subscription) { return next(new Error('Unable to Subscribe to Plan')); }
 
           callback(err, subscription);
         });
       },
-      function syncToStripe(new_subscription, callback) {
-        subscription = new_subscription;
+      function syncToStripe(newSubscription, callback) {
+        subscription = newSubscription;
 
-        callback(null)
-      }
-    ], function(err) {
-      if(err) {
+        callback(null);
+      },
+    ], (err) => {
+      if (err) {
         res.status(403).send(err);
       } else {
         res.status(201).send(subscription);
       }
     });
-  }
-}
+  },
+};
 
-module.exports = SubscribeController
+module.exports = SubscribeController;
