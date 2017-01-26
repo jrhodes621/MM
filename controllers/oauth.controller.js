@@ -14,6 +14,7 @@ const OAuthController = {
       StripeOauthHelper.getAccessToken(process.env.STRIPE_CONNECT_SECRET_KEY, code,
       (err, response) => {
         if (err) { return next(err); }
+        if (!response) { return next(err); }
 
         user.stripe_connect = JSON.parse(response);
         user.save((err) => {
